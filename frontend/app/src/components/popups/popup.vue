@@ -18,7 +18,7 @@ export default{
 </script>
 
 
-<style >
+<style scoped>
 .popup{
 
   position: fixed;
