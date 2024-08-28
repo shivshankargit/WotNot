@@ -7,6 +7,7 @@ import ContActs1 from './components/contacts/contacts1.vue';
 import ContActs2 from './components/contacts/contacts2.vue';
 import MoreOptions1 from './components/more/MoreOptions1.vue';
 import LoginPage from './components/login/login.vue';
+import SignupPage from './components/signup/signup.vue';
 import DashboardView from './views/dashboardview.vue';
 
 // const routes = [
@@ -53,6 +54,7 @@ import DashboardView from './views/dashboardview.vue';
 const routes = [
   // Public routes
   { path: '/login', component: LoginPage },
+  { path: '/login/signup', component: SignupPage },
   // { path: '/', component: PublicView },
 
   // Protected routes within the dashboard
