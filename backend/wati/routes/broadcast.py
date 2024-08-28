@@ -1,4 +1,4 @@
-from fastapi import APIRouter,Depends,HTTPException, File, UploadFile
+from fastapi import APIRouter,Depends,HTTPException, File, UploadFile,Request
 from ..models import Broadcast,Contacts
 from ..Schemas import broadcast,user
 from ..database import database
@@ -13,6 +13,7 @@ import io
 from ..oauth2 import get_current_user
 from dramatiq import get_broker
 from dramatiq import Message
+from ..crud.template import send_template_to_whatsapp
 from ..services import tasks
 # Replace with your actual WhatsApp Business API endpoint and token
 
@@ -175,3 +176,17 @@ async def delete_scheduled_broadcast(broadcast_id: str, db: Session = Depends(da
     db.commit()
     
     return {"detail": "Scheduled broadcast has been canceled."}
+
+
+
+
+
+@router.post("/create-template", response_model=broadcast.TemplateResponse)
+async def create_template(template: broadcast.TemplateCreate , request : Request , get_current_user: user.newuser=Depends(get_current_user)):
+    try:
+        template = await request.json()
+        broadcast.TemplateCreate.validate_template(template)
+        response = await send_template_to_whatsapp(template , get_current_user.PAccessToken , get_current_user.WABAID )
+        return response
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
