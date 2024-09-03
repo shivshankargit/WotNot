@@ -45,7 +45,7 @@
         <div v-if="isScheduled">
           <label>Schedule Date</label>
           <input type="date" v-model="scheduleDate" required>
-          
+
           <label>Schedule Time</label>
           <input type="time" v-model="scheduleTime" required>
         </div>
@@ -134,7 +134,7 @@ export default {
       selectedContacts: [],
       showPopup: false,
       scheduleDate: '',  // New data property for schedule date
-      scheduleTime: '', 
+      scheduleTime: '',
       isScheduled: false,
 
 
@@ -299,10 +299,10 @@ export default {
 
         }
 
-        const logResult = await logResponse.json();
+        const logResult = await logResponse.json()
+
         console.log('Broadcast logged:', logResult);
         this.fetchBroadcastList();
-
 
       } catch (error) {
         console.error('Error sending messages:', error);
@@ -331,25 +331,6 @@ export default {
       const scheduledDatetime = new Date(`${this.scheduleDate}T${this.scheduleTime}`).toISOString();
 
       try {
-        const response = await fetch(`http://localhost:8000/schedule-template-message/?scheduled_time=${encodeURIComponent(scheduledDatetime)}`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            recipients: phoneNumbers,
-            template: selectedTemplate,
-            // scheduled_time: scheduledDatetime // Send the scheduled datetime to backend
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-
-        const result = await response.json();
-        responseDiv.textContent = 'Broadcast scheduled successfully.';
 
         const logResponse = await fetch('http://localhost:8000/broadcast', {
           method: 'POST',
@@ -364,8 +345,8 @@ export default {
             success: 0,
             failed: 0,
             status: 'Scheduled',
-            scheduled_time:scheduledDatetime,
-            task_id:result.task_id
+            scheduled_time: scheduledDatetime,
+            // task_id:result.task_id
           }),
         });
 
@@ -375,6 +356,47 @@ export default {
 
         const logResult = await logResponse.json();
         console.log('Broadcast logged:', logResult);
+
+        const response = await fetch(`http://localhost:8000/schedule-template-message/?scheduled_time=${encodeURIComponent(scheduledDatetime)}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            recipients: phoneNumbers,
+            template: selectedTemplate,
+            broadcast_id: logResult.broadcast_id
+            // scheduled_time: scheduledDatetime // Send the scheduled datetime to backend
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const result = await response.json();
+
+        // Update the log entry with the task_id
+        const updateLogResponse = await fetch(`http://localhost:8000/broadcast/${logResult.broadcast_id}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            task_id: result.task_id,  // Include task_id from scheduling response
+          }),
+        });
+
+        if (!updateLogResponse.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const updateLogResult = await updateLogResponse.json();
+        console.log('Broadcast log updated with task_id:', updateLogResult);
+
+        responseDiv.textContent = 'Broadcast scheduled successfully.';
+
         this.fetchBroadcastList();
       } catch (error) {
         console.error('Error scheduling broadcast:', error);
