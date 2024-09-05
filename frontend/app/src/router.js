@@ -54,7 +54,7 @@ import DashboardView from './views/dashboardview.vue';
 const routes = [
   // Public routes
   { path: '/login', component: LoginPage },
-  { path: '/login/signup', component: SignupPage },
+  { path: '/signup', component: SignupPage },
   // { path: '/', component: PublicView },
 
   // Protected routes within the dashboard
