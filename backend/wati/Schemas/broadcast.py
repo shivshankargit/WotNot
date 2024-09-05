@@ -5,6 +5,7 @@ from datetime import datetime
 class input(BaseModel):
     recipients: list[str]
     template:str
+    broadcast_id:int
 
 class BroadcastListCreate(BaseModel): 
     name:str
@@ -15,7 +16,11 @@ class BroadcastListCreate(BaseModel):
     status:str
     scheduled_time: Optional[datetime] = None  # Optional, as it could be null
     task_id: Optional[str] = None 
-    
+
+class BroadcastListUpdate(BaseModel): 
+    task_id: Optional[str] = None 
+
+
 class Button(BaseModel):
     type: str = Field(..., description="The type of the button, e.g., 'URL' or 'QUICK_REPLY'")
     text: str = Field(..., description="The text of the button")
