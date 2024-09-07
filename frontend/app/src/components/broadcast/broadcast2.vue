@@ -15,11 +15,42 @@
     </div>
 
     <PopUp v-if="showPopup" @close="showPopup = false">
-      <form @submit.prevent="handleBroadcast" id="messageForm">
-        <div class="flex justify-between">
-          <h3 class="text-lg font-semibold mb-4">New Broadcast</h3>
-          <span class="relative text-2xl cursor-pointer text-black" @click="closePopup">&times;</span>
+       <form @submit.prevent="handleBroadcast" id="messageForm">
+        <h3>New Broadcast</h3>
+        <!-- <label>Broadcast Name</label>
+        <input type="text" v-model="broadcastName" placeholder="Broadcast Name" required>
+
+        <label>Recipients</label>
+        <input type="text" v-model="recipients" placeholder="Enter phone numbers, comma-separated" required>
+
+        <label for="templates">Choose a template</label>
+        <select v-model="selectedTemplate" required>
+          <option value="" disabled>Select your option</option>
+          <option v-for="template in templates" :key="template.id" :value="template.id">{{ template.name }}</option>
+        </select>
+        <h3>Contacts</h3>
+        <div class="CSVimportContainer">
+
+          <label for="csvFile">Upload CSV:</label>
+          <input type="file" @change="handleFileUpload" />
+          <button @click.prevent="importCSV">Import</button>
+          <a href="https://drive.google.com/file/d/1hVQErwmNN6eGN1zLBoniW_34-GzAtMwm/view?usp=sharing" target="_blank">
+            Download Sample CSV</a>
         </div>
+
+        
+        <h3>Schedule</h3>
+        <label>
+          <input type="checkbox" v-model="isScheduled"> Schedule for later
+        </label>
+
+        <div v-if="isScheduled">
+          <label>Schedule Date</label>
+          <input type="date" v-model="scheduleDate" required>
+
+          <label>Schedule Time</label>
+          <input type="time" v-model="scheduleTime" required>
+        </div>  -->
 
 
         <div class="mb-2">
@@ -43,18 +74,26 @@
           </select>
         </div>
 
-        <!-- Schedule Section -->
-        <h3>Schedule</h3>
-        <label>
-          <input type="checkbox" v-model="isScheduled"> Schedule for later
-        </label>
+        <div class="mb-1">
+          <label for="csvFile" class="block text-sm font-semibold">Upload CSV for Contacts:</label>
+          <input type="file" @change="handleFileUpload" class="mb-2 w-[60%] mr-1" />
+          <button @click.prevent="importCSV" class="bg-[#23a455] text-[#f5f6fa] px-4 py-2 rounded">Import</button>
+          <a href="https://drive.google.com/file/d/1hVQErwmNN6eGN1zLBoniW_34-GzAtMwm/view?usp=sharing" target="_blank"
+            class="text-blue-500">Download Sample CSV</a>
+        </div>
 
-        <div v-if="isScheduled">
-          <label>Schedule Date</label>
-          <input type="date" v-model="scheduleDate" required>
-          
-          <label>Schedule Time</label>
-          <input type="time" v-model="scheduleTime" required>
+        <h3 class="text-lg font-semibold mb-1">Schedule <input type="checkbox" v-model="isScheduled"> </h3>
+        <div v-if="isScheduled" class="flex justify-between">
+          <div class="w-[50%]">
+            <label for="scheduleDate" class="block text-sm font-medium">Schedule Date</label>
+            <input type="date" v-model="scheduleDate" id="scheduleDate" required
+              class="border border-gray-300 rounded px-3 py-2 w-full">
+          </div>
+          <div class="w-[50%]">
+            <label for="scheduleTime" class="block text-sm font-medium">Schedule Time</label>
+            <input type="time" v-model="scheduleTime" id="scheduleTime" required
+              class="border border-gray-300 rounded px-3 py-2 w-full">
+          </div>
         </div>
 
         <div class="mb-2 bg-gray-100 rounded-lg p-4 max-w-full shadow-md">
@@ -153,9 +192,6 @@ export default {
     // Fetch contacts when the component is mounted
   },
   methods: {
-    closePopup() {
-      this.showPopup = false;
-    },
 
 
     async fetchTemplates() {
@@ -220,16 +256,15 @@ export default {
         });
 
         if (!response.ok) {
-          console.log(response)
           throw new Error('Network response was not ok');
         }
 
         const broadcastList = await response.json();
         this.broadcasts = broadcastList.map(broadcast => ({
           id: broadcast.id,
-          name: broadcast.name.split(' - ')[0],
+          name: broadcast.name,
           template: broadcast.template,
-          contacts: broadcast.contacts.join(' , '),
+          contacts: broadcast.contacts,
           success: broadcast.success,
           failed: broadcast.failed,
           status: broadcast.status
@@ -340,25 +375,6 @@ export default {
       const scheduledDatetime = new Date(`${this.scheduleDate}T${this.scheduleTime}`).toISOString();
 
       try {
-        const response = await fetch(`http://localhost:8000/schedule-template-message/?scheduled_time=${encodeURIComponent(scheduledDatetime)}`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            recipients: phoneNumbers,
-            template: selectedTemplate,
-            // scheduled_time: scheduledDatetime // Send the scheduled datetime to backend
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-
-        const result = await response.json();
-        responseDiv.textContent = 'Broadcast scheduled successfully.';
 
         const logResponse = await fetch('http://localhost:8000/broadcast', {
           method: 'POST',
@@ -373,8 +389,8 @@ export default {
             success: 0,
             failed: 0,
             status: 'Scheduled',
-            scheduled_time:scheduledDatetime,
-            task_id:result.task_id
+            scheduled_time: scheduledDatetime,
+            // task_id:result.task_id
           }),
         });
 
