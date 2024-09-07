@@ -10,7 +10,6 @@ import LoginPage from './components/login/login.vue';
 import SignupPage from './components/signup/signup.vue';
 import DashboardView from './views/dashboardview.vue';
 import Profile from './views/profile.vue';
-import DummyVue from './components/broadcast/dummyVue.vue';
 
 // const routes = [
 //   {path: '/login', component: LoginPage, name: 'login'},
@@ -57,7 +56,6 @@ const routes = [
   // Public routes
   { path: '/login', component: LoginPage },
   { path: '/login/signup', component: SignupPage },
-  { path: '/dummy', component: DummyVue },
   
   // { path: '/', component: PublicView },
 
