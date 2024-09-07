@@ -5,6 +5,7 @@ from ..database import database
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import Session
 from ..oauth2 import get_current_user
+import logging
 
 router=APIRouter(tags=['Contacts'])
 
@@ -37,6 +38,7 @@ def read_contacts(skip: int = 0, limit: int = 10, tag: str = None, db: Session =
     if tag:
         query = query.filter(Contacts.Contact.tags.contains([tag]))
     contacts = query.offset(skip).limit(limit).all()
+    logging.info(contacts)
     return contacts
 
 @router.get("/contacts/{phone_no}", response_model=contacts.ContactRead)

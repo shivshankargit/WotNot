@@ -179,7 +179,7 @@ async def delete_scheduled_broadcast(broadcast_id: str, db: Session = Depends(da
 
 
 
-
+import logging
 
 @router.post("/create-template", response_model=broadcast.TemplateResponse)
 async def create_template(template: broadcast.TemplateCreate , request : Request , get_current_user: user.newuser=Depends(get_current_user)):
@@ -189,4 +189,5 @@ async def create_template(template: broadcast.TemplateCreate , request : Request
         response = await send_template_to_whatsapp(template , get_current_user.PAccessToken , get_current_user.WABAID )
         return response
     except HTTPException as e:
+        logging.critical(e)
         raise HTTPException(status_code=e.status_code, detail=e.detail)
