@@ -11,7 +11,7 @@ router=APIRouter(tags=['Contacts'])
 
 @router.post("/contacts/", response_model=contacts.ContactRead)
 def create_contact(contact: contacts.ContactCreate, db: Session = Depends(database.get_db),get_current_user: user.newuser=Depends(get_current_user)):
-    existing_contact = db.query(Contacts.Contact).filter(
+    existing_contact = db.query(Contacts.Contact).filter(Contacts.Contact.user_id == get_current_user.id,
         (Contacts.Contact.email == contact.email) | (Contacts.Contact.phone == contact.phone)
     ).first()
 
@@ -64,7 +64,7 @@ def update_contact(contact_id: int, contact: contacts.ContactCreate, db: Session
         raise HTTPException(status_code=404, detail="Contact not found")
     
     existing_contact = db.query(Contacts.Contact).filter(
-        (Contacts.Contact.id != contact_id) &
+        (Contacts.Contact.id != contact_id) &(Contacts.Contact.user_id == get_current_user.id) &
         ((Contacts.Contact.email == contact.email) | (Contacts.Contact.phone == contact.phone))
     ).first()
 

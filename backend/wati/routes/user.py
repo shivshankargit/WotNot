@@ -7,11 +7,12 @@ from .. import hashing
 router=APIRouter(tags=['User'])
 
 @router.post('/register')
-def newuser(request:user.register_user,db: Session=Depends(database.get_db)):
-    if(db.query(User.User).where(request.email==User.User.email).first()):
-         raise HTTPException(
-            status_code=400, detail="Contact with this email or phone already exists"
-        )
+def new_user(request: user.register_user, db: Session = Depends(database.get_db)):
+    existing_user = db.query(User.User).filter((User.User.email == request.email) | (User.User.Phone_id == request.Phone_id)).first()
+    if existing_user:
+        raise HTTPException(
+            status_code=400,
+            detail="Account with this email or phone number already exists")
     
     else:
         registeruser=User.User( 
@@ -24,5 +25,5 @@ def newuser(request:user.register_user,db: Session=Depends(database.get_db)):
         db.add(registeruser)
         db.commit()
         db.refresh(registeruser)
-        return registeruser
+        return {"success": True, "message": "Account created successfully"}
     
