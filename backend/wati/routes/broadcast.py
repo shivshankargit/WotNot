@@ -27,7 +27,7 @@ router=APIRouter( tags=['Broadcast'])
 # Broadcast 2 routes
 
 @router.post("/send-template-message/")
-async def send_template_message(request:broadcast.input,get_current_user: user.newuser=Depends(get_current_user)):
+async def send_template_message(request:broadcast.input_broadcast,get_current_user: user.newuser=Depends(get_current_user)):
     print(request)
     API_url=f"https://graph.facebook.com/v20.0/{get_current_user.Phone_id}/messages"
     headers = {

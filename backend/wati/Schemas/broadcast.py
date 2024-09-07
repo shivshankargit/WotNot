@@ -7,6 +7,10 @@ class input(BaseModel):
     template:str
     broadcast_id:int
 
+class input_broadcast(BaseModel):
+    recipients: list[str]
+    template:str
+
 class BroadcastListCreate(BaseModel): 
     name:str
     template:str

@@ -309,7 +309,8 @@ export default {
           },
           body: JSON.stringify({
             recipients: phoneNumbers,
-            template: selectedTemplate
+            template: selectedTemplate,
+            
           }),
         });
 
