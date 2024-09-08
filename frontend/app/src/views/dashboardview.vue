@@ -65,7 +65,7 @@
       </div>
 
       <div class="sidebar" v-if="currentSection === 'More'">
-        <a href="#" @click.prevent="navigate('/more/more1')" :class="{ active: isActive('/more/more1') }">More 1</a>
+        <a href="#" @click.prevent="navigate('/more/more1')" :class="{ active: isActive('/more/more1') }">Integrate</a>
       </div>
 
       <div class="main-content">

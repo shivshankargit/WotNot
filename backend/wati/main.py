@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .database import database
-from .routes import user,broadcast,contacts,auth
+from .routes import user,broadcast,contacts,auth,woocommerce
 from .services import dramatiq_router
 from . import oauth2
 # models creation
@@ -17,6 +17,7 @@ app.include_router(user.router)
 app.include_router(auth.router)
 app.include_router(oauth2.router)
 app.include_router(dramatiq_router.router)
+app.include_router(woocommerce.router)
 
 # defining origin for cors
 origins = [

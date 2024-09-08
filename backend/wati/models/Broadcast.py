@@ -19,6 +19,7 @@ class BroadcastList(database.Base):
     task_id = Column(String, nullable=True)  # Stores the task ID for scheduled broadcasts
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now())
+    
 
 
 
