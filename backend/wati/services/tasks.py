@@ -37,7 +37,7 @@ class CancelationMiddleware(Middleware):
         try:
             task_id = message.message_id
             status = get_task_status(task_id, db)  # Pass the session directly
-            if status == 'cancelled':
+            if status == 'Cancelled':
                 raise SkipMessage("Task has been canceled.")
         finally:
             db.close()  # Ensure the session is closed after use
@@ -89,7 +89,7 @@ def send_broadcast(template, recipients, API_url, headers,broadcast_id):
 
     if broadcast_id:
         broadcast.success=success_count
-        broadcast.status="Sucessful"
+        broadcast.status="Successful"
         broadcast.failed=failed_count
     db.add(broadcast)
     db.commit()

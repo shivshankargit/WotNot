@@ -1,8 +1,19 @@
 <template>
   <div class="content-section">
-    <button @click="showPopup = true"
-      class="bg-[#075e54] text-white py-2 px-4 rounded md:mb-[1%] md:mt-[3%] mb-[2%]">Add Contact</button>
+    <div class="flex flex-col md:flex-row justify-between mb-4 border-b pb-5">
+      <div>
+        <h2 class="text-xl md:text-2xl font-bold">Manage Contacts</h2>
+        <p class="text-sm md:text-base">Your content for Manage Contacts goes here.</p>
+      </div>
+      
 
+      <div>
+        <button @click="showPopup = true"
+          class="bg-[#075e54] text-[#f5f6fa] px-4 py-2 md:px-4 md:py-4 text-sm md:text-base rounded-md shadow-lg">
+          Add Contact
+        </button>
+      </div>
+    </div>
     <PopUp1 v-if="showPopup" @close="closePopup">
       <form @submit.prevent="submitForm" id="contactForm" class="p-6 w-[400px]">
         <h2 class="text-xl font-semibold mb-4">{{ isEditing ? 'Edit Contact' : 'Add Contact' }}</h2>
@@ -45,6 +56,7 @@
       </form>
     </PopUp1>
 
+    <h3 class="text-xl md:text-2xs mb-4"><b>Contact List</b></h3>
     <div class="bg-gray-100 rounded-lg p-4 mb-5 max-w-[100%] mx-auto shadow-md custom-scrollbar">
       <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
         <table class="w-full rounded-lg border-collapse block">

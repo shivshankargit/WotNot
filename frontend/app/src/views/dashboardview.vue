@@ -7,7 +7,7 @@
           <path fill="#075e54"
             d="M160 368c26.5 0 48 21.5 48 48l0 16 72.5-54.4c8.3-6.2 18.4-9.6 28.8-9.6L448 368c8.8 0 16-7.2 16-16l0-288c0-8.8-7.2-16-16-16L64 48c-8.8 0-16 7.2-16 16l0 288c0 8.8 7.2 16 16 16l96 0zm48 124l-.2 .2-5.1 3.8-17.1 12.8c-4.8 3.6-11.3 4.2-16.8 1.5s-8.8-8.2-8.8-14.3l0-21.3 0-6.4 0-.3 0-4 0-48-48 0-48 0c-35.3 0-64-28.7-64-64L0 64C0 28.7 28.7 0 64 0L448 0c35.3 0 64 28.7 64 64l0 288c0 35.3-28.7 64-64 64l-138.7 0L208 492z" />
         </svg>
-        <div class="logo"> WatNot</div>
+        <div class="logo"> WotNot</div>
         <div class="nav-item" v-for="section in navItems" :key="section.name" @click="navigate(section.path)"
           :class="{ active: isActive(section.path) }">
           <i :class="section.icon"></i>{{ section.label }}
@@ -83,21 +83,21 @@
 
       <!-- Broadcast Section Sidebar -->
       <div
-        class="fixed top-16 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4 shadow-lg overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out"
+        class="fixed top-14 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4 shadow-lg overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out"
         :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }"
         v-if="currentSection === 'broadcast'">
         <a href="#" @click.prevent="navigate('/broadcast/broadcast2')"
-          :class="{ 'bg-[#075e54] text-white': isActive('/broadcast/broadcast2') }"
+          :class="{ 'bg-[#075e54] hover:bg-[#075e54]  text-white': isActive('/broadcast/broadcast2') }"
           class="block p-3 text-gray-700 rounded-lg hover:bg-gray-200 hover:font-semibold">
           <i class="bi bi-broadcast mr-2"></i>Broadcast Messages
         </a>
         <a href="#" @click.prevent="navigate('/broadcast/broadcast1')"
-          :class="{ 'bg-[#075e54] text-white': isActive('/broadcast/broadcast1') }"
+          :class="{ 'bg-[#075e54]  hover:bg-[#075e54] text-white': isActive('/broadcast/broadcast1') }"
           class="block p-3 text-gray-700 rounded-lg hover:bg-gray-200 hover:font-semibold">
           <i class="bi bi-chat-right-text-fill mr-2"></i>Manage Templates
         </a>
         <a href="#" @click.prevent="navigate('/broadcast/broadcast3')"
-          :class="{ 'bg-[#075e54] text-white': isActive('/broadcast/broadcast3') }"
+          :class="{ 'bg-[#075e54] hover:bg-[#075e54] text-white': isActive('/broadcast/broadcast3') }"
           class="block p-3 text-gray-700 rounded-lg hover:bg-gray-200 hover:font-semibold">
           <i class="bi bi-calendar2-range-fill mr-2"></i>Scheduled Broadcasts
         </a>
@@ -105,15 +105,15 @@
 
       <!-- Contacts Section Sidebar -->
       <div
-        class="fixed top-16 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4 shadow-lg overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out"
+        class="fixed top-14 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4 shadow-lg overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out"
         :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }" v-if="currentSection === 'Contacts'">
         <a href="#" @click.prevent="navigate('/contacts/contacts1')"
-          :class="{ 'bg-[#075e54] text-white': isActive('/contacts/contacts1') }"
-          class="block p-3 text-gray-700 rounded-lg hover:bg-gray-200 hover:font-semibold">
-          <i class="bi bi-journal-bookmark-fill mr-2"></i>Manage Contacts
+          :class="{ 'bg-[#075e54] hover:bg-[#075e54] text-white ': isActive('/contacts/contacts1') }"
+          class="block p-3 text-gray-700 rounded-lg hover:bg-gray-200 hover:font-semibold ">
+          <i class="bi bi-journal-bookmark-fill mr-2 "></i>Manage Contacts
         </a>
         <a href="#" @click.prevent="navigate('/contacts/contacts2')"
-          :class="{ 'bg-[#075e54] text-white': isActive('/contacts/contacts2') }"
+          :class="{ 'bg-[#075e54] hover:bg-[#075e54] text-white': isActive('/contacts/contacts2') }"
           class="block p-3 text-gray-700 rounded-lg hover:bg-gray-200 hover:font-semibold">
           <i class="bi bi-tags-fill mr-2"></i>Manage Tags
         </a>
@@ -121,12 +121,12 @@
 
       <!-- More Section Sidebar -->
       <div
-        class="fixed top-16 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4 shadow-lg overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out"
+        class="fixed top-14 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4 shadow-lg overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out"
         :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }" v-if="currentSection === 'More'">
         <a href="#" @click.prevent="navigate('/more/more1')"
-          :class="{ 'bg-[#075e54] text-white': isActive('/more/more1') }"
-          class="block p-3 text-gray-700 rounded-lg hover:bg-gray-200 hover:font-semibold">
-          More 1
+          :class="{ 'bg-[#075e54] hover:bg-[#075e54] text-white': isActive('/more/more1') }"
+          class="block p-3 text-gray-700 rounded-lg hover:bg-gray-200 hover:font-semibold ">
+          Integration
         </a>
       </div>
 
@@ -406,14 +406,6 @@ h2 {
   margin-bottom: 20px;
 }
 
-input {
-  width: calc(100% - 20px);
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-  margin: 8px 0 20px 0;
-}
 
 button {
   background-color: #075e54;
@@ -437,248 +429,3 @@ button:hover {
 
 
 
-<!-- <style>
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  background-color: #f8f9fa;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-}
-
-.nav-left{
-  display: flex;
-}
-
-.nav-right{
-  display:flex;
-  
-  align-items: center;
-}
-
-.logo {
-  font-weight: 800;
-  margin: 8px 0 8px 0;
-  padding-right: 30px;
-  font-size: xx-large;
-  color: #075e54;
-}
-
-svg {
-  width: 62px;
-  height: 62px;
-  padding: 15px 10px 10px 10px;
-  color: #075e54;
-}
-
-.nav-item {
-  padding: 15px;
-  cursor: pointer;
-  color: #333;
-  text-align: center;
-  margin: 8px 0;
-  border-right: 1px solid #e9ecef;
-  font-size: medium;
-}
-
-.userDetails {
-  display: flex;
-  margin-left: 300px;
-}
-
-.userDetails p {
-  padding-left: 5px;
-}
-
-
-
-.profile-icon {
-  width: 60px;
-  height: 60px;
-  cursor: pointer;
-  margin-right:5px;
-}
-
-.profile-dropdown {
-  position: relative;
-  
-}
-
-.dropdown-menu {
-  position: absolute;
-  top: 75px;
-  right:30px;
-  width: 200px;
-  background-color: #ffffff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.dropdown-menu ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.dropdown-menu li {
-  padding: 10px;
-  cursor: pointer;
-  font-size: 18px;
-}
-
-
-
-.dropdown-menu li:hover {
-  background-color: #f1f1f1;
-}
-
-.dropdown-menu li i{
-  margin-right: 9px;
-}
-
-.logout {
-  align-self: flex-end;
-}
-
-.nav-item i {
-  padding-right: 9px;
-}
-
-.nav-item:hover {
-  font-weight: 600;
-  border-radius: 5px;
-  color: #075e54;
-}
-
-.content {
-  display: flex;
-  flex: 1;
-}
-
-.sidebar {
-  position: fixed;
-  top: 50px;
-  left: 0;
-  width: 270px;
-  height: calc(100vh - 65px);
-  background-color: #f5f6fa;
-  padding: 10px;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
-  margin-top: 15px;
-  z-index: 999;
-}
-
-.sidebar a {
-  display: block;
-  padding: 10px;
-  color: #333;
-  text-decoration: none;
-  margin-bottom: 10px;
-  border-radius: 5px;
-  font-size: large;
-}
-
-.sidebar i {
-  padding-right: 10px;
-}
-
-.sidebar a:hover {
-  font-weight: 600;
-  border-radius: 5px;
-  color: #075e54;
-  background-color: #e9ecef;
-}
-
-.sidebar a.active {
-  background-color: #075e54;
-  color: white;
-}
-
-.main-content {
-  flex: 1;
-  margin-top: 65px;
-  margin-left: 300px;
-  padding: 20px;
-  height: calc(100vh - 65px);
-  overflow-y: auto;
-  background-color: #ffffff;
-
-  padding: 50px 20px 20px 50px;
-  box-sizing: border-box;
-}
-
-.content-section {
-  height: 100%;
-}
-
-
-.container-contacts {
-  background-color: #f5f6fa;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 900px;
-  padding: 20px;
-
-  text-align: left;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-}
-
-select {
-  width: 100%;
-  padding: 10px;
-  margin: 8px 0 20px 0;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-}
-
-h2 {
-  color: #075e54;
-  margin-bottom: 20px;
-}
-
-input {
-  width: calc(100% - 20px);
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-  margin: 8px 0 20px 0;
-}
-
-button {
-  background-color: #075e54;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 10px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-button:hover {
-  background-color: #1ebd5b;
-}
-
-</style> -->
