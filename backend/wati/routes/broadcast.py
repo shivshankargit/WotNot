@@ -57,6 +57,7 @@ async def send_template_message(request:broadcast.input_broadcast,get_current_us
             success_count += 1
         else:
             errors.append({"recipient": recipient, "error": response.json()})
+            
     
     
     return {
@@ -95,6 +96,7 @@ def broadcastList(request:broadcast.BroadcastListCreate,db: Session = Depends(da
         name=request.name,
         template=request.template,
         contacts=request.contacts,
+        type=request.type,
         success=request.success,
         failed=request.failed,
         status=request.status,
@@ -186,7 +188,7 @@ async def delete_scheduled_broadcast(broadcast_id: str, db: Session = Depends(da
         raise HTTPException(status_code=404, detail="Broadcast not found")
     
     # Update the status to 'canceled'
-    broadcast.status = "cancelled"
+    broadcast.status = "Cancelled"
     db.commit()
     
     return {"detail": "Scheduled broadcast has been canceled."}

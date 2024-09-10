@@ -14,6 +14,7 @@ class input_broadcast(BaseModel):
 class BroadcastListCreate(BaseModel): 
     name:str
     template:str
+    type:str
     contacts:list[str]
     success:int
     failed:int

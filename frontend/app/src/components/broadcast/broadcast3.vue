@@ -1,7 +1,7 @@
 <template>
-  <div class="content-section p-4">
+  <div class="content-section ">
     <!-- Section Header -->
-    <div class="flex flex-col md:flex-row justify-between mb-4">
+    <div class="flex flex-col md:flex-row justify-between mb-4 border-b pb-5">
       <div>
         <h2 class="text-xl md:text-2xl font-bold">Scheduled Broadcasts</h2>
         <p class="text-sm md:text-base">Your content for scheduled broadcasts goes here.</p>
@@ -9,6 +9,7 @@
     </div>
 
     <!-- Broadcast List Table -->
+    <h3 class="text-xl md:text-2xs mb-4"><b>Scheduled Broadcast List</b></h3>
     <div class="bg-[#f5f6fa] rounded-md p-4 mb-4 shadow-lg">
       <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
         <table class="w-full border-collapse">
