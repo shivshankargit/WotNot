@@ -36,7 +36,7 @@
 
       <p class="mt-4 text-center text-sm">
         Don't have an account?
-        <a href="http://localhost:8080/#/login/signup" class="text-[#075e54] font-semibold mb-4">Sign Up</a>
+        <a href="" class="text-[#075e54] font-semibold mb-4" @click.prevent="redirectSignup">Sign Up</a>
       </p>
     </div>
   </main>
@@ -82,6 +82,9 @@ export default {
           console.error('Error:', error);
         });
     },
+    redirectSignup(){
+      this.$router.push("/signup");
+    }
   },
 };
 </script>

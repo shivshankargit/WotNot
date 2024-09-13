@@ -9,15 +9,15 @@
         </svg>
         <div class="logo"> WotNot</div>
         <div class="nav-item" v-for="section in navItems" :key="section.name" @click="navigate(section.path)"
-          :class="{ active: isActive(section.path) }">
+          :class="{ active: isActive(section.path)}">
           <i :class="section.icon"></i>{{ section.label }}
         </div>
       </div>
 
       <div class="nav-right">
-        <div v-if="user">
+        <div class="flex" v-if="user">
 
-          <p><strong>Email:</strong> {{ user.email }}</p>
+          <p class="text-green-700"> {{ user.email }}</p>
         </div>
         <div v-else>
           <p>Loading user details...</p>
@@ -41,39 +41,7 @@
 
     </div>
 
-    <!-- <div class="content">
-      <div class="sidebar" v-if="currentSection === 'broadcast'">
-        <a href="#" @click.prevent="navigate('/broadcast/broadcast2')"
-          :class="{ active: isActive('/broadcast/broadcast2') }"><i class="bi bi-broadcast"></i>Broadcast Messages</a>
-        <a href="#" @click.prevent="navigate('/broadcast/broadcast1')"
-          :class="{ active: isActive('/broadcast/broadcast1') }"><i class="bi bi-chat-right-text-fill"></i>Manage
-          Templates</a>
-        <a href="#" @click.prevent="navigate('/broadcast/broadcast3')"
-          :class="{ active: isActive('/broadcast/broadcast3') }"><i class="bi bi-calendar2-range-fill"></i>Scheduled
-          Broadcasts</a>
-      </div>
-
-      <div class="sidebar" v-if="currentSection === 'Contacts'">
-        <a href="#" @click.prevent="navigate('/contacts/contacts1')"
-          :class="{ active: isActive('/contacts/contacts1') }"><i class="bi bi-journal-bookmark-fill"></i>Manage
-          Contacts</a>
-        <a href="#" @click.prevent="navigate('/contacts/contacts2')"
-          :class="{ active: isActive('/contacts/contacts2') }"><i class="bi bi-tags-fill"></i>Manage Tags</a>
-      </div>
-
-      <div class="sidebar" v-if="currentSection === 'More'">
-        <a href="#" @click.prevent="navigate('/more/more1')" :class="{ active: isActive('/more/more1') }">Integrate</a>
-      </div>
-
-      <div class="main-content">
-        <router-view></router-view>
-      </div>
-      <ProfilePopup 
-        :visible="showProfilePopup" 
-        :user="user"
-        @close="showProfilePopup = false" 
-      />
-    </div> -->
+   
 
     <div class="flex flex-1">
       <!-- Hamburger button for mobile view -->
@@ -83,49 +51,49 @@
 
       <!-- Broadcast Section Sidebar -->
       <div
-        class="fixed top-14 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4 shadow-lg overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out"
+        class="fixed top-12 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4 overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out"
         :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }"
         v-if="currentSection === 'broadcast'">
         <a href="#" @click.prevent="navigate('/broadcast/broadcast2')"
-          :class="{ 'bg-[#075e54] hover:bg-[#075e54]  text-white': isActive('/broadcast/broadcast2') }"
-          class="block p-3 text-gray-700 rounded-lg hover:bg-gray-200 hover:font-semibold">
+          :class="{ 'text-green-900 font-semibold': isActive('/broadcast/broadcast2'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/broadcast/broadcast2')}"
+          class="block p-3 text-gray-700 rounded-lg ">
           <i class="bi bi-broadcast mr-2"></i>Broadcast Messages
         </a>
         <a href="#" @click.prevent="navigate('/broadcast/broadcast1')"
-          :class="{ 'bg-[#075e54]  hover:bg-[#075e54] text-white': isActive('/broadcast/broadcast1') }"
-          class="block p-3 text-gray-700 rounded-lg hover:bg-gray-200 hover:font-semibold">
+          :class="{ 'text-green-900 font-semibold': isActive('/broadcast/broadcast1') ,'hover:bg-gray-200 hover:font-semibold': !isActive('/broadcast/broadcast1') }"
+          class="block p-3 text-gray-700 rounded-lg ">
           <i class="bi bi-chat-right-text-fill mr-2"></i>Manage Templates
         </a>
         <a href="#" @click.prevent="navigate('/broadcast/broadcast3')"
-          :class="{ 'bg-[#075e54] hover:bg-[#075e54] text-white': isActive('/broadcast/broadcast3') }"
-          class="block p-3 text-gray-700 rounded-lg hover:bg-gray-200 hover:font-semibold">
+          :class="{ 'text-green-900 font-semibold': isActive('/broadcast/broadcast3'),'hover:bg-gray-200 hover:font-semibold': !isActive('/broadcast/broadcast3') }"
+          class="block p-3 text-gray-700 rounded-lg ">
           <i class="bi bi-calendar2-range-fill mr-2"></i>Scheduled Broadcasts
         </a>
       </div>
 
       <!-- Contacts Section Sidebar -->
       <div
-        class="fixed top-14 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4 shadow-lg overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out"
+        class="fixed top-12 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4  overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out"
         :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }" v-if="currentSection === 'Contacts'">
         <a href="#" @click.prevent="navigate('/contacts/contacts1')"
-          :class="{ 'bg-[#075e54] hover:bg-[#075e54] text-white ': isActive('/contacts/contacts1') }"
-          class="block p-3 text-gray-700 rounded-lg hover:bg-gray-200 hover:font-semibold ">
+          :class="{ 'text-green-900 font-semibold': isActive('/contacts/contacts1'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/contacts/contacts1')  }"
+          class="block p-3 text-gray-700 rounded-lg ">
           <i class="bi bi-journal-bookmark-fill mr-2 "></i>Manage Contacts
         </a>
         <a href="#" @click.prevent="navigate('/contacts/contacts2')"
-          :class="{ 'bg-[#075e54] hover:bg-[#075e54] text-white': isActive('/contacts/contacts2') }"
-          class="block p-3 text-gray-700 rounded-lg hover:bg-gray-200 hover:font-semibold">
+          :class="{ 'text-green-900 font-semibold': isActive('/contacts/contacts2'),'hover:bg-gray-200 hover:font-semibold': !isActive('/contacts/contacts2')  }"
+          class="block p-3 text-gray-700 rounded-lg ">
           <i class="bi bi-tags-fill mr-2"></i>Manage Tags
         </a>
       </div>
 
-      <!-- More Section Sidebar -->
+      <!-- Integration Section Sidebar -->
       <div
-        class="fixed top-14 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4 shadow-lg overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out"
-        :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }" v-if="currentSection === 'More'">
-        <a href="#" @click.prevent="navigate('/more/more1')"
-          :class="{ 'bg-[#075e54] hover:bg-[#075e54] text-white': isActive('/more/more1') }"
-          class="block p-3 text-gray-700 rounded-lg hover:bg-gray-200 hover:font-semibold ">
+        class="fixed top-12 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4  overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out"
+        :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }" v-if="currentSection === 'Integration'">
+        <a href="#" @click.prevent="navigate('/integration/integration1')"
+          :class="{ 'text-green-900 font-semibold': isActive('/integration/integration1') ,'hover:bg-gray-200 hover:font-semibold': !isActive('/integration/integration1') }"
+          class="block p-3 text-gray-700 rounded-lg  "><i class="bi bi-link-45deg"></i>
           Integration
         </a>
       </div>
@@ -156,7 +124,7 @@ export default {
       navItems: [
         { name: 'broadcast', label: 'Broadcast', icon: 'bi bi-broadcast', path: '/broadcast/broadcast2' },
         { name: 'Contacts', label: 'Contacts', icon: 'bi bi-person-video2', path: '/contacts/contacts1' },
-        { name: 'More', label: 'More', icon: 'bi bi-three-dots', path: '/more/more1' }
+        { name: 'Integration', label: 'Integration', icon: 'bi bi-plugin', path: '/integration/integration1' }
       ],
       user: null,
       dropdownOpen: false,
@@ -229,7 +197,7 @@ export default {
     },
     logout() {
       localStorage.removeItem('token');
-      this.$router.push('/login');
+      this.$router.push('/');
     },
 
     handleOutsideClick(event) {
@@ -243,7 +211,7 @@ export default {
 function getSectionFromRoute(path) {
   if (path.startsWith('/broadcast')) return 'broadcast';
   if (path.startsWith('/contacts')) return 'Contacts';
-  if (path.startsWith('/more')) return 'More';
+  if (path.startsWith('/integration')) return 'Integration';
   return 'broadcast';
 }
 </script>
@@ -421,6 +389,8 @@ button {
 button:hover {
   background-color: #1ebd5b;
 }
+
+
 </style>
 
 

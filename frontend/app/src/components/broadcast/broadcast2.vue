@@ -3,7 +3,7 @@
     <div class="flex flex-col md:flex-row justify-between mb-4 border-b pb-5">
       <div>
         <h2 class="text-xl md:text-2xl font-bold">Broadcast Messages</h2>
-        <p class="text-sm md:text-base">Your content for broadcast messages goes here.</p>
+        <p class="text-sm md:text-base">Send out Broadcast Messages using templates</p>
       </div>
 
       <div>
@@ -21,19 +21,19 @@
        
 
         <div class="mb-2">
-          <label for="broadcastName" class="block text-sm font-medium">Broadcast Name</label>
+          <label for="broadcastName" class="block text-sm font-medium">Broadcast Name<span class="text-red-800">*</span></label>
           <input type="text" v-model="broadcastName" id="broadcastName" placeholder="Broadcast Name" required
             class="border border-gray-300 rounded px-3 py-2 w-full">
         </div>
 
         <div class="mb-2">
-          <label for="recipients" class="block text-sm font-medium">Recipients</label>
+          <label for="recipients" class="block text-sm font-medium">Recipients<span class="text-red-800">*</span></label>
           <input type="text" v-model="recipients" id="recipients" placeholder="Enter phone numbers, comma-separated"
             required class="border border-gray-300 rounded px-3 py-2 w-full">
         </div>
 
         <div class="mb-2">
-          <label for="templates" class="block text-sm font-medium">Choose a template</label>
+          <label for="templates" class="block text-sm font-medium">Choose a template<span class="text-red-800">*</span></label>
           <select v-model="selectedTemplate" id="templates" required
             class="border border-gray-300 rounded px-3 py-2 w-full">
             <option value="" disabled>Select your option</option>
@@ -52,12 +52,12 @@
         <h3 class="text-lg font-semibold mb-1">Schedule <input type="checkbox" v-model="isScheduled"> </h3>
         <div v-if="isScheduled" class="flex justify-between">
           <div class="w-[50%]">
-            <label for="scheduleDate" class="block text-sm font-medium">Schedule Date</label>
+            <label for="scheduleDate" class="block text-sm font-medium">Schedule Date<span class="text-red-800">*</span></label>
             <input type="date" v-model="scheduleDate" id="scheduleDate" required
               class="border border-gray-300 rounded px-3 py-2 w-full">
           </div>
           <div class="w-[50%]">
-            <label for="scheduleTime" class="block text-sm font-medium">Schedule Time</label>
+            <label for="scheduleTime" class="block text-sm font-medium">Schedule Time<span class="text-red-800">*</span></label>
             <input type="time" v-model="scheduleTime" id="scheduleTime" required
               class="border border-gray-300 rounded px-3 py-2 w-full">
           </div>
@@ -123,6 +123,7 @@
                   'bg-green-100 text-green-500 ': broadcast.status === 'Successful',
                   'bg-blue-100 text-blue-500 ': broadcast.status === 'Scheduled',
                   'bg-red-100 text-red-500 ': broadcast.status === 'Cancelled',
+                  'bg-yellow-100 text-yellow-500 ': broadcast.status === 'Partially Successful',
                   'border-[#ddd]': true
                 }" class="text-[80%] lg:text-[100%] rounded-lg">
                   {{ broadcast.status }}
@@ -137,7 +138,7 @@
 </template>
 
 <script>
-
+import { useToast } from 'vue-toastification';
 import PopUp from "../popups/popup"
 export default {
   name: 'BroadCast2',
@@ -273,6 +274,7 @@ export default {
     },
 
     async sendMessage() {
+      const toast= useToast();
       const phoneNumbers = this.recipients.split(',').map(num => num.trim());
       const selectedTemplate = this.selectedTemplate;
       const formattedDate = this.formatDateTime(new Date());
@@ -322,8 +324,9 @@ export default {
 
         if (!logResponse.ok) {
           throw new Error('Network response was not ok')
-
-
+        }
+        else{
+          toast.success("Broadcast saved Succeccfully")
         }
 
         const logResult = await logResponse.json()
@@ -346,12 +349,13 @@ export default {
 
     async scheduleBroadcast() {
       // Logic for scheduling a broadcast
+      const toast= useToast();
       const phoneNumbers = this.recipients.split(',').map(num => num.trim());
       const selectedTemplate = this.selectedTemplate;
       const formattedDate = this.formatDateTime(new Date());
       const broadcastNameWithDate = `${this.broadcastName} - ${formattedDate}`;
       const responseDiv = document.getElementById('response');
-      responseDiv.textContent = 'Scheduling...';
+      // responseDiv.textContent = 'Scheduling...';
       const token = localStorage.getItem('token');
 
       // Combine date and time for scheduling
@@ -423,7 +427,9 @@ export default {
         const updateLogResult = await updateLogResponse.json();
         console.log('Broadcast log updated with task_id:', updateLogResult);
 
-        responseDiv.textContent = 'Broadcast scheduled successfully.';
+
+        toast.success("'Broadcast scheduled successfully");
+        // responseDiv.textContent = 'Broadcast scheduled successfully.';
 
         this.fetchBroadcastList();
       } catch (error) {
@@ -497,6 +503,12 @@ export default {
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+.my-custom-toast {
+  background-color: #4caf50; /* Custom background */
+  color: white;
+  font-size: 16px;
+  border-radius: 10px;
 }
 </style>
 

@@ -20,6 +20,7 @@ class Integration(database.Base):
 class WooIntegration(database.Base):
     __tablename__="Woo_Integration"
     id=Column(Integer,primary_key=True)
+    integration_id=Column(Integer,ForeignKey(Integration.id))
     user_id=Column(Integer,ForeignKey(User.User.id))
     api_key=Column(String)
     type=Column(String)
