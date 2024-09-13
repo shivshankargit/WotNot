@@ -54,6 +54,7 @@
 
 
 <script>
+import { useToast } from 'vue-toastification';
 
 export default {
   name: 'BroadCast3',
@@ -105,7 +106,10 @@ export default {
     },
 
     async DeleteScheduledBroadcast(broadcast_id) {
+      const toast= useToast();
       const token = localStorage.getItem('token');
+      const confirmDelete = confirm("Are you sure you want to delete this broadcast?");
+      if (!confirmDelete) return;
       try {
 
         const response = await fetch(`http://localhost:8000/broadcasts-delete/${broadcast_id}`, {
@@ -118,6 +122,9 @@ export default {
 
         if (!response.ok) {
           throw new Error('Network response was not ok');
+        }
+        else{
+          toast.success("Broadcast deleted successfully")
         }
 
         this.fetchScheduledBroadcastList();

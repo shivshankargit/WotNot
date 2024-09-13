@@ -76,9 +76,7 @@
           <div class="grid grid-cols-3 gap-4">
             <div>
               <label class="block below-402:text-custom-small text-sm font-medium">Template Name
-                <span class="relative text-sm" :class="{ 'text-black': !nameError, 'text-red-500': nameError }">
-                  *
-                </span>
+                <span class="text-red-800">*</span>
               </label>
               <div class="relative mb-2">
                 <input v-model="template.name" :placeholder="nameError || 'Template Name'" @blur="validateTemplateName"
@@ -91,8 +89,8 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium">Category</label>
-              <select v-model="selectedCategory" class="mt-1 p-2 w-full border border-gray-300 rounded-md h-10">
+              <label class="block text-sm font-medium">Category<span class="text-red-800">*</span></label>
+              <select v-model="selectedCategory" class="mt-1 p-2 w-full border border-gray-300 rounded-md h-10" required>
                 <option value="Marketing">Marketing</option>
                 <option value="Utility">Utility</option>
               </select>
@@ -101,7 +99,7 @@
             <!-- Language -->
             <div class="mb-4">
               <label class="block text-sm font-medium">Language</label>
-              <select class="mt-1 p-2 w-full border border-gray-300 rounded-md h-10">
+              <select class="mt-1 p-2 w-full border border-gray-300 rounded-md h-10" >
                 <option>English</option>
                 <!-- Add other languages here -->
               </select>
@@ -111,37 +109,16 @@
 
 
 
-          <!-- Template Type -->
-          <!-- <div class="mb-4">
-          <label class="block text-sm font-medium mb-2">Select Marketing template</label>
-          <div class="flex space-x-4">
-            <div>
-              <input type="radio" id="standard" name="template" value="standard" class="mr-2">
-              <label for="standard">Standard</label>
-            </div>
-            <div>
-              <input type="radio" id="catalog" name="template" value="catalog" class="mr-2">
-              <label for="catalog">Catalog</label>
-            </div>
-            <div>
-              <input type="radio" id="carousel" name="template" value="carousel" class="mr-2" disabled>
-              <label for="carousel">Carousel</label>
-            </div>
-            <div>
-              <input type="radio" id="limited" name="template" value="limited" class="mr-2" disabled>
-              <label for="limited">Limited Time Offers</label>
-            </div>
-          </div>
-        </div> -->
+       
 
           <label for="">Header</label>
           <input v-model="headerComponent.text" placeholder="Header Text (optional)"
             class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
 
           <div class="mb-4">
-            <label class="block text-sm font-medium">Body</label>
+            <label class="block text-sm font-medium">Body<span class="text-red-800">*</span></label>
             <textarea v-model="bodyComponent.text" class="mt-1 p-2 w-full border border-gray-300 rounded-md h-12"
-              placeholder="Template Message..." rows="4"></textarea>
+              placeholder="Template Message..." rows="4" required></textarea>
           </div>
 
           <label for="">Footer</label>

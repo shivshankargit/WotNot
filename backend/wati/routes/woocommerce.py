@@ -183,7 +183,7 @@ def apikey(request:Request,get_current_user: user.newuser=Depends(get_current_us
     
 
 @router.post("/integrate/woocommerce")
-def saveIntegartion(request:integration.wooIntegration,get_current_user: user.newuser=Depends(get_current_user),db: Session = Depends(database.get_db)):
+def saveWooIntegartion(request:integration.wooIntegration,get_current_user: user.newuser=Depends(get_current_user),db: Session = Depends(database.get_db)):
     parameters_list = [{"key": param.key} for param in request.parameters]
     
     exixsting=db.query(Integration.WooIntegration).filter((Integration.WooIntegration.user_id==get_current_user.id)&(Integration.WooIntegration.type=="woo/order_confirmation")).first()
@@ -192,21 +192,6 @@ def saveIntegartion(request:integration.wooIntegration,get_current_user: user.ne
         raise HTTPException(status_code=400, detail="Integration already exists")
    
    # Create the WooIntegrationDB model instance
-    woo_integration = Integration.WooIntegration(
-        template=request.template_id,
-        parameters=parameters_list,
-        api_key=get_current_user.api_key,
-        type=request.type,
-        user_id=get_current_user.id
-
-    )
-
-    # Add and commit the data to the database
-    db.add(woo_integration)
-    db.commit()
-    db.refresh(woo_integration)
-
-    # Create the WooIntegrationDB model instance
     integration=Integration.Integration(
         user_id=get_current_user.id,
         type=request.type,
@@ -217,5 +202,25 @@ def saveIntegartion(request:integration.wooIntegration,get_current_user: user.ne
     db.add(integration)
     db.commit()
     db.refresh(integration)
+
+    integration_search=db.query(Integration.Integration).filter((Integration.Integration.user_id==get_current_user.id)&(Integration.Integration.type==request.type)).first()
+
+    woo_integration = Integration.WooIntegration(
+        integration_id=integration_search.id,
+        parameters=parameters_list,
+        api_key=get_current_user.api_key,
+        type=request.type,
+        template=request.template_id,
+        user_id=get_current_user.id
+
+    )
+
+    # Add and commit the data to the database
+    db.add(woo_integration)
+    db.commit()
+    db.refresh(woo_integration)
+
+    # Create the WooIntegrationDB model instance
+   
 
     return {"template": request.template_id, "parameters": request.parameters}

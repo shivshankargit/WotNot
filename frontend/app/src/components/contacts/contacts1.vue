@@ -2,15 +2,16 @@
   <div class="content-section">
     <div class="flex flex-col md:flex-row justify-between mb-4 border-b pb-5">
       <div>
-        <h2 class="text-xl md:text-2xl font-bold">Manage Contacts</h2>
-        <p class="text-sm md:text-base">Your content for Manage Contacts goes here.</p>
+        <h2 class="text-xl md:text-2xl font-bold ">Manage Contacts</h2>
+        <p class="text-xsm md:text-base">Contact list stores the list of numbers that you've interacted with.
+          You can even manually export or import contacts.</p>
       </div>
       
 
       <div>
         <button @click="showPopup = true"
           class="bg-[#075e54] text-[#f5f6fa] px-4 py-2 md:px-4 md:py-4 text-sm md:text-base rounded-md shadow-lg">
-          Add Contact
+          + Add Contact
         </button>
       </div>
     </div>
@@ -20,27 +21,29 @@
         <hr class="mb-4" />
 
         <div class="mb-4">
-          <label for="name" class="block text-sm font-medium">Name</label>
+          <label for="name" class="block text-sm font-medium">Name<span class="text-red-800">*</span></label>
           <input type="text" v-model="contact.name" id="name" placeholder="Name" required
             class="border border-gray-300 rounded px-3 py-2 w-full">
         </div>
 
         <div class="mb-4">
-          <label for="phone" class="block text-sm font-medium">Phone Number</label>
+          <label for="phone" class="block text-sm font-medium">Phone Number<span class="text-red-800">*</span></label>
           <div class="flex">
             <select v-model="contact.countryCode" class="border border-gray-300 rounded-l px-3 py-2 w-20 mr-2">
               <option value="+1">+1</option>
               <option value="+44">+44</option>
               <option value="+91">+91</option>
             </select>
-            <input type="text" v-model="contact.phone" id="phone" placeholder="9876543210" required
+            <input type="text" v-model="contact.phone" id="phone" placeholder="Phone Number" required
               class="border border-gray-300 rounded-r px-3 py-2 w-full">
           </div>
         </div>
-
+        <label for="email" class="block text-sm font-medium">Email<span class="text-red-800">*</span></label>
         <input type="email" v-model="contact.email" id="email" placeholder="Email" required
           class="border border-gray-300 rounded px-3 py-2 mb-2 w-full">
-
+        
+        
+        <label for="email" class="block text-sm font-medium">Tags</label>
         <input type="text" v-model="contact.tags" id="tags" placeholder="Tags (comma separated)"
           class="border border-gray-300 rounded px-3 py-2 mb-2 w-full">
 
@@ -104,6 +107,7 @@
 </template>
 
 <script>
+import { useToast } from 'vue-toastification';
 import PopUp1 from "../popups/popup1";
 // import PopUpSmall from "../popups/popup_small";
 export default {
@@ -139,6 +143,7 @@ export default {
   methods: {
 
   async submitForm() {
+  const toast= useToast()
   const { id, name, email, phone, countryCode, tags } = this.contact;
 
   let fullPhoneNumber = phone;
@@ -167,12 +172,16 @@ export default {
     });
 
     if (response.ok) {
-      alert("Contact saved successfully");
+      if (id) {
+      toast.success("Contact updated successfully");
+    } else {
+      toast.success("Contact created successfully");
+    }
       this.clearForm();
       this.fetchContactList();
     } else {
       const errorData = await response.json();
-      alert(`Error: ${errorData.detail}`);
+      toast.error(`Error: ${errorData.detail}`);
     }
   } catch (error) {
     console.error("Error saving contact:", error);
@@ -246,6 +255,7 @@ export default {
       this.closeActionPopup();
     },
     async deleteContact(phone) {
+      const toast= useToast()
       const confirmDelete = confirm("Are you sure you want to delete this contact?");
       if (!confirmDelete) return;
 
@@ -260,12 +270,12 @@ export default {
         });
 
         if (response.ok) {
-          alert("Contact deleted successfully");
+          toast.success("Contact deleted successfully");
           this.fetchContactList();
           this.closeActionPopup();
         } else {
           const errorData = await response.json();
-          alert(`Error: ${errorData.detail}`);
+          toast.error(`Error: ${errorData.detail}`);
         }
       } catch (error) {
         console.error("Error deleting contact:", error);

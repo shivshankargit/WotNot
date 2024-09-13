@@ -4,7 +4,7 @@
     <div class="flex flex-col md:flex-row justify-between mb-4 border-b pb-5">
       <div>
         <h2 class="text-2xl font-bold ">Integration</h2>
-        <p>Your content for Integration goes here.</p>
+        <p>Integrate other application with WotNot</p>
       </div>
 
     </div>
@@ -29,7 +29,8 @@
           <hr class="mb-4" />
 
           <div>
-            <label class="block text-gray-700 font-semibold mb-2">Select action</label>
+            <label class="block text-gray-700 font-semibold mb-2" required>Select action<span
+                class="text-red-800">*</span></label>
             <select v-model="SelectedAction"
               class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" required>
               <option value="" disabled>Select your option</option>
@@ -39,16 +40,18 @@
           </div>
 
           <div v-if="SelectedAction === 'woo/order_confirmation'">
-            <label class="block text-gray-700 font-semibold mb-2">Select template</label>
+            <label class="block text-gray-700 font-semibold mb-2">Select template<span
+                class="text-red-800">*</span></label>
             <select v-model="selectedTemplate"
-              class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+              class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" required>
               <option value="" disabled>Select your template</option>
               <option v-for="template in templates" :key="template.id" :value="template.id">{{ template.name }}</option>
             </select>
           </div>
 
           <div v-if="selectedTemplate !== null">
-            <label for="" class="block text-gray-700 font-semibold mb-2">Add Parameters</label>
+            <label for="" class="block text-gray-700 font-semibold mb-2">Add Parameters<span
+                class="text-red-800">*</span></label>
             <div v-for="(parameter, index) in parameters" :key="index" class="flex items-center space-x-2 mb-2">
 
               <select v-model="parameter.key" class="w-full p-2 border rounded-md bg-gray-100">
@@ -95,7 +98,7 @@
 
         </form>
       </div>
-      
+
 
     </PopUp>
     <h3 class="text-xl md:text-2xs mb-4"><b>Integration List</b></h3>
@@ -108,6 +111,7 @@
               <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Application</th>
               <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Type</th>
               <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">API Key</th>
+              <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Action</th>
 
             </tr>
           </thead>
@@ -117,6 +121,11 @@
               <td class="border-[#ddd] p-2 md:p-4 text-center">{{ integration.app }}</td>
               <td class="border-[#ddd] p-2 md:p-4 text-center">{{ integration.type }}</td>
               <td class="border-[#ddd] p-2 md:p-4 text-center">{{ integration.api_key }}</td>
+              <button @click="deleteIntegration(integration.id)" class="hover:bg-white rounded-full p-2 transition center">
+                <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="hover"
+                  colors="primary:#ff5757,secondary:#000000" style="width:32px;height:32px">
+                </lord-icon>
+              </button>
             </tr>
           </tbody>
         </table>
@@ -128,11 +137,12 @@
 
 
 <script>
-import PopUp from "../popups/popup"
+import PopUp from "../popups/popup";
+import { useToast } from 'vue-toastification';
 
 export default {
 
-  name: 'MoreOptions1',
+  name: 'AppIntegration',
   data() {
 
     return {
@@ -141,7 +151,7 @@ export default {
       templates: [],
       selectedTemplate: null,
       webhookLink: '',
-      integrations:[],
+      integrations: [],
       templateParams: [],
       parameters: [],  // List of parameters for the template
       parameterOptions: [{ label: "Customer Name", key: "billing.first_name" },
@@ -162,6 +172,9 @@ export default {
     await this.fetchTemplates()
     await this.fetchapiKey();
     await this.fetchIntegrationList();
+    const script = document.createElement('script');
+    script.src = "https://cdn.lordicon.com/lordicon.js";
+    document.body.appendChild(script);
 
 
 
@@ -236,6 +249,7 @@ export default {
 
       // Replace with your API endpoint
       try {
+        const toast = useToast();
         const token = localStorage.getItem('token');
         const response = await fetch('http://localhost:8000/integrate/woocommerce', {
           method: 'POST',
@@ -247,15 +261,50 @@ export default {
         });
 
         if (response.ok) {
-          alert("Integration saved successfully");
+          toast.success("Integration saved successfully");
+          this.fetchIntegrationList();
 
         } else {
           const errorData = await response.json();
-          alert(`Error: ${errorData.detail}`);
+          toast.error(`Error: ${errorData.detail}`);
         }
         // Handle successful submission
       } catch (error) {
         console.error('Failed to submit the template: ', error);
+      }
+    },
+
+    async deleteIntegration(integration_id) {
+      try {
+
+        const toast = useToast();
+        const token = localStorage.getItem('token');
+        const confirmDelete=confirm("Are you sure you want to delete this contact?                           Note:Make sure to also delete the webhook from woocommece.")
+        if (!confirmDelete) return;
+        const response = await fetch(`http://localhost:8000/integration/${integration_id}`, 
+          {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+
+  
+        if(response.ok){
+          toast.success("Integration deleted successfully")
+          this.fetchIntegrationList();
+        }
+        else{
+          const errordata=await response.json()
+          toast.error(`Error:${errordata.detail}`)
+        }
+
+
+      } catch (error) {
+        console.error('Failed to delete the integration: ', error)
+
       }
     },
 
@@ -270,7 +319,7 @@ export default {
           }
         })
 
-         if (!response.ok) {
+        if (!response.ok) {
           throw new Error('Network response was not ok');
         }
 
@@ -279,7 +328,7 @@ export default {
           id: integration.id,
           app: integration.app,
           type: integration.type,
-          api_key:integration.api_key
+          api_key: integration.api_key
         }));
       } catch (error) {
         console.error('Failed to submit the template: ', error);
