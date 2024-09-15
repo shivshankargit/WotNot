@@ -27,9 +27,11 @@ class BroadcastAnalysis(database.Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id=Column(Integer,ForeignKey(User.User.id))
     broadcast_id = Column(Integer,ForeignKey(BroadcastList.id))
+    status=Column(String)
     message_id = Column(String,unique=True)
     phone_no=Column(String)
     read=Column(Boolean,nullable=True)
     delivered=Column(Boolean,nullable=True)
     sent=Column(Boolean,nullable=True)
+    replied=Column(Boolean,nullable=True)
 

@@ -103,16 +103,21 @@ async def receive_meta_webhook(request: Request, db: Session = Depends(database.
                             message_read=True
                             message_delivered=True
                             message_sent=True
+                            
                         
                         if(message_status=="delivered"):
                             message_read=False
                             message_delivered=True
                             message_sent=True
+                            
+
 
                         if(message_status=="sent"):
                             message_read=False
                             message_delivered=False
                             message_sent=True
+                            
+
 
 
                         broadcast_report = (
@@ -128,9 +133,39 @@ async def receive_meta_webhook(request: Request, db: Session = Depends(database.
                                 broadcast_report.read=message_read
                                 broadcast_report.delivered=message_delivered
                                 broadcast_report.sent=message_sent
+                                broadcast_report.status=message_status
+
                         db.add(broadcast_report)
                         db.commit()
                         db.refresh(broadcast_report) 
+                
+                elif "messages" in value:
+                    for message in value["messages"]:
+
+                        message_reply=True
+                        message_status='Replied'
+                         
+                        wamid=message['context']['id']
+                        broadcast_report = (
+                                db.query(Broadcast.BroadcastAnalysis)
+                                .filter( Broadcast.BroadcastAnalysis.message_id==wamid)
+                                .first()
+                            )
+                        
+                        if not broadcast_report:
+                                raise HTTPException(status_code=404,detail="Broadcast not found")
+
+                        if wamid:
+                                broadcast_report.replied=message_sent=message_reply
+                                broadcast_report.status=message_status
+
+                        db.add(broadcast_report)
+                        db.commit()
+                        db.refresh(broadcast_report) 
+
+                         
+                         
+
       
 
                        
@@ -195,28 +230,45 @@ async def send_template_message(request:broadcast.input_broadcast,get_current_us
         }
 
         response = requests.post(API_url, headers=headers, data=json.dumps(data))
-        
+        response_data = response.json()
+
+
         if response.status_code == 200:
             success_count += 1
+
+            wamid = response_data['messages'][0]['id']
+            phone_num=response_data['contacts'][0]["wa_id"]
+
+            MessageIdLog=Broadcast.BroadcastAnalysis(
+            user_id=get_current_user.id,
+            broadcast_id=saved_broadcast_id,
+            message_id=wamid,
+            status="sent",
+            phone_no=phone_num,  
+             )
+            db.add(MessageIdLog)
+            db.commit()
+            db.refresh(MessageIdLog) 
+
+        
         else:
             failed_count += 1
             errors.append({"recipient": recipient, "error": response.json()})
 
-        response_data = response.json()
-
-        # Access the wamid
-        wamid = response_data['messages'][0]['id']
-        phone_num=response_data['contacts'][0]["wa_id"]
-
-        MessageIdLog=Broadcast.BroadcastAnalysis(
+            MessageIdLog=Broadcast.BroadcastAnalysis(
             user_id=get_current_user.id,
             broadcast_id=saved_broadcast_id,
-            message_id=wamid,
-            phone_no=phone_num,  
-        )
-        db.add(MessageIdLog)
-        db.commit()
-        db.refresh(MessageIdLog) 
+            status="failed",
+            phone_no=recipient,  
+             )
+            db.add(MessageIdLog)
+            db.commit()
+            db.refresh(MessageIdLog) 
+
+        
+
+        # Access the wamid
+        
 
        
     
@@ -393,4 +445,4 @@ def BroadcastReport(broadcast_id:int,get_current_user: user.newuser=Depends(get_
     if not broadcast_data:
         raise HTTPException(status_code=404,detail="Broadcast data not found")
 
-    return (broadcast_data)
+    return broadcast_data

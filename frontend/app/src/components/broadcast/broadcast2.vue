@@ -15,25 +15,28 @@
     </div>
 
     <PopUp v-if="showPopup" @close="showPopup = false">
-       <form @submit.prevent="handleBroadcast" id="messageForm">
+      <form @submit.prevent="handleBroadcast" id="messageForm">
         <h2 class="text-xl font-semibold mb-4">New Broadcast</h2>
         <hr class="mb-4" />
-       
+
 
         <div class="mb-2">
-          <label for="broadcastName" class="block text-sm font-medium">Broadcast Name<span class="text-red-800">*</span></label>
+          <label for="broadcastName" class="block text-sm font-medium">Broadcast Name<span
+              class="text-red-800">*</span></label>
           <input type="text" v-model="broadcastName" id="broadcastName" placeholder="Broadcast Name" required
             class="border border-gray-300 rounded px-3 py-2 w-full">
         </div>
 
         <div class="mb-2">
-          <label for="recipients" class="block text-sm font-medium">Recipients<span class="text-red-800">*</span></label>
+          <label for="recipients" class="block text-sm font-medium">Recipients<span
+              class="text-red-800">*</span></label>
           <input type="text" v-model="recipients" id="recipients" placeholder="Enter phone numbers, comma-separated"
             required class="border border-gray-300 rounded px-3 py-2 w-full">
         </div>
 
         <div class="mb-2">
-          <label for="templates" class="block text-sm font-medium">Choose a template<span class="text-red-800">*</span></label>
+          <label for="templates" class="block text-sm font-medium">Choose a template<span
+              class="text-red-800">*</span></label>
           <select v-model="selectedTemplate" id="templates" required
             class="border border-gray-300 rounded px-3 py-2 w-full">
             <option value="" disabled>Select your option</option>
@@ -52,12 +55,14 @@
         <h3 class="text-lg font-semibold mb-1">Schedule <input type="checkbox" v-model="isScheduled"> </h3>
         <div v-if="isScheduled" class="flex justify-between">
           <div class="w-[50%]">
-            <label for="scheduleDate" class="block text-sm font-medium">Schedule Date<span class="text-red-800">*</span></label>
+            <label for="scheduleDate" class="block text-sm font-medium">Schedule Date<span
+                class="text-red-800">*</span></label>
             <input type="date" v-model="scheduleDate" id="scheduleDate" required
               class="border border-gray-300 rounded px-3 py-2 w-full">
           </div>
           <div class="w-[50%]">
-            <label for="scheduleTime" class="block text-sm font-medium">Schedule Time<span class="text-red-800">*</span></label>
+            <label for="scheduleTime" class="block text-sm font-medium">Schedule Time<span
+                class="text-red-800">*</span></label>
             <input type="time" v-model="scheduleTime" id="scheduleTime" required
               class="border border-gray-300 rounded px-3 py-2 w-full">
           </div>
@@ -97,27 +102,28 @@
         <table class="w-full rounded-lg border-collapse">
           <thead>
             <tr class="bg-[#dddddd] text-center">
-              <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">ID</th>
+              
               <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Broadcast Name</th>
               <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Type</th>
               <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Template</th>
               <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Contacts</th>
-              <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Success</th>
-              <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Failed</th>
+              <!-- <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Success</th>
+              <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Failed</th> -->
               <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Status</th>
-              
+              <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Action</th>
+
+
             </tr>
           </thead>
           <tbody class="bg-white">
             <tr v-for="broadcast in broadcasts" :key="broadcast.id">
-              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.id }}</td>
+              
               <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.name }}</td>
               <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.type }}</td>
               <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.template }}</td>
-              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.contacts }}</td>
-              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.success }}</td>
-              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.failed }}</td>
-              <!-- <td class="border-[#ddd] p-2 md:p-4 text-left">{{ broadcast.status }}</td> -->
+              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.contacts.length }}</td>
+              <!-- <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.success }}</td>
+              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.failed }}</td> -->
               <td class="p-2 md:p-4 text-center">
                 <div :class="{
                   'bg-green-100 text-green-500 ': broadcast.status === 'Successful',
@@ -129,11 +135,203 @@
                   {{ broadcast.status }}
                 </div>
               </td>
+              <td class="border-[#ddd] p-2 md:p-4 text-center"><button class="relative my-2 h-auto w-auto p-1 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200"
+                  @click="showReportPopup = true, fetchBroadcastReport(broadcast.id)"> View Report</button>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
+
+
     </div>
+    <PopUp v-if="showReportPopup" @close="showReportPopup = false, broadcastReports = ['']">
+
+      <h3 class="text-xl md:text-2xs mb-4"><b>Broadcast Report</b></h3>
+
+      <!-- show the overview totals -->
+
+      <div class="grid grid-cols-4 gap-4 p-4">
+        <!-- Sent -->
+        <div class="bg-gray-100 p-4 rounded-md shadow-sm flex flex-col items-left border-2 border-green-600">
+
+          <div class="flex justify-between items-center">
+            <span class="text-3xl font-semibold">{{ totals.sent }}</span>
+            <div class="w-10 h-10 flex items-center justify-center mb-auto rounded-full bg-white"><svg width="18" height="14" viewBox="0 0 18 14" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path d="M1.66797 7L7.16797 12.5L16.3346 1.5" stroke="#23A455" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+              </svg></div>
+          </div>
+
+
+          <span class="text-gray-500">Sent</span>
+        </div>
+
+        <!-- Delivered -->
+        <div class="bg-gray-100 p-4 rounded-md shadow-sm flex flex-col items-left border-2 border-green-600">
+
+          <div class="flex justify-between items-center">
+            <span class="text-3xl font-semibold">{{ totals.delivered }}</span>
+            <div class="w-10 h-10 flex items-center justify-center mb-auto rounded-full bg-white"><svg width="22" height="12" viewBox="0 0 22 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1.83203 6L6.64453 10.5833L9.05078 7.83333" stroke="#23A455" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M7.33203 5.99984L12.1445 10.5832L20.1654 1.4165" stroke="#23A455" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M14.6654 1.4165L11.457 5.08317" stroke="#23A455" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+              </svg></div>
+          </div>
+
+
+          <span class="text-gray-500">Delivered</span>
+        </div>
+
+        <!-- Read -->
+        <div class="bg-gray-100 p-4 rounded-md shadow-sm flex flex-col items-left border-2 border-green-600">
+          <div class="flex justify-between items-center">
+            <span class="text-3xl font-semibold" >{{ totals.read }}</span>
+            <div class="w-10 h-10 flex items-center justify-center mb-auto rounded-full bg-white"><svg width="22" height="16" viewBox="0 0 22 16" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M20.2565 6.962C20.7305 7.582 20.7305 8.419 20.2565 9.038C18.7635 10.987 15.1815 15 10.9995 15C6.81752 15 3.23552 10.987 1.74252 9.038C1.51191 8.74113 1.38672 8.37592 1.38672 8C1.38672 7.62408 1.51191 7.25887 1.74252 6.962C3.23552 5.013 6.81752 1 10.9995 1C15.1815 1 18.7635 5.013 20.2565 6.962V6.962Z"
+                  stroke="#23A455" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path
+                  d="M11 11C12.6569 11 14 9.65685 14 8C14 6.34315 12.6569 5 11 5C9.34315 5 8 6.34315 8 8C8 9.65685 9.34315 11 11 11Z"
+                  stroke="#23A455" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg></div>
+            
+          </div>
+          <span class="text-gray-500">Read</span>
+        </div>
+
+        <!-- Replied -->
+        <div class="bg-gray-100 p-4 rounded-md shadow-sm flex flex-col items-left border-2 border-green-600">
+          <div class="flex justify-between items-center">
+            <span class="text-3xl font-semibold">{{ totals.replied }}</span>
+            <div class="w-10 h-10 flex items-center justify-center mb-auto rounded-full bg-white">
+            <svg width="22" height="16" viewBox="0 0 22 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.60219 0.736277C8.76965 0.805709 8.91277 0.923237 9.01344 1.074C9.11411 1.22476 9.16782 1.40199 9.16777 1.58328V3.03711L11.2697 0.935194C11.3979 0.807035 11.5612 0.719762 11.739 0.684408C11.9168 0.649055 12.1011 0.667208 12.2685 0.736572C12.436 0.805936 12.5792 0.923397 12.6799 1.07411C12.7806 1.22482 12.8344 1.40201 12.8344 1.58328V4.35986C14.5385 4.45978 15.9245 4.84203 17.0447 5.44519C18.2398 6.0821 19.2221 7.0554 19.8699 8.24469C21.0524 10.3851 21.0844 12.9023 21.0844 14.4166C21.0844 14.6597 20.9879 14.8929 20.816 15.0648C20.644 15.2367 20.4109 15.3333 20.1678 15.3333C19.9247 15.3333 19.6915 15.2367 19.5196 15.0648C19.3477 14.8929 19.2511 14.6597 19.2511 14.4166C19.2511 13.8474 19.0513 13.4257 18.7039 13.0783C18.3335 12.7089 17.7679 12.399 17.0245 12.1616C15.7925 11.7693 14.2562 11.6354 12.8344 11.6437V14.4166C12.8344 14.5979 12.7806 14.7751 12.6799 14.9258C12.5792 15.0765 12.436 15.1939 12.2685 15.2633C12.1011 15.3327 11.9168 15.3508 11.739 15.3155C11.5612 15.2801 11.3979 15.1929 11.2697 15.0647L9.16777 12.9628V14.4166C9.16773 14.5979 9.11395 14.7751 9.01322 14.9258C8.9125 15.0765 8.76935 15.1939 8.60187 15.2633C8.4344 15.3327 8.25012 15.3508 8.07233 15.3155C7.89454 15.2801 7.73122 15.1929 7.60302 15.0647L1.18636 8.64803C1.01451 8.47613 0.917969 8.24301 0.917969 7.99994C0.917969 7.75688 1.01451 7.52376 1.18636 7.35186L7.60302 0.935194C7.73121 0.806922 7.89457 0.719555 8.07243 0.684147C8.25028 0.648739 8.43465 0.666881 8.60219 0.736277ZM7.33444 11.1294L4.85302 8.64803C4.68117 8.47613 4.58464 8.24301 4.58464 7.99994C4.58464 7.75688 4.68117 7.52376 4.85302 7.35186L7.33444 4.87044V3.79611L3.13061 7.99994L7.33444 12.2038V11.1294ZM18.955 11.0011C18.8138 10.3485 18.5814 9.719 18.2648 9.13111C17.7871 8.24994 17.0601 7.5293 16.1748 7.05944C15.1866 6.52686 13.8199 6.16661 11.9178 6.16661C11.6747 6.16661 11.4415 6.07003 11.2696 5.89812C11.0977 5.72622 11.0011 5.49306 11.0011 5.24994V3.79611L6.79727 7.99994L11.0011 12.2038V10.7499C11.0011 10.514 11.0921 10.2871 11.2552 10.1165C11.4182 9.94593 11.6408 9.84481 11.8765 9.83419C13.5989 9.75628 15.787 9.84336 17.5819 10.4154C18.0584 10.5635 18.5185 10.7601 18.955 11.002V11.0011Z" fill="#23A455"></path></svg></div>
+
+          </div>
+
+          <span class="text-gray-500">Replied</span>
+        </div>
+
+        <div class="bg-gray-100 p-4 rounded-md shadow-sm flex flex-col items-left border-2 border-green-600">
+          <div class="flex justify-between items-center">
+            <span class="text-3xl font-semibold">{{ totals.sent }}</span>
+            <div class="w-10 h-10 flex items-center justify-center mb-auto rounded-full bg-white">
+            <svg width="22" height="16" viewBox="0 0 22 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.60219 0.736277C8.76965 0.805709 8.91277 0.923237 9.01344 1.074C9.11411 1.22476 9.16782 1.40199 9.16777 1.58328V3.03711L11.2697 0.935194C11.3979 0.807035 11.5612 0.719762 11.739 0.684408C11.9168 0.649055 12.1011 0.667208 12.2685 0.736572C12.436 0.805936 12.5792 0.923397 12.6799 1.07411C12.7806 1.22482 12.8344 1.40201 12.8344 1.58328V4.35986C14.5385 4.45978 15.9245 4.84203 17.0447 5.44519C18.2398 6.0821 19.2221 7.0554 19.8699 8.24469C21.0524 10.3851 21.0844 12.9023 21.0844 14.4166C21.0844 14.6597 20.9879 14.8929 20.816 15.0648C20.644 15.2367 20.4109 15.3333 20.1678 15.3333C19.9247 15.3333 19.6915 15.2367 19.5196 15.0648C19.3477 14.8929 19.2511 14.6597 19.2511 14.4166C19.2511 13.8474 19.0513 13.4257 18.7039 13.0783C18.3335 12.7089 17.7679 12.399 17.0245 12.1616C15.7925 11.7693 14.2562 11.6354 12.8344 11.6437V14.4166C12.8344 14.5979 12.7806 14.7751 12.6799 14.9258C12.5792 15.0765 12.436 15.1939 12.2685 15.2633C12.1011 15.3327 11.9168 15.3508 11.739 15.3155C11.5612 15.2801 11.3979 15.1929 11.2697 15.0647L9.16777 12.9628V14.4166C9.16773 14.5979 9.11395 14.7751 9.01322 14.9258C8.9125 15.0765 8.76935 15.1939 8.60187 15.2633C8.4344 15.3327 8.25012 15.3508 8.07233 15.3155C7.89454 15.2801 7.73122 15.1929 7.60302 15.0647L1.18636 8.64803C1.01451 8.47613 0.917969 8.24301 0.917969 7.99994C0.917969 7.75688 1.01451 7.52376 1.18636 7.35186L7.60302 0.935194C7.73121 0.806922 7.89457 0.719555 8.07243 0.684147C8.25028 0.648739 8.43465 0.666881 8.60219 0.736277ZM7.33444 11.1294L4.85302 8.64803C4.68117 8.47613 4.58464 8.24301 4.58464 7.99994C4.58464 7.75688 4.68117 7.52376 4.85302 7.35186L7.33444 4.87044V3.79611L3.13061 7.99994L7.33444 12.2038V11.1294ZM18.955 11.0011C18.8138 10.3485 18.5814 9.719 18.2648 9.13111C17.7871 8.24994 17.0601 7.5293 16.1748 7.05944C15.1866 6.52686 13.8199 6.16661 11.9178 6.16661C11.6747 6.16661 11.4415 6.07003 11.2696 5.89812C11.0977 5.72622 11.0011 5.49306 11.0011 5.24994V3.79611L6.79727 7.99994L11.0011 12.2038V10.7499C11.0011 10.514 11.0921 10.2871 11.2552 10.1165C11.4182 9.94593 11.6408 9.84481 11.8765 9.83419C13.5989 9.75628 15.787 9.84336 17.5819 10.4154C18.0584 10.5635 18.5185 10.7601 18.955 11.002V11.0011Z" fill="#23A455"></path></svg></div>
+
+          </div>
+
+          <span class="text-gray-500">Success</span>
+        </div>
+
+        <div class="bg-gray-100 p-4 rounded-md shadow-sm flex flex-col items-left border-2 border-green-600">
+          <div class="flex justify-between items-center">
+            <span class="text-3xl font-semibold">{{ totals.failed }}</span>
+            <div class="w-10 h-10 flex items-center justify-center mb-auto rounded-full bg-white">
+            <svg width="22" height="16" viewBox="0 0 22 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.60219 0.736277C8.76965 0.805709 8.91277 0.923237 9.01344 1.074C9.11411 1.22476 9.16782 1.40199 9.16777 1.58328V3.03711L11.2697 0.935194C11.3979 0.807035 11.5612 0.719762 11.739 0.684408C11.9168 0.649055 12.1011 0.667208 12.2685 0.736572C12.436 0.805936 12.5792 0.923397 12.6799 1.07411C12.7806 1.22482 12.8344 1.40201 12.8344 1.58328V4.35986C14.5385 4.45978 15.9245 4.84203 17.0447 5.44519C18.2398 6.0821 19.2221 7.0554 19.8699 8.24469C21.0524 10.3851 21.0844 12.9023 21.0844 14.4166C21.0844 14.6597 20.9879 14.8929 20.816 15.0648C20.644 15.2367 20.4109 15.3333 20.1678 15.3333C19.9247 15.3333 19.6915 15.2367 19.5196 15.0648C19.3477 14.8929 19.2511 14.6597 19.2511 14.4166C19.2511 13.8474 19.0513 13.4257 18.7039 13.0783C18.3335 12.7089 17.7679 12.399 17.0245 12.1616C15.7925 11.7693 14.2562 11.6354 12.8344 11.6437V14.4166C12.8344 14.5979 12.7806 14.7751 12.6799 14.9258C12.5792 15.0765 12.436 15.1939 12.2685 15.2633C12.1011 15.3327 11.9168 15.3508 11.739 15.3155C11.5612 15.2801 11.3979 15.1929 11.2697 15.0647L9.16777 12.9628V14.4166C9.16773 14.5979 9.11395 14.7751 9.01322 14.9258C8.9125 15.0765 8.76935 15.1939 8.60187 15.2633C8.4344 15.3327 8.25012 15.3508 8.07233 15.3155C7.89454 15.2801 7.73122 15.1929 7.60302 15.0647L1.18636 8.64803C1.01451 8.47613 0.917969 8.24301 0.917969 7.99994C0.917969 7.75688 1.01451 7.52376 1.18636 7.35186L7.60302 0.935194C7.73121 0.806922 7.89457 0.719555 8.07243 0.684147C8.25028 0.648739 8.43465 0.666881 8.60219 0.736277ZM7.33444 11.1294L4.85302 8.64803C4.68117 8.47613 4.58464 8.24301 4.58464 7.99994C4.58464 7.75688 4.68117 7.52376 4.85302 7.35186L7.33444 4.87044V3.79611L3.13061 7.99994L7.33444 12.2038V11.1294ZM18.955 11.0011C18.8138 10.3485 18.5814 9.719 18.2648 9.13111C17.7871 8.24994 17.0601 7.5293 16.1748 7.05944C15.1866 6.52686 13.8199 6.16661 11.9178 6.16661C11.6747 6.16661 11.4415 6.07003 11.2696 5.89812C11.0977 5.72622 11.0011 5.49306 11.0011 5.24994V3.79611L6.79727 7.99994L11.0011 12.2038V10.7499C11.0011 10.514 11.0921 10.2871 11.2552 10.1165C11.4182 9.94593 11.6408 9.84481 11.8765 9.83419C13.5989 9.75628 15.787 9.84336 17.5819 10.4154C18.0584 10.5635 18.5185 10.7601 18.955 11.002V11.0011Z" fill="#23A455"></path></svg></div>
+
+          </div>
+
+          <span class="text-gray-500">Failed</span>
+        </div>
+
+        <!-- Sending -->
+        <!-- <div class="bg-gray-100 p-4 rounded-md shadow-sm flex flex-col items-center">
+          <span class="text-2xl font-semibold">0</span>
+          <span class="text-green-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 10h1v4H3zM9 10h1v4H9zM21 10h1v4h-1zM17 10h1v4h-1zM12 7l5 5-5 5-5-5 5-5z" />
+            </svg>
+          </span>
+          <span class="text-gray-500">Sending</span>
+        </div> -->
+
+        <!-- Failed -->
+        <!-- <div class="bg-gray-100 p-4 rounded-md shadow-sm flex flex-col items-center">
+          <span class="text-2xl font-semibold">286</span>
+          <span class="text-green-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M18.364 5.636L5.636 18.364M5.636 5.636l12.728 12.728" />
+            </svg>
+          </span>
+          <span class="text-gray-500">Failed</span>
+        </div> -->
+
+        <!-- Processing -->
+        <!-- <div class="bg-gray-100 p-4 rounded-md shadow-sm flex flex-col items-center">
+          <span class="text-2xl font-semibold">0</span>
+          <span class="text-green-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 8V4M8 4h4v4H8zm4 12v4h-4v-4h4zM12 16V4" />
+            </svg>
+          </span>
+          <span class="text-gray-500">Processing</span>
+        </div> -->
+
+        <!-- Queued -->
+        <!-- <div class="bg-gray-100 p-4 rounded-md shadow-sm flex flex-col items-center">
+          <span class="text-2xl font-semibold">0</span>
+          <span class="text-green-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 4v12h16V4H4zm16-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" />
+            </svg>
+          </span>
+          <span class="text-gray-500">Queued</span>
+        </div> -->
+      </div>
+
+      <!-- Display totals -->
+      <!-- <div class="totals">
+        <p>Total Sent: {{ totals.sent }}</p>
+        <p>Total Delivered: {{ totals.delivered }}</p>
+        <p>Total Read: {{ totals.read }}</p>
+        <p>Total Replied: {{ totals.replied }}</p>
+      </div> -->
+
+      <div class="broadcastListContainer bg-gray-100 rounded-lg p-4 max-w-full mx-auto shadow-md custom-scrollbar">
+        <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
+          <table class="w-full rounded-lg border-collapse">
+            <thead>
+              <tr class="bg-[#dddddd] text-center">
+                <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Phone No</th>
+                <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Status</th>
+                <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Sent</th>
+                <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Delivered</th>
+                <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Read</th>
+                <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Replied</th>
+
+              </tr>
+            </thead>
+            <tbody class="bg-white">
+              <tr v-for="contactReport in broadcastReports" :key="contactReport.id">
+                <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.phone_no }}</td>
+                <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.status }}</td>
+                <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.sent }}</td>
+                <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.delivered }}</td>
+                <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.read }}</td>
+                <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.replied }}</td>
+
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+
+      </div>
+
+    </PopUp>
   </div>
 </template>
 
@@ -155,9 +353,16 @@ export default {
       templates: [],
       contacts: [],
       broadcasts: [],
+      // broadcast report
+      broadcastReports: [],
+      totalRead: '',
+      totalSent: '',
+      totalDelivered: '',
+
       file: null,
       selectedContacts: [],
       showPopup: false,
+      showReportPopup: false,
       scheduleDate: '',  // New data property for schedule date
       scheduleTime: '',
       isScheduled: false,
@@ -273,7 +478,7 @@ export default {
       this.recipients = this.selectedContacts.join(', ');
     },
     async sendMessage() {
-      const toast= useToast();
+      const toast = useToast();
       const phoneNumbers = this.recipients.split(',').map(num => num.trim());
       const selectedTemplate = this.selectedTemplate;
       const formattedDate = this.formatDateTime(new Date());
@@ -292,7 +497,7 @@ export default {
           body: JSON.stringify({
             recipients: phoneNumbers,
             template: selectedTemplate,
-            
+
           }),
         });
 
@@ -313,7 +518,7 @@ export default {
           body: JSON.stringify({
             name: broadcastNameWithDate,
             template: selectedTemplate,
-            type:"Broadcast",
+            type: "Broadcast",
             contacts: phoneNumbers,
             success: result.successful_messages,
             failed: result.errors.length,
@@ -324,7 +529,7 @@ export default {
         if (!logResponse.ok) {
           throw new Error('Network response was not ok')
         }
-        else{
+        else {
           toast.success("Broadcast saved Succeccfully")
         }
 
@@ -341,7 +546,7 @@ export default {
 
     async sendBroadcast() {
       // Logic for scheduling a broadcast
-      const toast= useToast();
+      const toast = useToast();
       const phoneNumbers = this.recipients.split(',').map(num => num.trim());
       const selectedTemplate = this.selectedTemplate;
       const formattedDate = this.formatDateTime(new Date());
@@ -350,7 +555,7 @@ export default {
       // responseDiv.textContent = 'Scheduling...';
       const token = localStorage.getItem('token');
       try {
-        
+
         const response = await fetch('http://localhost:8000/send-template-message/', {
           method: 'POST',
           headers: {
@@ -361,16 +566,16 @@ export default {
             name: broadcastNameWithDate,
             recipients: phoneNumbers,
             template: selectedTemplate,
-            type:"Broadcast",
+            type: "Broadcast",
             status: 'Saved',
-            
+
           }),
         });
 
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        else{
+        else {
           toast.success("'Broadcast sent successfully");
           responseDiv.textContent = 'Broadcast scheduled successfully.';
         }
@@ -379,7 +584,7 @@ export default {
         responseDiv.textContent = `Success: ${result.successful_messages}, Errors: ${result.errors.length}`;
 
 
-       
+
 
         this.fetchBroadcastList();
       } catch (error) {
@@ -387,72 +592,42 @@ export default {
         responseDiv.textContent = 'Error scheduling broadcast.';
       }
     },
-    // async sendMessage() {
-    //   const toast= useToast();
-    //   const phoneNumbers = this.recipients.split(',').map(num => num.trim());
-    //   const selectedTemplate = this.selectedTemplate;
-    //   const formattedDate = this.formatDateTime(new Date());
-    //   const broadcastNameWithDate = `${this.broadcastName} - ${formattedDate}`;
-    //   const responseDiv = document.getElementById('response');
-    //   responseDiv.textContent = 'Sending...';
-    //   const token = localStorage.getItem('token');
 
-    //   try {
-    //     const response = await fetch('http://localhost:8000/send-template-message/', {
-    //       method: 'POST',
-    //       headers: {
-    //         'Authorization': `Bearer ${token}`,
-    //         'Content-Type': 'application/json',
-    //       },
-    //       body: JSON.stringify({
-    //         recipients: phoneNumbers,
-    //         template: selectedTemplate,
-            
-    //       }),
-    //     });
+    async fetchBroadcastReport(broadcast_id) {
 
-    //     if (!response.ok) {
-    //       throw new Error('Network response was not ok');
 
-    //     }
+      const token = localStorage.getItem('token');
+      try {
 
-    //     const result = await response.json();
-    //     responseDiv.textContent = `Success: ${result.successful_messages}, Errors: ${result.errors.length}`;
+        const response = await fetch(`http://localhost:8000/broadcast-report/${broadcast_id}`, {
+          method: "GET",
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        });
 
-    //     const logResponse = await fetch('http://localhost:8000/broadcast', {
-    //       method: 'POST',
-    //       headers: {
-    //         'Authorization': `Bearer ${token}`,
-    //         'Content-Type': 'application/json',
-    //       },
-    //       body: JSON.stringify({
-    //         name: broadcastNameWithDate,
-    //         template: selectedTemplate,
-    //         type:"Broadcast",
-    //         contacts: phoneNumbers,
-    //         success: result.successful_messages,
-    //         failed: result.errors.length,
-    //         status: result.errors.length > 0 ? 'Partially Successful' : 'Successful'
-    //       }),
-    //     });
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
 
-    //     if (!logResponse.ok) {
-    //       throw new Error('Network response was not ok')
-    //     }
-    //     else{
-    //       toast.success("Broadcast saved Succeccfully")
-    //     }
+        const result = await response.json()
+        this.broadcastReports = result.map(report => ({
 
-    //     const logResult = await logResponse.json()
+          phone_no: report.phone_no,
+          status: report.status,
+          sent: report.sent,
+          delivered: report.delivered,
+          read: report.read,
+          replied: report.replied
 
-    //     console.log('Broadcast logged:', logResult);
-    //     this.fetchBroadcastList();
+        }));
 
-    //   } catch (error) {
-    //     console.error('Error sending messages:', error);
-    //     responseDiv.textContent = 'Error sending messages.';
-    //   }
-    // },
+      } catch (error) {
+        console.error("Error fetching report for the broadcast", error)
+      }
+    },
+
     handleBroadcast() {
       if (this.isScheduled) {
         this.scheduleBroadcast();
@@ -463,7 +638,7 @@ export default {
 
     async scheduleBroadcast() {
       // Logic for scheduling a broadcast
-      const toast= useToast();
+      const toast = useToast();
       const phoneNumbers = this.recipients.split(',').map(num => num.trim());
       const selectedTemplate = this.selectedTemplate;
       const formattedDate = this.formatDateTime(new Date());
@@ -486,7 +661,7 @@ export default {
           body: JSON.stringify({
             name: broadcastNameWithDate,
             template: selectedTemplate,
-            type:"Schedule",
+            type: "Schedule",
             contacts: phoneNumbers,
             success: 0,
             failed: 0,
@@ -589,6 +764,21 @@ export default {
     },
 
   },
+  computed: {
+    totals() {
+      return this.broadcastReports.reduce(
+        (acc, report) => {
+          acc.sent += report.sent ? 1 : 0;
+          acc.delivered += report.delivered ? 1 : 0;
+          acc.read += report.read ? 1 : 0;
+          acc.replied += report.replied ? 1 : 0;
+          acc.failed += report.status === "failed" ? 1 : 0;
+          return acc;
+        },
+        { sent: 0, delivered: 0, read: 0, replied: 0 ,failed:0} // Initial count set to 0 for all
+      );
+    }
+  },
   watch: {
     selectedContacts: function () {
       this.updateRecipients();
@@ -618,8 +808,10 @@ export default {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
 .my-custom-toast {
-  background-color: #4caf50; /* Custom background */
+  background-color: #4caf50;
+  /* Custom background */
   color: white;
   font-size: 16px;
   border-radius: 10px;
