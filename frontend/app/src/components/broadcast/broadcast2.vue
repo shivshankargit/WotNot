@@ -272,7 +272,6 @@ export default {
     updateRecipients() {
       this.recipients = this.selectedContacts.join(', ');
     },
-
     async sendMessage() {
       const toast= useToast();
       const phoneNumbers = this.recipients.split(',').map(num => num.trim());
@@ -339,11 +338,126 @@ export default {
         responseDiv.textContent = 'Error sending messages.';
       }
     },
+
+    async sendBroadcast() {
+      // Logic for scheduling a broadcast
+      const toast= useToast();
+      const phoneNumbers = this.recipients.split(',').map(num => num.trim());
+      const selectedTemplate = this.selectedTemplate;
+      const formattedDate = this.formatDateTime(new Date());
+      const broadcastNameWithDate = `${this.broadcastName} - ${formattedDate}`;
+      const responseDiv = document.getElementById('response');
+      // responseDiv.textContent = 'Scheduling...';
+      const token = localStorage.getItem('token');
+      try {
+        
+        const response = await fetch('http://localhost:8000/send-template-message/', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: broadcastNameWithDate,
+            recipients: phoneNumbers,
+            template: selectedTemplate,
+            type:"Broadcast",
+            status: 'Saved',
+            
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        else{
+          toast.success("'Broadcast sent successfully");
+          responseDiv.textContent = 'Broadcast scheduled successfully.';
+        }
+
+        const result = await response.json();
+        responseDiv.textContent = `Success: ${result.successful_messages}, Errors: ${result.errors.length}`;
+
+
+       
+
+        this.fetchBroadcastList();
+      } catch (error) {
+        console.error('Error scheduling broadcast:', error);
+        responseDiv.textContent = 'Error scheduling broadcast.';
+      }
+    },
+    // async sendMessage() {
+    //   const toast= useToast();
+    //   const phoneNumbers = this.recipients.split(',').map(num => num.trim());
+    //   const selectedTemplate = this.selectedTemplate;
+    //   const formattedDate = this.formatDateTime(new Date());
+    //   const broadcastNameWithDate = `${this.broadcastName} - ${formattedDate}`;
+    //   const responseDiv = document.getElementById('response');
+    //   responseDiv.textContent = 'Sending...';
+    //   const token = localStorage.getItem('token');
+
+    //   try {
+    //     const response = await fetch('http://localhost:8000/send-template-message/', {
+    //       method: 'POST',
+    //       headers: {
+    //         'Authorization': `Bearer ${token}`,
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify({
+    //         recipients: phoneNumbers,
+    //         template: selectedTemplate,
+            
+    //       }),
+    //     });
+
+    //     if (!response.ok) {
+    //       throw new Error('Network response was not ok');
+
+    //     }
+
+    //     const result = await response.json();
+    //     responseDiv.textContent = `Success: ${result.successful_messages}, Errors: ${result.errors.length}`;
+
+    //     const logResponse = await fetch('http://localhost:8000/broadcast', {
+    //       method: 'POST',
+    //       headers: {
+    //         'Authorization': `Bearer ${token}`,
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify({
+    //         name: broadcastNameWithDate,
+    //         template: selectedTemplate,
+    //         type:"Broadcast",
+    //         contacts: phoneNumbers,
+    //         success: result.successful_messages,
+    //         failed: result.errors.length,
+    //         status: result.errors.length > 0 ? 'Partially Successful' : 'Successful'
+    //       }),
+    //     });
+
+    //     if (!logResponse.ok) {
+    //       throw new Error('Network response was not ok')
+    //     }
+    //     else{
+    //       toast.success("Broadcast saved Succeccfully")
+    //     }
+
+    //     const logResult = await logResponse.json()
+
+    //     console.log('Broadcast logged:', logResult);
+    //     this.fetchBroadcastList();
+
+    //   } catch (error) {
+    //     console.error('Error sending messages:', error);
+    //     responseDiv.textContent = 'Error sending messages.';
+    //   }
+    // },
     handleBroadcast() {
       if (this.isScheduled) {
         this.scheduleBroadcast();
       } else {
-        this.sendMessage();
+        this.sendBroadcast();
       }
     },
 

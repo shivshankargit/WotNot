@@ -10,6 +10,9 @@ class input(BaseModel):
 class input_broadcast(BaseModel):
     recipients: list[str]
     template:str
+    status:str
+    name:str
+    type:str
 
 class BroadcastListCreate(BaseModel): 
     name:str
@@ -24,6 +27,17 @@ class BroadcastListCreate(BaseModel):
 
 class BroadcastListUpdate(BaseModel): 
     task_id: Optional[str] = None 
+
+# class BroadcastAnalysis(BaseModel):
+#     id:int 
+#     broadcast_id:int
+#     message_id:str
+#     phone_no:str
+#     read:bool
+#     delivered:bool
+#     sent:bool
+
+    
 
 
 class Button(BaseModel):
