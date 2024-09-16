@@ -1,86 +1,182 @@
 <template>
-  <div class="content-section">
+  <div class="content-section p-4">
+    <div class="flex flex-col md:flex-row justify-between mb-4">
+      <div>
+        <h2 class="text-xl md:text-2xl font-bold">Manage Templates</h2>
+        <p class="text-sm md:text-base">Your content for scheduled broadcasts goes here.</p>
+      </div>
 
-    <h2>Manage Templates</h2>
-    <p>Your content for scheduled broadcasts goes here.</p>
+      <div >
+        <button @click="showPopup = true"
+          class="bg-[#075e54] text-[#f5f6fa] px-4 py-2 md:px-4 md:py-4 text-sm md:text-base rounded-md shadow-lg">
+          Create New Template
+        </button>
 
-    <div class="CreateTemplateContainer">
-      <p>Create New Template</p>
-      <button @click="showSelectionPopup = true">Create Template</button>
-    </div>
-
-    <div class="templateList_container">
-      <table class="templateList-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Language</th>
-            <th>Status</th>
-            <th>Category</th>
-            <th>Sub Category</th>
-            <th>ID</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="template in templates" :key="template.id">
-            <td>{{ template.name }}</td>
-            <td>{{ template.language }}</td>
-            <td>{{ template.status }}</td>
-            <td>{{ template.category }}</td>
-            <td>{{ template.sub_category }}</td>
-            <td>{{ template.id }}</td>
-            <td><button id="TemplatedeleteBtn" @click="deleteTemplate(template.id)">Delete</button></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Popup for Template Type Selection -->
-    <div v-if="showSelectionPopup" class="popup-overlay" @click.self="closeSelectionPopup">
-      <div class="popup-content">
-        <h2>Select Template Type</h2>
-        <div class="template-type-options">
-          <button @click="selectType('MARKETING')">Marketing</button>
-          <button @click="selectType('UTILITY')">Utility</button>
-        </div>
-        <button @click="closeSelectionPopup" class="discard-button">Close</button>
       </div>
     </div>
 
-    <!-- Create Template Popup -->
-    <div v-if="showPopup" class="popup-overlay" @click.self="closePopup">
-      <div class="popup-content">
-        <h2>Create {{ selectedType }} Template</h2>
-        <form @submit.prevent="submitTemplate">
-          <input v-model="template.name" placeholder="Template Name" required />
-          <textarea v-model="bodyComponent.text" placeholder="Body Text" required></textarea>
+    <div class="bg-[#f5f6fa] rounded-md p-4 mb-4 shadow-lg">
+      <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
+        <table class="w-full rounded-md border-collapse">
+          <thead>
+            <tr class="border-b-2 bg-[#dddddd] text-center">
+              <th class="p-2 text-center md:p-4 border-b-2 bg-[#dddddd] sticky top-0 ">Name</th>
+              <th class="p-2 text-center md:p-4 border-b-2 bg-[#dddddd] sticky top-0 ">Language</th>
+              <th class="p-2 text-center md:p-4 border-b-2 bg-[#dddddd] sticky top-0 ">Status</th>
+              <th class="p-2 text-center md:p-4 border-b-2 bg-[#dddddd] sticky top-0 ">Category</th>
+              <th class="p-2 text-center md:p-4 border-b-2 bg-[#dddddd] sticky top-0 ">Sub Category</th>
+              <th class="p-2 text-center md:p-4 border-b-2 bg-[#dddddd] sticky top-0 ">ID</th>
+              <th class="p-2 text-center md:p-4 border-b-2 bg-[#dddddd] sticky top-0 z-10">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white">
+            <tr v-for="template in templates" :key="template.id">
+              <td class=" border-[#ddd] p-2 md:p-4 text-left">{{ template.name }}</td>
+              <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.language }}</td>
+              <!-- <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.status }}</td> -->
+              <td class="p-2 md:p-4 text-center">
+                <div :class="{
+                  'bg-green-100 text-green-500 ': template.status === 'APPROVED',
+                  'bg-blue-100 text-blue-500 ': template.status === 'PENDING',
+                  'bg-red-100 text-red-500 ': template.status === 'REJECTED',
+                  'border-[#ddd]': true
+                }" class="text-[80%] lg:text-[100%] rounded-lg">
+                  {{ template.status }}
+                </div>
+              </td>
+              <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.category }}</td>
+              <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.sub_category }}</td>
+              <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.id }}</td>
+              <td class=" border-[#ddd] p-2 md:p-4 text-center">
+                <button @click="deleteTemplate(template.id)" class="hover:bg-white rounded-full p-2 transition">
+                  <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="hover"
+                    colors="primary:#ff5757,secondary:#000000" style="width:32px;height:32px">
+                  </lord-icon>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-          <!-- Conditionally display header component -->
-          <input v-model="headerComponent.text" placeholder="Header Text (optional)" />
+    <div v-if="showPopup" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[1000]"
+      @click.self="closePopup">
+      <div class="max-w-3xl mx-auto p-6 bg-white shadow rounded-lg">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold">Create Template Message</h2>
+          <span class="relative bottom-1 text-4xl cursor-pointer text-black" @click="closePopup">&times;</span>
+        </div>
 
-          <!-- Conditionally display footer component -->
-          <input v-model="footerComponent.text" placeholder="Footer Text (optional)" />
+        <form>
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label class="block below-402:text-custom-small text-sm font-medium">Template Name
+                <span class="relative text-sm" :class="{ 'text-black': !nameError, 'text-red-500': nameError }">
+                  *
+                </span>
+              </label>
+              <div class="relative mb-2">
+                <input v-model="template.name" :placeholder="nameError || 'Template Name'" @blur="validateTemplateName"
+                  :class="[
+                    'border border-[#ddd] p-2 rounded-md w-full',
+                    { 'border-red-500': nameError, 'placeholder-red-500': nameError }
+                  ]" required />
 
-          <!-- Conditionally display button component -->
-          <input v-if="selectedSubCategory !== 'ORDER_STATUS'" v-model="button.text"
-            placeholder="Button Text (optional)" />
-          <input v-if="selectedSubCategory !== 'ORDER_STATUS'" v-model="button.url"
-            placeholder="Button URL (optional)" />
+              </div>
+            </div>
 
-          <!-- New Dropdown for Sub-Category Selection -->
-          <select v-model="selectedSubCategory" required>
+            <div>
+              <label class="block text-sm font-medium">Category</label>
+              <select v-model="selectedCategory" class="mt-1 p-2 w-full border border-gray-300 rounded-md h-10">
+                <option value="Marketing">Marketing</option>
+                <option value="Utility">Utility</option>
+              </select>
+            </div>
+
+            <!-- Language -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium">Language</label>
+              <select class="mt-1 p-2 w-full border border-gray-300 rounded-md h-10">
+                <option>English</option>
+                <!-- Add other languages here -->
+              </select>
+            </div>
+
+          </div>
+
+
+
+          <!-- Template Type -->
+          <!-- <div class="mb-4">
+          <label class="block text-sm font-medium mb-2">Select Marketing template</label>
+          <div class="flex space-x-4">
+            <div>
+              <input type="radio" id="standard" name="template" value="standard" class="mr-2">
+              <label for="standard">Standard</label>
+            </div>
+            <div>
+              <input type="radio" id="catalog" name="template" value="catalog" class="mr-2">
+              <label for="catalog">Catalog</label>
+            </div>
+            <div>
+              <input type="radio" id="carousel" name="template" value="carousel" class="mr-2" disabled>
+              <label for="carousel">Carousel</label>
+            </div>
+            <div>
+              <input type="radio" id="limited" name="template" value="limited" class="mr-2" disabled>
+              <label for="limited">Limited Time Offers</label>
+            </div>
+          </div>
+        </div> -->
+
+          <label for="">Header</label>
+          <input v-model="headerComponent.text" placeholder="Header Text (optional)"
+            class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
+
+          <div class="mb-4">
+            <label class="block text-sm font-medium">Body</label>
+            <textarea v-model="bodyComponent.text" class="mt-1 p-2 w-full border border-gray-300 rounded-md h-12"
+              placeholder="Template Message..." rows="4"></textarea>
+          </div>
+
+          <label for="">Footer</label>
+          <input v-model="footerComponent.text" placeholder="Footer Text (optional)"
+            class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
+
+          <span>
+            <button
+              class="relative my-2 h-8 w-24 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200"
+              @click.prevent="addbutton">
+              Add Button
+            </button>
+          </span>
+
+          <!-- Button Text and URL Inputs -->
+          <input v-if="addButton && selectedSubCategory !== 'ORDER_STATUS'" v-model="button.text"
+            placeholder="Button Text (optional)" class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
+          <input v-if="addButton && selectedSubCategory !== 'ORDER_STATUS'" v-model="button.url"
+            placeholder="Button URL (optional)" class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
+
+
+          <!-- Sub-Category Selection -->
+          <label v-if="selectedCategory === 'Marketing'" for="">Sub-Category</label>
+          <select v-model="selectedSubCategory" v-if="selectedCategory === 'Marketing'" required
+            class="border border-[#ddd] p-2 rounded-md w-full mb-2">
             <option value="" disabled>Select Sub-Category</option>
             <option value="ORDER_DETAILS">Order Details</option>
             <!-- <option value="ORDER_STATUS">Order Status</option> -->
           </select>
-
-          <button type="submit" class="submit-button">Submit</button>
+          <!-- Actions -->
+          <div class="flex space-x-4">
+            <button @click="submitTemplate" class="px-4 py-2 bg-green-600 text-white rounded-md">Save</button>
+            <button @click="closePopup" class="px-4 py-2 bg-gray-400 text-white rounded-md">Cancel</button>
+          </div>
         </form>
-        <button @click="closePopup" class="discard-button">Close</button>
       </div>
     </div>
   </div>
+
 </template>
 
 <script>
@@ -90,10 +186,13 @@ export default {
   name: 'BroadCast1',
   data() {
     return {
+      templateName: '',
+      isTemplateNameValid: true,
       templates: [],
       showPopup: false,
+      addButton: false,
       showSelectionPopup: false,
-      selectedType: '',
+      selectedCategory: 'Marketing',
       selectedSubCategory: '',
       template: {
         name: '',
@@ -117,16 +216,31 @@ export default {
         text: '',
         url: ''
       },
-      
+      nameError: ''
     };
   },
 
   async mounted() {
     await this.fetchtemplateList();
+
+    // Dynamically load the Lordicon script
+    const script = document.createElement('script');
+    script.src = "https://cdn.lordicon.com/lordicon.js";
+    document.body.appendChild(script);
   },
 
   methods: {
-     async fetchtemplateList() {
+    addbutton() {
+      this.addButton = !this.addButton;
+    },
+
+    openPopup() {
+      this.showPopup = true;
+      this.selectedType = 'MARKETING';  // Ensure Marketing is default when opening
+    },
+
+
+    async fetchtemplateList() {
       const token = localStorage.getItem('token');
       try {
         const response = await fetch("http://localhost:8000/template", {
@@ -148,13 +262,11 @@ export default {
       }
     },
 
-    selectType(type) {
-      this.selectedType = type;
-      this.showSelectionPopup = false;
-      this.showPopup = true;
-    },
-
     async submitTemplate() {
+      if (this.nameError) {
+        return; // Prevent form submission if there are validation errors
+      }
+
       this.template.components = [this.bodyComponent];
 
       if (this.selectedSubCategory !== 'ORDER_STATUS') {
@@ -176,13 +288,13 @@ export default {
         if (this.footerComponent.text) {
           this.template.components.push(this.footerComponent);
         }
-      } 
-      
+      }
+
       const payload = {
         name: this.template.name,
         components: this.template.components,
         language: 'en_US',
-        category: this.selectedType,
+        category: this.selectedCategory,
         sub_category: this.selectedSubCategory
       };
 
@@ -210,25 +322,80 @@ export default {
       }
     },
 
+    // 
+    validateTemplateName() {
+      // Updated regex to allow lowercase letters and underscores
+      const regex = /^[a-z_]+$/;
+
+      if (this.template.name.trim() === '') {
+        this.nameError = 'Template name is required';
+      } else if (!regex.test(this.template.name)) {
+        this.template.name = '';
+        this.nameError = 'Template name must contain only lowercase letters and underscores.';
+      } else {
+        this.nameError = '';
+      }
+    },
+
+    watch: {
+      templateName() {
+        this.validateTemplateName();
+      },
+    },
+
+    selectType(type) {
+      this.selectedType = type;
+      this.showSelectionPopup = false;
+      this.showPopup = true;
+    },
+
+    closePopup() {
+      this.template.name = '';
+      this.showPopup = false;
+    },
+
     closeSelectionPopup() {
       this.showSelectionPopup = false;
-      this.selectedType = '';
-    },
-    closePopup() {
-      this.showPopup = false;
-      this.template.name = '';
-      this.bodyComponent.text = '';
-      this.headerComponent.text = '';
-      this.footerComponent.text = '';
-      this.button.text = '';
-      this.button.url = '';
-      this.selectedSubCategory = '';
     }
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  border-radius: 16px;
+  background-color: #e7e7e7;
+  border: 1px solid #cacaca;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+  background-color: #075e54;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+</style>
+
+<!-- <style scoped>
+
+.error {
+  border-color: red;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.875em;
+  margin-top: 0.5em;
+}
 
 table {
   width: 100%;
@@ -373,4 +540,4 @@ th {
 .submit-button:hover {
   background-color: #218838;
 }
-</style>
+</style>  -->
