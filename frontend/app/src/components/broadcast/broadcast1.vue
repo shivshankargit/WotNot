@@ -15,21 +15,21 @@
       </div>
     </div>
 
-    <h3 class="text-xl md:text-2xs mb-4"><b>Template List</b></h3>
-    <div class="bg-[#f5f6fa] rounded-md p-4 mb-4 shadow-lg">
+    <h3 class="text-xl md:text-2xs mb-4 text-gray-600"><b>Template List</b></h3>
+    
       
       <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
         
         <table class="w-full rounded-md border-collapse">
           <thead>
-            <tr class="border-b-2 bg-[#dddddd] text-center">
-              <th class="p-2 text-center md:p-4 border-b-2 bg-[#dddddd] sticky top-0 ">Name</th>
-              <th class="p-2 text-center md:p-4 border-b-2 bg-[#dddddd] sticky top-0 ">Language</th>
-              <th class="p-2 text-center md:p-4 border-b-2 bg-[#dddddd] sticky top-0 ">Status</th>
-              <th class="p-2 text-center md:p-4 border-b-2 bg-[#dddddd] sticky top-0 ">Category</th>
-              <th class="p-2 text-center md:p-4 border-b-2 bg-[#dddddd] sticky top-0 ">Sub Category</th>
-              <th class="p-2 text-center md:p-4 border-b-2 bg-[#dddddd] sticky top-0 ">ID</th>
-              <th class="p-2 text-center md:p-4 border-b-2 bg-[#dddddd] sticky top-0 z-10">Actions</th>
+            <tr class="border-b-2 bg-[#ffffff] text-center">
+              <th class="p-2 text-left md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Name</th>
+              <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Language</th>
+              <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Status</th>
+              <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Category</th>
+              <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Sub Category</th>
+              <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">ID</th>
+              <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 z-10">Actions</th>
             </tr>
           </thead>
           <tbody class="bg-white">
@@ -61,7 +61,7 @@
           </tbody>
         </table>
       </div>
-    </div>
+    
 
     <div v-if="showPopup" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[1000]"
       @click.self="closePopup">
