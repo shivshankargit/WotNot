@@ -12,6 +12,7 @@ import csv
 import io
 from ..oauth2 import get_current_user
 from dramatiq import get_broker
+import asyncio
 
 from ..crud.template import send_template_to_whatsapp
 
@@ -25,22 +26,6 @@ import logging
 
 
 router=APIRouter( tags=['Broadcast'])
-
-# access_token = "EAAXZCr1Or3lkBO9B0ZA84JDwoXgYd2BFqYA0Vn6BU2ZBk31OFEy3RPOwn68HWkabINs8y7OF2D2iDT5Uf8wwhcL51jlGANLZBUpGl26ezAAUM4f7pa3a80GUHVGQrP3n1z9dOGi54tZC3bXuK6kGcCsregUdZCl0y6c2oeBgRlw2ZBkSJFZCKuAtmbz1N9lk3uyZA5ZAU1KzXN1KZCeh1UJRgZDZD"
-# BUSINESS_ACCOUNT_ID = '362091573648558'
-
-
-
-
-
-
-# access_token = "EAAXZCr1Or3lkBO9B0ZA84JDwoXgYd2BFqYA0Vn6BU2ZBk31OFEy3RPOwn68HWkabINs8y7OF2D2iDT5Uf8wwhcL51jlGANLZBUpGl26ezAAUM4f7pa3a80GUHVGQrP3n1z9dOGi54tZC3bXuK6kGcCsregUdZCl0y6c2oeBgRlw2ZBkSJFZCKuAtmbz1N9lk3uyZA5ZAU1KzXN1KZCeh1UJRgZDZD"
-# BUSINESS_ACCOUNT_ID = '362091573648558'
-
-
-# webhooks route 
-# verification
-
 
 WEBHOOK_VERIFY_TOKEN = "12345"  # Replace with your verification token
 
@@ -143,7 +128,7 @@ async def receive_meta_webhook(request: Request, db: Session = Depends(database.
                     for message in value["messages"]:
 
                         message_reply=True
-                        message_status='Replied'
+                        message_status='replied'
                          
                         wamid=message['context']['id']
                         broadcast_report = (
@@ -198,13 +183,15 @@ async def send_template_message(request:broadcast.input_broadcast,get_current_us
         type=request.type,
         success=0,
         failed=0,
-        status="saved"
+        status="processing..."
+        
     )
     db.add(broadcastList)
     db.commit()
     db.refresh(broadcastList)
     
     saved_broadcast_id = broadcastList.id
+
 
     API_url=f"https://graph.facebook.com/v20.0/{get_current_user.Phone_id}/messages"
     headers = {

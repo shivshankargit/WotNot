@@ -3,9 +3,12 @@ from typing import List, Optional
 from datetime import datetime
 
 class input(BaseModel):
+    name:str
     recipients: list[str]
     template:str
-    broadcast_id:int
+    status:str
+    scheduled_time:str
+    type:str
 
 class input_broadcast(BaseModel):
     recipients: list[str]

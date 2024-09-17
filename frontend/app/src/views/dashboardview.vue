@@ -56,17 +56,17 @@
         v-if="currentSection === 'broadcast'">
         <a href="#" @click.prevent="navigate('/broadcast/broadcast2')"
           :class="{ 'text-green-900 font-semibold': isActive('/broadcast/broadcast2'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/broadcast/broadcast2')}"
-          class="block p-3 text-gray-700 rounded-lg ">
+          class="block p-3 text-gray-600 rounded-lg ">
           <i class="bi bi-broadcast mr-2"></i>Broadcast Messages
         </a>
         <a href="#" @click.prevent="navigate('/broadcast/broadcast1')"
           :class="{ 'text-green-900 font-semibold': isActive('/broadcast/broadcast1') ,'hover:bg-gray-200 hover:font-semibold': !isActive('/broadcast/broadcast1') }"
-          class="block p-3 text-gray-700 rounded-lg ">
+          class="block p-3 text-gray-600 rounded-lg ">
           <i class="bi bi-chat-right-text-fill mr-2"></i>Manage Templates
         </a>
         <a href="#" @click.prevent="navigate('/broadcast/broadcast3')"
           :class="{ 'text-green-900 font-semibold': isActive('/broadcast/broadcast3'),'hover:bg-gray-200 hover:font-semibold': !isActive('/broadcast/broadcast3') }"
-          class="block p-3 text-gray-700 rounded-lg ">
+          class="block p-3 text-gray-600 rounded-lg ">
           <i class="bi bi-calendar2-range-fill mr-2"></i>Scheduled Broadcasts
         </a>
       </div>
@@ -77,12 +77,12 @@
         :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }" v-if="currentSection === 'Contacts'">
         <a href="#" @click.prevent="navigate('/contacts/contacts1')"
           :class="{ 'text-green-900 font-semibold': isActive('/contacts/contacts1'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/contacts/contacts1')  }"
-          class="block p-3 text-gray-700 rounded-lg ">
+          class="block p-3 text-gray-600 rounded-lg ">
           <i class="bi bi-journal-bookmark-fill mr-2 "></i>Manage Contacts
         </a>
         <a href="#" @click.prevent="navigate('/contacts/contacts2')"
           :class="{ 'text-green-900 font-semibold': isActive('/contacts/contacts2'),'hover:bg-gray-200 hover:font-semibold': !isActive('/contacts/contacts2')  }"
-          class="block p-3 text-gray-700 rounded-lg ">
+          class="block p-3 text-gray-600 rounded-lg ">
           <i class="bi bi-tags-fill mr-2"></i>Manage Tags
         </a>
       </div>
@@ -93,13 +93,13 @@
         :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }" v-if="currentSection === 'Integration'">
         <a href="#" @click.prevent="navigate('/integration/integration1')"
           :class="{ 'text-green-900 font-semibold': isActive('/integration/integration1') ,'hover:bg-gray-200 hover:font-semibold': !isActive('/integration/integration1') }"
-          class="block p-3 text-gray-700 rounded-lg  "><i class="bi bi-link-45deg"></i>
+          class="block p-3 text-gray-600 rounded-lg  "><i class="bi bi-link-45deg"></i>
           Integration
         </a>
       </div>
 
       <!-- Main Content -->
-      <div class="flex-1 mt-16 md:ml-72 p-8 bg-white overflow-y-auto h-[calc(100vh-65px)]">
+      <div class="flex-1 mt-16 md:ml-64 p-8 bg-white overflow-y-auto h-[calc(100vh-65px)]">
         <router-view></router-view>
       </div>
 

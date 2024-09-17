@@ -18,11 +18,6 @@
     <PopUp v-if="showPopup" @close="showPopup = false"
       class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 custom-scrollbar">
 
-
-
-
-
-
       <div class="popup-content custom-scrollbar p-4">
         <form class="space-y-4" @submit.prevent="submitTemplate">
           <h2 class="text-xl font-bold ">Woocommerce</h2>
@@ -101,7 +96,7 @@
 
 
     </PopUp>
-    <h3 class="text-xl md:text-2xs mb-4"><b>Integration List</b></h3>
+    <h3 class="text-xl md:text-2xs mb-4 text-gray-600"><b>Integration List</b></h3>
     <div class="broadcastListContainer bg-gray-100 rounded-lg p-4 max-w-full mx-auto shadow-md custom-scrollbar">
       <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
         <table class="w-full rounded-lg border-collapse">

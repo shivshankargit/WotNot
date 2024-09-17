@@ -59,19 +59,20 @@
       </form>
     </PopUp1>
 
-    <h3 class="text-xl md:text-2xs mb-4"><b>Contact List</b></h3>
-    <div class="bg-gray-100 rounded-lg p-4 mb-5 max-w-[100%] mx-auto shadow-md custom-scrollbar">
+    <h3 class="text-xl md:text-2xs mb-4 text-gray-600"><b>Contact List</b></h3>
+    
+    
       <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
         <table class="w-full rounded-lg border-collapse block">
           <thead>
-            <tr>
-              <th class="py-5 px-3 border-white m-2 text-left bg-[#dddddd] sticky top-0">id</th>
-              <th class="py-5 px-3 border-white m-2 text-left bg-[#dddddd] sticky top-0">contacts_Name</th>
-              <th class="py-5 px-3 border-white m-2 text-left bg-[#dddddd] sticky top-0">phone_number</th>
-              <th class="py-5 px-3 border-white m-2 text-left bg-[#dddddd] sticky top-0">email</th>
-              <th class="py-5 px-3 border-white m-2 text-left bg-[#dddddd] sticky top-0">tags</th>
-              <th class="py-5 px-3 border-white m-2 text-left bg-[#dddddd] sticky top-0">Created at</th>
-              <th class="py-5 px-3 border-white m-2 text-center bg-[#dddddd] sticky top-0 z-10">Action</th>
+            <tr class="bg-[#ffffff] border-b-2 border-gray-300" >
+              <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Id</th>
+              <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Name</th>
+              <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Phone Number</th>
+              <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Email</th>
+              <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Tags</th>
+              <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Created at</th>
+              <th class="py-5 px-3 border-white m-2 text-center bg-[#ffffff] sticky top-0 z-10">Action</th>
             </tr>
           </thead>
 
@@ -102,7 +103,6 @@
           </tbody>
         </table>
       </div>
-    </div>
   </div>
 </template>
 
