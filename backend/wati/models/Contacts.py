@@ -15,3 +15,4 @@ class Contact(database.Base):
     tags = Column(MutableList.as_mutable(JSON), default=[])
     created_at = Column(TIMESTAMP, server_default=func.now())
     updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
+    paid_amount = Column(Integer)

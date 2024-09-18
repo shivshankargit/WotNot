@@ -325,7 +325,7 @@ export default {
     // 
     validateTemplateName() {
       // Updated regex to allow lowercase letters and underscores
-      const regex = /^[a-z_]+$/;
+      const regex = /^[a-z_1-9]+$/;
 
       if (this.template.name.trim() === '') {
         this.nameError = 'Template name is required';
