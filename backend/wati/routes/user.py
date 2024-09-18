@@ -7,7 +7,7 @@ from .. import hashing
 router=APIRouter(tags=['User'])
 
 @router.post('/register')
-def newuser(request: user.register_user,db: Session=Depends(database.get_db)):
+def newuser(request:user.register_user,db: Session=Depends(database.get_db)):
     if(db.query(User.User).where(request.email==User.User.email).first()):
          raise HTTPException(
             status_code=400, detail="Contact with this email or phone already exists"
