@@ -180,6 +180,8 @@ export default {
   },
 
 
+
+
   async mounted() {
     await this.fetchUserDetails() ;
     await this.created();
@@ -577,13 +579,6 @@ button:hover {
     transform: scale(1);
   }
 }
-
-</style>
-
-
-
-
-
 
 </style>
 
