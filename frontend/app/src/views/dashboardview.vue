@@ -31,17 +31,36 @@
           <div v-if="dropdownOpen" class="dropdown-menu">
             <ul>
               <li @click="goToProfile"><i class="bi bi-person-circle"></i> View Profile</li>
+              <li @click="goToPurchaseHistory"><i class="bi bi-currency-rupee"></i> Purchase History </li>
               <li @click="goToSettings"><i class="bi bi-gear-fill"></i> Settings</li>
               <li @click="logout"><i class="bi bi-box-arrow-right"></i> Logout</li>
             </ul>
           </div>
+        </div>
+
+        <!-- Wallet Button with Icon -->
+        <div class="wallet-section">
+          <button @click="toggleWalletModal" class="wallet-btn">
+            <i class="bi bi-wallet2"></i>
+          </button>
         </div>
       </div>
 
 
     </div>
 
-   
+    <!-- Wallet Modal Pop-up -->
+    <div v-if="walletModalOpen" class="modal-overlay" @click="toggleWalletModal">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h2>Wallet</h2>
+          <!-- X Close Button -->
+          <span class="close-btn" @click="toggleWalletModal">&times;</span>
+        </div>
+        <p><strong>Current Balance:</strong> {{ currentBalance }}</p>
+        <button @click="topUpBalance" class="topup-btn">Top Up Balance</button>
+      </div>
+    </div>
 
     <div class="flex flex-1">
       <!-- Hamburger button for mobile view -->
@@ -121,6 +140,10 @@ export default {
   },
   data() {
     return {
+      localUser: {
+        whatsapp_business_id: '', 
+        // currentBalance: 0 ,
+      },
       navItems: [
         { name: 'broadcast', label: 'Broadcast', icon: 'bi bi-broadcast', path: '/broadcast/broadcast2' },
         { name: 'Contacts', label: 'Contacts', icon: 'bi bi-person-video2', path: '/contacts/contacts1' },
@@ -130,6 +153,8 @@ export default {
       dropdownOpen: false,
       showProfilePopup: false,
       isMenuOpen: false,
+      walletModalOpen: false ,
+      currentBalance: 0
     }
   },
   setup() {
@@ -158,7 +183,7 @@ export default {
 
 
   async mounted() {
-
+    await this.fetchUserDetails() ;
     await this.created();
     document.addEventListener('click', this.handleOutsideClick);
   },
@@ -186,14 +211,75 @@ export default {
       }
     },
 
+    async fetchUserDetails() {
+      try {
+        const response = await fetch('http://localhost:8000/user', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch user details');
+        }
+
+        const data = await response.json();
+        this.localUser.whatsapp_business_id = data['Whatsapp_Business_Id'];
+        
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+      }
+    },
+
+    async fetchWalletDetails(accountId) {
+    try {
+        
+        const response = await fetch(`http://localhost:8000/conversations-cost/${accountId}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+        
+        // Check if the response is ok (status code 200-299)
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        
+        // Parse the JSON data from the response
+        const costData = await response.json();
+        
+        // Set the current balance using the response data
+        this.currentBalance = costData;
+        this.currentBalance = this.currentBalance.toFixed(3) ; // Assuming the response directly gives the balance
+        
+        
+    } catch (error) {
+        console.error('Error fetching wallet details:', error);
+        // Handle errors accordingly, e.g., show an error message to the user
+        return null; // Or any default value or error handling logic
+    }
+},
+
     toggleDropdown() {
       this.dropdownOpen = !this.dropdownOpen;
+    },
+    async toggleWalletModal() {
+      await this.fetchWalletDetails(this.localUser.whatsapp_business_id)
+      this.walletModalOpen = !this.walletModalOpen;
+    },
+    topUpBalance() {
+      alert('Coming Soon...');
     },
     goToProfile() {
       this.showProfilePopup = true;
     },
     goToSettings() {
       this.$router.push('/settings');
+    },
+    goToPurchaseHistory() {
+      this.$router.push('/purchase-history');
     },
     logout() {
       localStorage.removeItem('token');
@@ -390,6 +476,109 @@ button:hover {
   background-color: #1ebd5b;
 }
 
+.wallet-btn {
+  background: linear-gradient(45deg, #34eb83, #2ebf91);
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 10px 10px;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.wallet-btn i {
+  margin-right: 10px;
+}
+
+.wallet-btn:hover {
+  transform: translateY(-3px);
+  background: linear-gradient(45deg, #28b479, #249e85);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #ffffff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  width: 400px;
+  text-align: center;
+  position: relative;
+  animation: fadeIn 0.3s ease;
+}
+
+/* Modal Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+/* Close Button (X) */
+.close-btn {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+  color: #ff0000;
+}
+
+/* Top-Up Button */
+.topup-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 10px 30px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.topup-btn:hover {
+  background-color: #218838;
+}
+
+/* Fade-in Animation for Modal */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 
 </style>
 
