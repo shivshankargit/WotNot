@@ -531,39 +531,6 @@ export default {
       }
     },
 
-
-    // async fetchBroadcastList() {
-    //   const token = localStorage.getItem('token');
-    //   try {
-    //     const response = await fetch('http://localhost:8000/broadcast/', {
-    //       method: 'GET',
-    //       headers: {
-    //         'Authorization': `Bearer ${token}`,
-    //         'Content-Type': 'application/json',
-    //       },
-    //     });
-
-    //     if (!response.ok) {
-    //       throw new Error('Network response was not ok');
-    //     }
-
-    //     const broadcastList = await response.json();
-    //     this.broadcasts = broadcastList.map(broadcast => ({
-    //       id: broadcast.id,
-    //       name: broadcast.name,
-    //       type: broadcast.type,
-    //       template: broadcast.template,
-    //       contacts: broadcast.contacts,
-    //       success: broadcast.success,
-    //       failed: broadcast.failed,
-    //       status: broadcast.status
-
-
-    //     }));
-    //   } catch (error) {
-    //     console.error('Error fetching contacts:', error);
-    //   }
-    // },
     async fetchBroadcastList(statusFilter = null) {
       const token = localStorage.getItem('token');
       try {
@@ -602,10 +569,12 @@ export default {
       }
 
     },
+
     filterBroadcastsByStatus(event) {
       const status = event.target.value;
       this.fetchBroadcastList(status);
     },
+
     formatDateTime(date) {
       const day = String(date.getDate()).padStart(2, '0');
       const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -630,15 +599,12 @@ export default {
 
     async uploadMedia() {
       const token = localStorage.getItem('token');
+      this.mediafile = event.target.files[0];
+      const formData = new FormData();
+      formData.append('file', this.mediafile);
 
       try {
-
-
-        this.mediafile = event.target.files[0];
-
-        const formData = new FormData();
-        formData.append('file', this.mediafile);
-
+        
         const response = await fetch("http://localhost:8000/upload-media", {
           method: "POST",
           headers: {
@@ -660,9 +626,7 @@ export default {
         else {
           this.uploadedMedia = true
           alert("Media Uploaded Successfully")
-
         }
-
       } catch (error) {
         console.error('Error uploading media:', error);
       }

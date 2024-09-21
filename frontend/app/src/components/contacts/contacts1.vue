@@ -52,7 +52,7 @@
       </button>
     </div>
   </div>
-<button type="button" @click="addTag" style="margin-top: 5px;margin-bottom: 20px; background-color: #055E54; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Add Tag</button>
+<button type="button" @click="addTag" class="my-2 h-auto w-auto p-1 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200">Add Tag</button>
 
   </div>
 </div>
