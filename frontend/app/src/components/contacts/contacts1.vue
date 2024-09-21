@@ -69,10 +69,12 @@
       </form>
     </PopUp1>
 
-    <h3 class="text-xl md:text-2xs mb-4 text-gray-600"><b>Contact List</b></h3>
     
-    <div class="controls-container mb-4">
-      <div class="dropdown-container">
+    
+    <div class="bg-[#f5f6fa] p-5  filter-container space-x-2">
+
+      <h3 class="text-xl md:text-2xs mb-0 text-gray-600"><b>Contact List</b></h3>
+      <!-- <div class="dropdown-container">
         <b><label for="sort-by">Sort by:</label></b>
         <select v-model="sortBy" @change="fetchContactList">
           <option value="created_at">Created At</option>
@@ -89,10 +91,20 @@
       </div>
 
       <div class="search-container">
-  <b><label for="search">Search by phone number:</label></b>
-  <input type="text" v-model="searchQuery" placeholder="Search by phone number" @input="fetchContactList">
-</div>
+      <b><label for="search">Search by phone number:</label></b>
+      <input type="text" v-model="searchQuery" placeholder="Search by phone number" @input="fetchContactList">
+      </div> -->
 
+
+      
+      <div class="flex items-center space-x-2   tags-search-container">
+        <h3 class="text-l"><b>Filter by tags:</b></h3>
+        
+        <input type="text" v-model="tag_key" placeholder="Key" class="border border-gray-300 rounded px-3 py-2 w-40px">
+        <input type="text" v-model="tag_value" placeholder="Value" class="border border-gray-300 rounded px-3 py-2 w-40px">
+        
+        <button @click="fiterBytTags" class="relative my-2 h-auto w-auto p-1 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200">Apply filter</button>
+      </div>
     </div> 
 
     
@@ -107,7 +119,7 @@
               <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Email</th>
               <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Tags</th>
               <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Created at</th>
-              <th class="py-5 px-3 border-white m-2 text-center bg-[#ffffff] sticky top-0 z-10">Action</th>
+              <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0 z-10">Action</th>
             </tr>
           </thead>
 
@@ -124,7 +136,7 @@
               </td>
               <td class="border-gray-300 py-5 px-3">{{ formatDate(contact.created_at) }}</td>
               <td class="border-gray-300 py-5 px-3">
-                <div class="flex justify-center">
+                <div class="flex justify-left">
                   <button @click="modifyContact(contact)" class="hover:bg-white rounded-full p-2 transition">
                     <lord-icon src="https://cdn.lordicon.com/wuvorxbv.json" trigger="hover"
                       style="width:32px;height:32px">
@@ -172,6 +184,10 @@ export default {
         phone: "",
         countryCode: "+91",
         tags: [],
+
+      // Search Bar
+        tag_key: '',
+        tag_value:'',
       },
       selectedContact: null,
       contacts: [],
@@ -305,6 +321,44 @@ export default {
         }));
       } catch (error) {
         console.error("Error fetching contacts:", error);
+      }
+    },
+
+    // Contacts Tags Filter
+    async fiterBytTags(){
+      const token = localStorage.getItem("token");
+      const tagValue=this.tag_value
+      const tagKey=this.tag_key
+      try{
+        
+        const response=await fetch(`http://localhost:8000/contacts-filter/filter?tag_key=${tagKey}&tag_value=${tagValue}`,{
+          method:"GET",
+          headers:{
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }});
+
+
+          const contactsList= await response.json()
+          this.contacts = contactsList.map((contact) => ({
+          id: contact.id,
+          name: contact.name,
+          phone: contact.phone,
+          email: contact.email,
+          tags: contact.tags.map(tag => {
+            const [key, value] = tag.split(":");
+            return { key, value };
+          }),
+          created_at: contact.created_at, // Store raw dates for sorting
+          updated_at: contact.updated_at // Store updated_at too
+        }));
+
+          if(!response.ok){
+            throw new Error("Network response not ok")
+          }
+
+      }catch(error){
+        console.error("Error filtering contacts",error)
       }
     },
     closeActionPopup() {

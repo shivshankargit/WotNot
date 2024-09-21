@@ -1,6 +1,7 @@
 from pydantic import BaseModel,HttpUrl,Field
 from typing import List, Optional
 from datetime import datetime
+from fastapi import  File, UploadFile
 
 class input(BaseModel):
     name:str
@@ -16,6 +17,8 @@ class input_broadcast(BaseModel):
     status:str
     name:str
     type:str
+    image_id:Optional[str] = None 
+    
 
 class BroadcastListCreate(BaseModel): 
     name:str
@@ -78,3 +81,6 @@ class TemplateResponse(BaseModel):
     id: str
     status: str
     category: str
+
+class uploadMedia(BaseModel):
+    File:UploadFile

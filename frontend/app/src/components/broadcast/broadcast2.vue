@@ -44,11 +44,28 @@
           <div class="mb-2 ">
             <label for="templates" class="block text-sm font-medium">Choose a template<span
                 class="text-red-800">*</span></label>
-            <select v-model="selectedTemplate" id="templates" required
+            <!-- <select v-model="selectedTemplate" id="templates" required
               class="border border-gray-300 rounded px-3 py-2 w-full">
               <option value="" disabled>Select your option</option>
               <option v-for="template in templates" :key="template.id" :value="template.id">{{ template.name }}</option>
+            </select> -->
+
+            <!-- New select field-->
+            <select id="template-select" v-model="selectedTemplateId" @change="onTemplateSelect"
+              class="border border-gray-300 rounded px-3 py-2 w-full ">
+              <option v-for="template in templates" :key="template.id" :value="template.id">
+                {{ template.name }}
+              </option>
             </select>
+
+            <!-- Conditional Image URL input field -->
+            <div v-if="selectedTemplateHasImage">
+              <label for="" class="block text-sm font-semibold">Upload Media</label>
+              <input type="file" @change="onFileChange" class="mb-2 w-[60%] mr-1">
+            </div>
+            <div v-if="uploadedMedia">{{ this.mediaId }}</div>
+
+
           </div>
 
         </div>
@@ -79,12 +96,12 @@
         </div>
 
         <div v-else>
-          <h4 ><b>Contacts</b></h4>
+          <h4><b>Contacts</b></h4>
           <p class="text-sm mb-2 ">Select from your saved contacts</p>
         </div>
 
 
-        
+
         <div class="p-4 bg-[#f5f6fa] mb-4">
           <div class="overflow-x-auto max-h-[20vh] custom-scrollbar">
             <table class="contact-table w-full rounded-lg border-collapse">
@@ -131,8 +148,8 @@
                 class="border border-gray-300 rounded px-3 py-2 w-full">
             </div>
             <div class="w-[50%]">
-              <label for="scheduleTime" class="block text-sm font-medium">Time<span
-                  class="text-red-800">*</span>(GMT +5:30)</label>
+              <label for="scheduleTime" class="block text-sm font-medium">Time<span class="text-red-800">*</span>(GMT
+                +5:30)</label>
               <input type="time" v-model="scheduleTime" id="scheduleTime" required
                 class="border border-gray-300 rounded px-3 py-2 w-full">
             </div>
@@ -141,56 +158,76 @@
 
 
 
-        <button type="submit" class="bg-[#23a455] text-[#f5f6fa] px-4 py-2 rounded" >{{ isScheduled ? 'Schedule Message'
+        <button type="submit" class="bg-[#23a455] text-[#f5f6fa] px-4 py-2 rounded">{{ isScheduled ? 'Schedule Message'
           : 'Send Message' }}</button>
       </form>
       <div id="response"></div>
     </PopUp>
 
-    <h3 class="text-xl md:text-2xs mb-4 text-gray-600"><b>Broadcast List</b></h3>
-    <!-- <div class="broadcastListContainer bg-gray-100 rounded-lg p-4 max-w-full mx-auto shadow-md custom-scrollbar"> -->
-      <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
-        <table class="w-full rounded-lg border-collapse">
-          <thead>
-            <tr class="bg-[#ffffff] text-center">
 
-              <th class="p-2 md:p-4 text-left border-b-2 bg-[#ffffff] sticky top-0 ">Broadcast Name</th>
-              <th class="p-2 md:p-4 border-b-2 bg-[#ffffff] sticky top-0 " >Type</th>
-              <th class="p-2 md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Template</th>
-              <th class="p-2 md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Contacts</th>
-              <th class="p-2 md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Status</th>
-              <th class="p-2 md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Action</th>
+    <div class=" bg-[#f5f6fa] p-4  filter-container space-x-2">
+      <h3 class="text-xl md:text-2xs mb-2 text-gray-600"><b>Broadcast List</b></h3>
 
+      <div class="flex items-center filter-container space-x-2">
+        <h3><b>Filter by:</b></h3>
 
-            </tr>
-          </thead>
-          <tbody class="bg-white">
-            <tr v-for="broadcast in broadcasts" :key="broadcast.id">
-
-              <td class="border-[#ddd] p-2 md:p-4 text-left">{{ broadcast.name }}</td>
-              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.type }}</td>
-              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.template }}</td>
-              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.contacts.length }}</td>
-              <td class="p-2 md:p-4 text-center">
-                <div :class="{
-                  'bg-green-200 text-green-600 ': broadcast.status === 'Successful',
-                  'bg-blue-200 text-blue-600 ': broadcast.status === 'Scheduled',
-                  'bg-red-200 text-red-600 ': broadcast.status === 'Cancelled',
-                  'bg-yellow-100 text-yellow-500 ': broadcast.status === 'Partially Successful',
-                  'bg-yellow-200 text-yellow-600 ': broadcast.status === 'processing...',
-                  'border-[#ddd]': true
-                }" class="text-[80%] lg:text-[100%] rounded-lg">
-                  {{ broadcast.status }}
-                </div>
-              </td>
-              <td class="border-[#ddd] p-2 md:p-4 text-center"><button
-                  class="my-2 h-auto w-auto p-1 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200"
-                  @click="showReportPopup = true, fetchBroadcastReport(broadcast.id)"> View Report</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="w-40px">
+          <select name="" id="" @change="filterBroadcastsByStatus" class="border border-gray-300 rounded px-3 py-2 ">
+            <option value="">Status</option>
+            <option value="Successful">Successful</option>
+            <option value="Cancelled">Cancelled</option>
+            <option value="Partially Successful">Partially Successful</option>
+          </select>
+        </div>
       </div>
+
+
+    </div>
+
+
+    <!-- <div class="broadcastListContainer bg-gray-100 rounded-lg p-4 max-w-full mx-auto shadow-md custom-scrollbar"> -->
+    <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
+      <table class="w-full rounded-lg border-collapse">
+        <thead>
+          <tr class="bg-[#ffffff] text-center">
+
+            <th class="p-2 md:p-4 text-left border-b-2 bg-[#ffffff] sticky top-0 ">Broadcast Name</th>
+            <th class="p-2 md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Type</th>
+            <th class="p-2 md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Template</th>
+            <th class="p-2 md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Contacts</th>
+            <th class="p-2 md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Status</th>
+            <th class="p-2 md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Action</th>
+
+
+          </tr>
+        </thead>
+        <tbody class="bg-white">
+          <tr v-for="broadcast in broadcasts" :key="broadcast.id">
+
+            <td class="border-[#ddd] p-2 md:p-4 text-left">{{ broadcast.name }}</td>
+            <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.type }}</td>
+            <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.template }}</td>
+            <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.contacts.length }}</td>
+            <td class="p-2 md:p-4 text-center">
+              <div :class="{
+                'bg-[#e9f6ee] text-green-600 ': broadcast.status === 'Successful',
+                'bg-blue-200 text-blue-600 ': broadcast.status === 'Scheduled',
+                'bg-red-200 text-red-600 ': broadcast.status === 'Cancelled',
+                'bg-yellow-100 text-yellow-500 ': broadcast.status === 'Partially Successful',
+                'bg-yellow-200 text-yellow-600 ': broadcast.status === 'processing...',
+                'border-[#ddd]': true
+              }" class="text-[80%] lg:text-[100%] rounded-lg">
+                {{ broadcast.status }}
+              </div>
+            </td>
+            <td class="border-[#ddd] p-2 md:p-4 text-center"><button
+                class="my-2 h-auto w-auto p-1 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200"
+                @click="showReportPopup = true, fetchBroadcastReport(broadcast.id)"> View Report</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
 
     <!-- </div> -->
@@ -352,6 +389,10 @@ export default {
   ,
   data() {
     return {
+      mediafile: null,
+      mediaId: "",
+      uploadedMedia: false,
+
       broadcastName: '',
       recipients: '',
       selectedTemplate: '',
@@ -368,7 +409,7 @@ export default {
       allSelected: false,
 
 
-      file: null,
+      csvFile: null,
       selectedContacts: [],
       showPopup: false,
       showReportPopup: false,
@@ -377,41 +418,91 @@ export default {
       isScheduled: false,
 
 
+      selectedTemplateId: null, // Holds the selected template's ID
+      selectedTemplateHasImage: false, // Boolean to control if image URL input should appear
+      imageUrl: '',// To store the input value for the image URL
+
+
     };
   },
   async mounted() {
-    await this.fetchTemplates();
+    // await this.fetchTemplates();
     await this.fetchContacts();
     await this.fetchBroadcastList();
+    await this.fetchtemplateList();
 
-    
+
 
     // Fetch contacts when the component is mounted
   },
   methods: {
 
 
-    async fetchTemplates() {
+    // async fetchTemplates() {
+    //   try {
+    //     const token = localStorage.getItem('token');
+    //     const response = await fetch('http://localhost:8000/templates/', {
+    //       method: 'GET',
+    //       headers: {
+    //         'Authorization': `Bearer ${token}`,
+    //         'Content-Type': 'application/json',
+    //       },
+    //     });
+
+    //     if (!response.ok) {
+    //       throw new Error('Network response was not ok');
+    //     }
+
+    //     const templateNames = await response.json();
+    //     this.templates = templateNames.map(name => ({ id: name, name }));
+    //   } catch (error) {
+    //     console.error('Error fetching templates:', error);
+    //   }
+    // },
+
+    async fetchtemplateList() {
+      const token = localStorage.getItem('token');
       try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:8000/templates/', {
+        const response = await fetch("http://localhost:8000/template", {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
-          },
+          }
         });
 
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
 
-        const templateNames = await response.json();
-        this.templates = templateNames.map(name => ({ id: name, name }));
+        const templatelist = await response.json();
+        this.templates = templatelist.data;
       } catch (error) {
-        console.error('Error fetching templates:', error);
+        console.error("There was an error fetching the templates:", error);
       }
     },
+
+    onTemplateSelect() {
+      // Find the selected template
+      const selectedTemplate = this.templates.find(template => template.id === this.selectedTemplateId);
+
+      // Check if the selected template has a HEADER with IMAGE format
+      const headerComponent = selectedTemplate.components.find(
+        component => component.type === 'HEADER' && component.format === 'IMAGE'
+      );
+
+      if (headerComponent) {
+        // Show the image input field and pre-fill with the example image URL if available
+        this.selectedTemplateHasImage = true;
+        this.imageUrl = headerComponent.example?.header_handle?.[0] || ''; // Use the first example image if available
+      } else {
+        // Hide the image input field if no image is found in the template
+        this.selectedTemplateHasImage = false;
+        this.imageUrl = '';
+      }
+    },
+
+
 
     async fetchContacts() {
 
@@ -441,7 +532,39 @@ export default {
     },
 
 
-    async fetchBroadcastList() {
+    // async fetchBroadcastList() {
+    //   const token = localStorage.getItem('token');
+    //   try {
+    //     const response = await fetch('http://localhost:8000/broadcast/', {
+    //       method: 'GET',
+    //       headers: {
+    //         'Authorization': `Bearer ${token}`,
+    //         'Content-Type': 'application/json',
+    //       },
+    //     });
+
+    //     if (!response.ok) {
+    //       throw new Error('Network response was not ok');
+    //     }
+
+    //     const broadcastList = await response.json();
+    //     this.broadcasts = broadcastList.map(broadcast => ({
+    //       id: broadcast.id,
+    //       name: broadcast.name,
+    //       type: broadcast.type,
+    //       template: broadcast.template,
+    //       contacts: broadcast.contacts,
+    //       success: broadcast.success,
+    //       failed: broadcast.failed,
+    //       status: broadcast.status
+
+
+    //     }));
+    //   } catch (error) {
+    //     console.error('Error fetching contacts:', error);
+    //   }
+    // },
+    async fetchBroadcastList(statusFilter = null) {
       const token = localStorage.getItem('token');
       try {
         const response = await fetch('http://localhost:8000/broadcast/', {
@@ -457,23 +580,32 @@ export default {
         }
 
         const broadcastList = await response.json();
-        this.broadcasts = broadcastList.map(broadcast => ({
-          id: broadcast.id,
-          name: broadcast.name,
-          type: broadcast.type,
-          template: broadcast.template,
-          contacts: broadcast.contacts,
-          success: broadcast.success,
-          failed: broadcast.failed,
-          status: broadcast.status
 
+        // Filter broadcasts based on the statusFilter if it's provided
+        this.broadcasts = broadcastList
+          .map(broadcast => ({
+            id: broadcast.id,
+            name: broadcast.name,
+            type: broadcast.type,
+            template: broadcast.template,
+            contacts: broadcast.contacts,
+            success: broadcast.success,
+            failed: broadcast.failed,
+            status: broadcast.status
+          }))
+          .filter(broadcast => {
+            return statusFilter ? broadcast.status === statusFilter : true;
+          });
 
-        }));
       } catch (error) {
-        console.error('Error fetching contacts:', error);
+        console.error('Error fetching broadcasts:', error);
       }
-    },
 
+    },
+    filterBroadcastsByStatus(event) {
+      const status = event.target.value;
+      this.fetchBroadcastList(status);
+    },
     formatDateTime(date) {
       const day = String(date.getDate()).padStart(2, '0');
       const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -488,24 +620,92 @@ export default {
     updateRecipients() {
       this.recipients = this.selectedContacts.join(', ');
     },
- 
+
+
+    onFileChange(event) {
+      this.file = event.target.files[0];
+      this.uploadMedia();
+    },
+
+
+    async uploadMedia() {
+      const token = localStorage.getItem('token');
+
+      try {
+
+
+        this.mediafile = event.target.files[0];
+
+        const formData = new FormData();
+        formData.append('file', this.mediafile);
+
+        const response = await fetch("http://localhost:8000/upload-media", {
+          method: "POST",
+          headers: {
+
+            'Authorization': `Bearer ${token}`,
+            // 'Content-Type': 'multipart/form-data',
+
+          },
+          body: formData,
+        });
+
+        const media = await response.json()
+        this.mediaId = media.whatsapp_media_id
+        console.log(this.mediaId)
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        else {
+          this.uploadedMedia = true
+          alert("Media Uploaded Successfully")
+
+        }
+
+      } catch (error) {
+        console.error('Error uploading media:', error);
+      }
+    },
+
 
     async sendBroadcast() {
       // Logic for scheduling a broadcast
+
       const toast = useToast();
       const phoneNumbers = this.recipients.split(',').map(num => num.trim());
-      const selectedTemplate = this.selectedTemplate;
+      const Template = this.templates.find(template => template.id === this.selectedTemplateId);
+      const selectedTemplate = Template.name
       const formattedDate = this.formatDateTime(new Date());
       const broadcastNameWithDate = `${this.broadcastName} - ${formattedDate}`;
       const responseDiv = document.getElementById('response');
+      const mediaID = this.mediaId
       // responseDiv.textContent = 'Scheduling...';
       const token = localStorage.getItem('token');
       try {
 
-        this.showPopup=false;
+        this.showPopup = false;
         this.clearForm();
         this.fetchBroadcastList();
-        
+
+        const requestBody = {
+          name: broadcastNameWithDate,
+          recipients: phoneNumbers,
+          template: selectedTemplate,
+          type: "Broadcast",
+          status: 'Save',
+        };
+
+        // Add image header if user has selected one
+        if (mediaID) {
+          requestBody.image_id = mediaID;
+        }
+
+        // Add body parameters if provided (array of parameters)
+        // if (this.bodyParameters && this.bodyParameters.length > 0) {
+        //     requestBody.body_parameters = this.bodyParameters;
+        // }
+
 
         const response = await fetch('http://localhost:8000/send-template-message/', {
           method: 'POST',
@@ -513,14 +713,9 @@ export default {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            name: broadcastNameWithDate,
-            recipients: phoneNumbers,
-            template: selectedTemplate,
-            type: "Broadcast",
-            status: 'Saved',
+          body: JSON.stringify(requestBody),
 
-          }),
+
         });
 
         if (!response.ok) {
@@ -535,10 +730,6 @@ export default {
         const result = await response.json();
         responseDiv.textContent = `Success: ${result.successful_messages}, Errors: ${result.errors.length}`;
 
-
-
-
-        
       } catch (error) {
         console.error('Error scheduling broadcast:', error);
         responseDiv.textContent = 'Error scheduling broadcast.';
@@ -583,7 +774,7 @@ export default {
     handleBroadcast() {
       if (this.isScheduled) {
         this.scheduleBroadcast2();
-        
+
       } else {
         this.sendBroadcast();
       }
@@ -604,7 +795,7 @@ export default {
 
       try {
 
-        this.showPopup=false;
+        this.showPopup = false;
         this.clearForm();
         this.fetchBroadcastList();
 
@@ -643,31 +834,34 @@ export default {
         this.broadcastName = '',
         this.recipients = '',
         this.selectedTemplate = '',
-        this.file = null,
+        this.csvFile = null,
+        this.mediaId = "",
+        this.mediafile = null,
+        this.uploadedMedia = false,
         this.selectedContacts = [],
         this.scheduleDate = '',  // New data property for schedule date
         this.scheduleTime = '',
         this.isScheduled = false,
         this.contacts = [],
-        this.csvUploaded=false
+        this.csvUploaded = false
 
     },
 
     handleFileUpload(event) {
-      this.file = event.target.files[0];
+      this.csvFile = event.target.files[0];
       this.importCSV();
 
     },
 
     async importCSV() {
       const toast = useToast();
-      if (!this.file) {
+      if (!this.csvFile) {
         alert('Please select a file to import.');
         return;
       }
 
       const formData = new FormData();
-      formData.append('file', this.file);
+      formData.append('file', this.csvFile);
 
       try {
         const response = await fetch('http://localhost:8000/import-contacts', {
@@ -704,20 +898,20 @@ export default {
       }
     },
 
-    currentDateTime(){
+    currentDateTime() {
       const now = new Date();
 
-    // Format the date as YYYY-MM-DD
-    const year = now.getFullYear();
-    const month = (now.getMonth() + 1).toString().padStart(2, '0');
-    const day = now.getDate().toString().padStart(2, '0');
-    this.scheduleDate = `${year}-${month}-${day}`;
+      // Format the date as YYYY-MM-DD
+      const year = now.getFullYear();
+      const month = (now.getMonth() + 1).toString().padStart(2, '0');
+      const day = now.getDate().toString().padStart(2, '0');
+      this.scheduleDate = `${year}-${month}-${day}`;
 
-    // Add 5 minutes to the current time
-    now.setMinutes(now.getMinutes() + 2);
-    const hours = now.getHours().toString().padStart(2, '0');
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-    this.scheduleTime = `${hours}:${minutes}`;
+      // Add 5 minutes to the current time
+      now.setMinutes(now.getMinutes() + 2);
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      this.scheduleTime = `${hours}:${minutes}`;
     }
 
 
@@ -726,7 +920,7 @@ export default {
     totals() {
       return this.broadcastReports.reduce(
         (acc, report) => {
-          acc.sent += report.sent === "sent" ? 1 : 0;
+          acc.sent += report.sent ? 1 : 0;
           acc.delivered += report.delivered ? 1 : 0;
           acc.read += report.read ? 1 : 0;
           acc.replied += report.replied ? 1 : 0;
