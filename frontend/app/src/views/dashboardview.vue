@@ -32,7 +32,7 @@
         </div>
 
 
-        <div class="profile-dropdown" @click="toggleDropdown">
+        <div class="profile-dropdown" @click="toggleDropdown" ref="profileDropdown">
           <!-- <img src="../assets/—Pngtree—avatar icon profile icon member_5247852.png" alt="Profile"
             class="profile-icon" /> -->
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
@@ -40,7 +40,7 @@
               <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
             </svg>
 
-          <div v-if="dropdownOpen" class="dropdown-menu">
+          <div v-if="dropdownOpen" class="dropdown-menu" ref="dropdownMenu">
             <ul>
               <li @click="goToProfile"><i class="bi bi-person-circle"></i> View Profile</li>
               <li @click="goToPurchaseHistory"><i class="bi bi-currency-rupee"></i> Purchase History </li>
@@ -57,7 +57,7 @@
     </div>
 
     <!-- Wallet Modal Pop-up -->
-    <div v-if="walletModalOpen" class="modal-overlay" @click="toggleWalletModal">
+    <div v-if="walletModalOpen" class="modal-overlay" >
       <div class="modal-content" @click.stop>
         <div class="modal-header">
           <h2>Wallet</h2>
@@ -273,8 +273,14 @@ export default {
       this.dropdownOpen = !this.dropdownOpen;
     },
     async toggleWalletModal() {
-      await this.fetchWalletDetails(this.localUser.whatsapp_business_id)
       this.walletModalOpen = !this.walletModalOpen;
+      const walletOpen= this.walletModalOpen
+
+      if(walletOpen){
+        await this.fetchWalletDetails(this.localUser.whatsapp_business_id)
+      }
+      
+
     },
     topUpBalance() {
       alert('Coming Soon...');
@@ -294,10 +300,15 @@ export default {
     },
 
     handleOutsideClick(event) {
-      if (!this.$el.contains(event.target)) {
-        this.dropdownOpen = false;
-      }
-    },
+    // Check if the click is outside the dropdown element
+    const dropdownMenu = this.$refs.dropdownMenu; // Use $refs to access the dropdown menu element
+    const profileDropdown = this.$refs.profileDropdown; // Use $refs to access the profile dropdown element
+
+    if (dropdownMenu && !dropdownMenu.contains(event.target) && profileDropdown && !profileDropdown.contains(event.target)) {
+      this.dropdownOpen = false; // Close dropdown
+    }
+  },
+ 
   }
 }
 

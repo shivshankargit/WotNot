@@ -65,6 +65,13 @@
             </div>
             <div v-if="uploadedMedia">{{ this.mediaId }}</div>
 
+            <div v-if="selectedTemplateHasParameters">
+              <label for="">Select Parameter</label>
+              <select name="" id="" v-model="bodyParameter">
+                <option value="Name">Cotact_Name</option>
+              </select>
+            </div>
+
 
           </div>
 
@@ -347,6 +354,7 @@
           <table class="w-full rounded-lg border-collapse">
             <thead>
               <tr class="bg-[#dddddd] text-center">
+                <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Name</th>
                 <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Phone No</th>
                 <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Status</th>
                 <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Sent</th>
@@ -358,7 +366,9 @@
             </thead>
             <tbody class="bg-white">
               <tr v-for="contactReport in broadcastReports" :key="contactReport.id">
+                <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.contact_name}}</td>
                 <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.phone_no }}</td>
+                
                 <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.status }}</td>
                 <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.sent }}</td>
                 <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.delivered }}</td>
@@ -421,7 +431,9 @@ export default {
       selectedTemplateId: null, // Holds the selected template's ID
       selectedTemplateHasImage: false, // Boolean to control if image URL input should appear
       imageUrl: '',// To store the input value for the image URL
-
+      selectedTemplateHasParameters: false,
+      bodyParameters:[],
+      bodyParameter:''
 
     };
   },
@@ -489,6 +501,7 @@ export default {
       // Check if the selected template has a HEADER with IMAGE format
       const headerComponent = selectedTemplate.components.find(
         component => component.type === 'HEADER' && component.format === 'IMAGE'
+
       );
 
       if (headerComponent) {
@@ -499,6 +512,29 @@ export default {
         // Hide the image input field if no image is found in the template
         this.selectedTemplateHasImage = false;
         this.imageUrl = '';
+      }
+
+
+      // Check if the selected template has BODY parameters
+      const bodyComponent = selectedTemplate.components.find(component => component.type === 'BODY');
+
+      if (bodyComponent && bodyComponent.text.includes('{{')) {
+        // Extract the parameters from the body text if there are placeholders
+        const parameterMatches = bodyComponent.text.match(/{{\d+}}/g);
+        if (parameterMatches) {
+          this.selectedTemplateHasParameters = true;
+          this.bodyParameters = parameterMatches.map((param, index) => ({
+            name: `Parameter ${index + 1}`,
+            value: ''
+          }));
+        } else {
+          this.selectedTemplateHasParameters = false;
+          this.bodyParameters = [];
+        }
+      } else {
+        // Hide the parameter input fields if no parameters are found
+        this.selectedTemplateHasParameters = false;
+        this.bodyParameters = [];
       }
     },
 
@@ -604,7 +640,7 @@ export default {
       formData.append('file', this.mediafile);
 
       try {
-        
+
         const response = await fetch("http://localhost:8000/upload-media", {
           method: "POST",
           headers: {
@@ -633,43 +669,110 @@ export default {
     },
 
 
-    async sendBroadcast() {
-      // Logic for scheduling a broadcast
+    // async sendBroadcast() {
+    //   // Logic for scheduling a broadcast
 
+    //   const toast = useToast();
+    //   const phoneNumbers = this.recipients.split(',').map(num => num.trim());
+    //   const Template = this.templates.find(template => template.id === this.selectedTemplateId);
+    //   const selectedTemplate = Template.name
+    //   const formattedDate = this.formatDateTime(new Date());
+    //   const broadcastNameWithDate = `${this.broadcastName} - ${formattedDate}`;
+    //   const responseDiv = document.getElementById('response');
+    //   const mediaID = this.mediaId
+    //   // responseDiv.textContent = 'Scheduling...';
+    //   const token = localStorage.getItem('token');
+    //   try {
+
+    //     this.showPopup = false;
+    //     this.clearForm();
+    //     this.fetchBroadcastList();
+
+    //     const requestBody = {
+    //       name: broadcastNameWithDate,
+    //       recipients: phoneNumbers,
+    //       template: selectedTemplate,
+    //       type: "Broadcast",
+    //       status: 'Save',
+    //     };
+
+    //     // Add image header if user has selected one
+    //     if (mediaID) {
+    //       requestBody.image_id = mediaID;
+    //     }
+
+    //     // Add body parameters if provided (array of parameters)
+    //     // if (this.bodyParameters && this.bodyParameters.length > 0) {
+    //     //     requestBody.body_parameters = this.bodyParameters;
+    //     // }
+
+
+    //     const response = await fetch('http://localhost:8000/send-template-message/', {
+    //       method: 'POST',
+    //       headers: {
+    //         'Authorization': `Bearer ${token}`,
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify(requestBody),
+
+
+    //     });
+
+    //     if (!response.ok) {
+    //       throw new Error('Network response was not ok');
+    //     }
+    //     else {
+    //       this.fetchBroadcastList();
+    //       toast.success("'Broadcast sent successfully");
+    //       responseDiv.textContent = 'Broadcast sent successfully.';
+    //     }
+
+    //     const result = await response.json();
+    //     responseDiv.textContent = `Success: ${result.successful_messages}, Errors: ${result.errors.length}`;
+
+    //   } catch (error) {
+    //     console.error('Error sending broadcast:', error);
+    //     responseDiv.textContent = 'Error sending broadcast.';
+    //   }
+    // },
+    async sendBroadcast() {
       const toast = useToast();
-      const phoneNumbers = this.recipients.split(',').map(num => num.trim());
+
+      // Assuming recipients have both name and number in format 'Name:1234567890'
+      const contacts = this.recipients.split(',').map(entry => {
+        const [name, phone] = entry.split(':').map(item => item.trim());
+        return { name, phone };
+      });
+
       const Template = this.templates.find(template => template.id === this.selectedTemplateId);
-      const selectedTemplate = Template.name
+      const selectedTemplate = Template.name;
       const formattedDate = this.formatDateTime(new Date());
       const broadcastNameWithDate = `${this.broadcastName} - ${formattedDate}`;
       const responseDiv = document.getElementById('response');
-      const mediaID = this.mediaId
-      // responseDiv.textContent = 'Scheduling...';
+      const mediaID = this.mediaId;
       const token = localStorage.getItem('token');
-      try {
+      const bodyparamter=this.bodyParameter
 
+      try {
         this.showPopup = false;
         this.clearForm();
         this.fetchBroadcastList();
 
         const requestBody = {
           name: broadcastNameWithDate,
-          recipients: phoneNumbers,
+          recipients: contacts, // Now sending both name and number
           template: selectedTemplate,
           type: "Broadcast",
-          status: 'Save',
+          status: 'Saved',
         };
 
-        // Add image header if user has selected one
         if (mediaID) {
           requestBody.image_id = mediaID;
         }
 
-        // Add body parameters if provided (array of parameters)
-        // if (this.bodyParameters && this.bodyParameters.length > 0) {
-        //     requestBody.body_parameters = this.bodyParameters;
-        // }
-
+        if (bodyparamter) {
+          requestBody.body_parameters = bodyparamter;
+        }
 
         const response = await fetch('http://localhost:8000/send-template-message/', {
           method: 'POST',
@@ -678,28 +781,23 @@ export default {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(requestBody),
-
-
         });
 
         if (!response.ok) {
           throw new Error('Network response was not ok');
-        }
-        else {
+        } else {
           this.fetchBroadcastList();
-          toast.success("'Broadcast sent successfully");
-          responseDiv.textContent = 'Broadcast scheduled successfully.';
+          toast.success('Broadcast sent successfully');
         }
 
         const result = await response.json();
         responseDiv.textContent = `Success: ${result.successful_messages}, Errors: ${result.errors.length}`;
 
       } catch (error) {
-        console.error('Error scheduling broadcast:', error);
-        responseDiv.textContent = 'Error scheduling broadcast.';
+        console.error('Error sending broadcast:', error);
+        responseDiv.textContent = 'Error sending broadcast.';
       }
     },
-
     async fetchBroadcastReport(broadcast_id) {
 
 
@@ -722,11 +820,13 @@ export default {
         this.broadcastReports = result.map(report => ({
 
           phone_no: report.phone_no,
+          contact_name: report.contact_name,
           status: report.status,
           sent: report.sent,
           delivered: report.delivered,
           read: report.read,
           replied: report.replied
+
 
         }));
 
@@ -744,15 +844,25 @@ export default {
       }
     },
     async scheduleBroadcast2() {
+
+      const contacts = this.recipients.split(',').map(entry => {
+        const [name, phone] = entry.split(':').map(item => item.trim());
+        return { name, phone };
+      });
+
+
       // Logic for scheduling a broadcast
       const toast = useToast();
-      const phoneNumbers = this.recipients.split(',').map(num => num.trim());
-      const selectedTemplate = this.selectedTemplate;
+      // const phoneNumbers = this.recipients.split(',').map(num => num.trim());
+      const Template = this.templates.find(template => template.id === this.selectedTemplateId);
+      const selectedTemplate = Template.name;
       const formattedDate = this.formatDateTime(new Date());
       const broadcastNameWithDate = `${this.broadcastName} - ${formattedDate}`;
       const responseDiv = document.getElementById('response');
       // responseDiv.textContent = 'Scheduling...';
       const token = localStorage.getItem('token');
+      const mediaID = this.mediaId;
+      const bodyparamter=this.bodyParameter
 
       // Combine date and time for scheduling
       const scheduledDatetime = new Date(`${this.scheduleDate}T${this.scheduleTime}`).toISOString();
@@ -763,20 +873,35 @@ export default {
         this.clearForm();
         this.fetchBroadcastList();
 
+        this.showPopup = false;
+        this.clearForm();
+        this.fetchBroadcastList();
+
+        const requestBody = {
+          name: broadcastNameWithDate,
+            recipients: contacts,
+            template: selectedTemplate,
+            type: "Scheduled",
+            status: 'Saved',
+            scheduled_time: scheduledDatetime
+        };
+
+        if (mediaID) {
+          requestBody.image_id = mediaID;
+        }
+
+        if (bodyparamter) {
+
+          requestBody.body_parameters = bodyparamter;
+        }
+
         const response = await fetch(`http://localhost:8000/schedule-template-message/`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            name: broadcastNameWithDate,
-            recipients: phoneNumbers,
-            template: selectedTemplate,
-            type: "Scheduled",
-            status: 'Saved',
-            scheduled_time: scheduledDatetime
-          }),
+          body: JSON.stringify(requestBody),
         });
 
         if (!response.ok) {
@@ -796,6 +921,10 @@ export default {
     clearForm() {
       this.contact = "",
         this.broadcastName = '',
+        this.selectedTemplateHasParameters='',
+        this.selectedTemplateHasImage=false,
+        this.selectedTemplateId='',
+        this.bodyParameter='',
         this.recipients = '',
         this.selectedTemplate = '',
         this.csvFile = null,
@@ -839,17 +968,55 @@ export default {
 
         const data = await response.json();
         this.contacts = data.contacts;
-        this.csvUploaded = true
+        this.csvUploaded = true;
         toast.success('Contacts imported successfully!');
 
-        // Append phone numbers to the recipients input field
-        const phoneNumbers = this.contacts.map(contact => contact.phone).join(',');
-        this.recipients = this.recipients ? this.recipients + ',' + phoneNumbers : phoneNumbers;
+        // Format and append contacts in the required format 'Name:1234567890'
+        const formattedContacts = this.contacts.map(contact => `${contact.name}:${contact.phone}`).join(',');
+
+        // Update recipients with formatted contact list
+        this.recipients = this.recipients ? `${this.recipients},${formattedContacts}` : formattedContacts;
+
       } catch (error) {
         console.error(error);
         toast.error('Failed to import contacts.');
       }
     },
+
+
+    // async importCSV() {
+    //   const toast = useToast();
+    //   if (!this.csvFile) {
+    //     alert('Please select a file to import.');
+    //     return;
+    //   }
+
+    //   const formData = new FormData();
+    //   formData.append('file', this.csvFile);
+
+    //   try {
+    //     const response = await fetch('http://localhost:8000/import-contacts', {
+    //       method: 'POST',
+    //       body: formData,
+    //     });
+
+    //     if (!response.ok) {
+    //       throw new Error('Network response was not ok');
+    //     }
+
+    //     const data = await response.json();
+    //     this.contacts = data.contacts;
+    //     this.csvUploaded = true
+    //     toast.success('Contacts imported successfully!');
+
+    //     // Append phone numbers to the recipients input field
+    //     const phoneNumbers = this.contacts.map(contact => contact.phone).join(',');
+    //     this.recipients = this.recipients ? this.recipients + ',' + phoneNumbers : phoneNumbers;
+    //   } catch (error) {
+    //     console.error(error);
+    //     toast.error('Failed to import contacts.');
+    //   }
+    // },
 
     selectAll(event) {
       // Check if the "Select All" checkbox is checked or unchecked
