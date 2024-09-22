@@ -168,32 +168,160 @@ async def receive_meta_webhook(request: Request, db: Session = Depends(database.
 
 # Broadcast 2 routes
 
+# test
 
+# @router.post("/send-template-message/")
+# async def send_template_message(
+#     request: broadcast.input_broadcast, 
+#     get_current_user: user.newuser = Depends(get_current_user), 
+#     db: Session = Depends(database.get_db)
+# ):
+#     print(request)
+
+#     # Save broadcast details
+#     broadcastList = Broadcast.BroadcastList(
+#         user_id=get_current_user.id,
+#         name=request.name,
+#         template=request.template,
+#         contacts=request.recipients,
+#         type=request.type,
+#         success=0,
+#         failed=0,
+#         status="processing..."
+#     )
+#     db.add(broadcastList)
+#     db.commit()
+#     db.refresh(broadcastList)
+    
+#     saved_broadcast_id = broadcastList.id
+
+
+#     # Prepare API URL and headers
+#     API_url = f"https://graph.facebook.com/v20.0/{get_current_user.Phone_id}/messages"
+#     headers = {
+#         "Authorization": f"Bearer {get_current_user.PAccessToken}",
+#         "Content-Type": "application/json"
+#     }
+
+#     success_count = 0
+#     errors = []
+#     failed_count = 0
+
+#     for recipient in request.recipients:
+#         # Create the base payload
+#         data = {
+#             "messaging_product": "whatsapp",
+#             "to": recipient,
+#             "type": "template",
+#             "template": {
+#                 "name": request.template,
+#                 "language": {"code": "en_US"}
+#             }
+#         }
+
+#         # Check if the image URL is provided and add it to the payload
+#         if request.image_id:
+#             data["template"]["components"] = [
+#                 {
+#                     "type": "header",
+#                     "parameters": [
+#                         {
+#                             "type": "image",
+#                             "image": {
+#                                         "id": request.image_id
+#                         }
+#                         }
+#                     ]
+#                 }
+#             ]
+
+#         # Check if body parameters are provided and add them to the payload
+#         # if request.body_parameters:
+#         #     body_params = [{"type": "text", "text": param} for param in request.body_parameters]
+#         #     if "components" not in data["template"]:
+#         #         data["template"]["components"] = []
+#         #     data["template"]["components"].append({
+#         #         "type": "body",
+#         #         "parameters": body_params
+#         #     })
+
+#         # Send the request to the WhatsApp API
+#         response = requests.post(API_url, headers=headers, data=json.dumps(data))
+#         response_data = response.json()
+
+#         if response.status_code == 200:
+#             success_count += 1
+#             wamid = response_data['messages'][0]['id']
+#             phone_num = response_data['contacts'][0]["wa_id"]
+
+#             MessageIdLog = Broadcast.BroadcastAnalysis(
+#                 user_id=get_current_user.id,
+#                 broadcast_id=saved_broadcast_id,
+#                 message_id=wamid,
+#                 status="sent",
+#                 phone_no=phone_num,
+#             )
+#             db.add(MessageIdLog)
+#             db.commit()
+#             db.refresh(MessageIdLog)
+#         else:
+#             failed_count += 1
+#             errors.append({"recipient": recipient, "error": response_data})
+
+#             MessageIdLog = Broadcast.BroadcastAnalysis(
+#                 user_id=get_current_user.id,
+#                 broadcast_id=saved_broadcast_id,
+#                 status="failed",
+#                 phone_no=recipient,
+#             )
+#             db.add(MessageIdLog)
+#             db.commit()
+#             db.refresh(MessageIdLog)
+
+#     # Update broadcast status
+#     broadcast = db.query(Broadcast.BroadcastList).filter(Broadcast.BroadcastList.id == saved_broadcast_id).first()
+#     if not broadcast:
+#         raise HTTPException(status_code=404, detail="Broadcast not found")
+
+#     if saved_broadcast_id:
+#         broadcast.success = success_count
+#         broadcast.status = "Successful" if failed_count == 0 else "Partially Successful"
+#         broadcast.failed = failed_count
+#     db.add(broadcast)
+#     db.commit()
+#     db.refresh(broadcast)
+
+#     return {
+#         "status": "completed",
+#         "successful_messages": success_count,
+#         "errors": errors
+#     }
 
 
 @router.post("/send-template-message/")
-async def send_template_message(request:broadcast.input_broadcast,get_current_user: user.newuser=Depends(get_current_user),db: Session = Depends(database.get_db)):
-    print(request)
-
-    broadcastList=Broadcast.BroadcastList(
+async def send_template_message(
+    request: broadcast.input_broadcast,
+    get_current_user: user.newuser = Depends(get_current_user),
+    db: Session = Depends(database.get_db)
+):
+    # Save broadcast details
+    broadcastList = Broadcast.BroadcastList(
         user_id=get_current_user.id,
         name=request.name,
         template=request.template,
-        contacts=request.recipients,
+        contacts=[contact.phone for contact in request.recipients],  # Only storing phone numbers for now
         type=request.type,
         success=0,
         failed=0,
         status="processing..."
-        
     )
     db.add(broadcastList)
     db.commit()
     db.refresh(broadcastList)
-    
+
     saved_broadcast_id = broadcastList.id
 
-
-    API_url=f"https://graph.facebook.com/v20.0/{get_current_user.Phone_id}/messages"
+    API_url = f"https://graph.facebook.com/v20.0/{get_current_user.Phone_id}/messages"
     headers = {
         "Authorization": f"Bearer {get_current_user.PAccessToken}",
         "Content-Type": "application/json"
@@ -203,83 +331,104 @@ async def send_template_message(request:broadcast.input_broadcast,get_current_us
     errors = []
     failed_count = 0
 
-    for recipient in request.recipients:
+    for contact in request.recipients:
+        recipient_name = contact.name
+        recipient_phone = contact.phone
+
         data = {
             "messaging_product": "whatsapp",
-            "to": recipient,
-            "type":"template",
+            "to": recipient_phone,
+            "type": "template",
             "template": {
                 "name": request.template,
-                "language": {
-                    "code": "en_US"
-                }
+                "language": {"code": "en_US"},
+                # You can insert recipient_name into your message template if needed
             }
         }
+
+        if request.image_id:
+            data["template"]["components"] = [
+                {
+                    "type": "header",
+                    "parameters": [
+                        {
+                            "type": "image",
+                            "image": {"id": request.image_id}
+                        }
+                    ]
+                }
+            ]
+
+        
+        
+        if request.body_parameters:
+            if request.body_parameters == "Name":
+                body_params = [{"type": "text","text": f"{recipient_name}"}]
+                
+            else:
+                data["template"]["components"] = []
+
+            if "components" not in data["template"]:
+                data["template"]["components"] = []
+            data["template"]["components"].append({
+                "type": "body",
+                "parameters": body_params
+            })
+
+        
 
         response = requests.post(API_url, headers=headers, data=json.dumps(data))
         response_data = response.json()
 
-
         if response.status_code == 200:
             success_count += 1
-
             wamid = response_data['messages'][0]['id']
-            phone_num=response_data['contacts'][0]["wa_id"]
+            phone_num = response_data['contacts'][0]["wa_id"]
 
-            MessageIdLog=Broadcast.BroadcastAnalysis(
-            user_id=get_current_user.id,
-            broadcast_id=saved_broadcast_id,
-            message_id=wamid,
-            status="sent",
-            phone_no=phone_num,  
-             )
+            MessageIdLog = Broadcast.BroadcastAnalysis(
+                user_id=get_current_user.id,
+                broadcast_id=saved_broadcast_id,
+                message_id=wamid,
+                status="sent",
+                phone_no=phone_num,
+                contact_name=recipient_name,
+            )
             db.add(MessageIdLog)
             db.commit()
-            db.refresh(MessageIdLog) 
-
-        
+            db.refresh(MessageIdLog)
         else:
             failed_count += 1
-            errors.append({"recipient": recipient, "error": response.json()})
+            errors.append({"recipient": recipient_phone, "error": response_data})
 
-            MessageIdLog=Broadcast.BroadcastAnalysis(
-            user_id=get_current_user.id,
-            broadcast_id=saved_broadcast_id,
-            status="failed",
-            phone_no=recipient,  
-             )
+            MessageIdLog = Broadcast.BroadcastAnalysis(
+                user_id=get_current_user.id,
+                broadcast_id=saved_broadcast_id,
+                status="failed",
+                phone_no=recipient_phone,
+                contact_name=recipient_name,
+            )
             db.add(MessageIdLog)
             db.commit()
-            db.refresh(MessageIdLog) 
+            db.refresh(MessageIdLog)
 
-        
-
-        # Access the wamid
-        
-
-       
-    
-
-
-    broadcast=db.query(Broadcast.BroadcastList).filter(Broadcast.BroadcastList.id == saved_broadcast_id).first()
-
+    # Update broadcast status
+    broadcast = db.query(Broadcast.BroadcastList).filter(Broadcast.BroadcastList.id == saved_broadcast_id).first()
     if not broadcast:
-            raise HTTPException(status_code=404,detail="Broadcast not found")
+        raise HTTPException(status_code=404, detail="Broadcast not found")
 
-    if saved_broadcast_id:
-            broadcast.success=success_count
-            broadcast.status="Successful"
-            broadcast.failed=failed_count
+    broadcast.success = success_count
+    broadcast.status = "Successful" if failed_count == 0 else "Partially Successful"
+    broadcast.failed = failed_count
     db.add(broadcast)
     db.commit()
-    db.refresh(broadcast) 
-    
-    
+    db.refresh(broadcast)
+
     return {
         "status": "completed",
         "successful_messages": success_count,
         "errors": errors
     }
+
 
 
 
@@ -433,3 +582,44 @@ def BroadcastReport(broadcast_id:int,get_current_user: user.newuser=Depends(get_
         raise HTTPException(status_code=404,detail="Broadcast data not found")
 
     return broadcast_data
+
+@router.post("/upload-media")
+async def upload_file(file: UploadFile = File(...),get_current_user: user.newuser=Depends(get_current_user)):
+    # Read the contents of the uploaded file
+    contents = await file.read()
+    
+
+    # Upload the file to WhatsApp directly from memory (no need to save it)
+    try:
+        media_url = f"https://graph.facebook.com/v20.0/{get_current_user.Phone_id}/media"
+        headers = {
+            "Authorization": f"Bearer {get_current_user.PAccessToken}"
+        }
+        files = {
+            'file': (file.filename, contents, file.content_type),  # File from memory
+        }
+        data = {
+            'type': file.content_type.split("/")[0],
+            'messaging_product': 'whatsapp' # Extract media type (image, video, etc.)
+        }
+
+        # Make the POST request to upload media to WhatsApp
+        response = requests.post(media_url, headers=headers, files=files, data=data)
+
+        # Check for errors in the WhatsApp API response
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=response.json())
+
+        # Get the media ID from the response
+        media_id = response.json().get("id")
+
+        return JSONResponse(content={
+            "filename": file.filename,
+            "file_size": len(contents),
+            "content_type": file.content_type,
+            "whatsapp_media_id": media_id
+        })
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error uploading file to WhatsApp: {str(e)}")
+

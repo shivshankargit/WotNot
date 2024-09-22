@@ -1,5 +1,5 @@
 from fastapi import APIRouter,Depends,HTTPException
-from ..models import Contacts
+from ..models import Contacts,User
 from ..Schemas import contacts,user
 from ..database import database
 from typing import List, Optional
@@ -39,16 +39,16 @@ def create_contact(contact: contacts.ContactCreate, db: Session = Depends(databa
     db.refresh(db_contact)
     return db_contact
 
-#@router.get("/contacts/", response_model=list[contacts.ContactRead])
-#def read_contacts(skip: int = 0, limit: int = 10, tag: str = None, db: Session = Depends(database.get_db),get_current_user: user.newuser=Depends(get_current_user)):
-#    query = db.query(Contacts.Contact).filter(Contacts.Contact.user_id==get_current_user.id)
-#    if tag:
-#        query = query.filter(Contacts.Contact.tags.contains([tag]))
-#    contacts = query.offset(skip).limit(limit).all()
-#    logging.info(contacts)
-#    return contacts
+@router.get("/contacts/", response_model=list[contacts.ContactRead])
+def read_contacts(skip: int = 0, limit: int = 10, tag: str = None, db: Session = Depends(database.get_db),get_current_user: user.newuser=Depends(get_current_user)):
+   query = db.query(Contacts.Contact).filter(Contacts.Contact.user_id==get_current_user.id)
+   if tag:
+       query = query.filter(Contacts.Contact.tags.contains([tag]))
+   contacts = query.offset(skip).limit(limit).all()
+   logging.info(contacts)
+   return contacts
 
-@router.get("/contacts/", response_model=List[ContactRead])
+@router.get("/contacts-filter/", response_model=List[ContactRead])
 def read_contacts(
     skip: int = 0,
     limit: int = 10,
@@ -118,3 +118,22 @@ def update_contact(contact_id: int, contact: contacts.ContactCreate, db: Session
 
 
 
+@router.get("/contacts-filter/filter", response_model=List[contacts.ContactRead])
+def filter_contacts_by_tags(
+    tag_key: str,
+    tag_value: str,
+    db: Session = Depends(database.get_db),
+    get_current_user: user.newuser=Depends(get_current_user)
+):
+    search_tag = f"{tag_key}:{tag_value}"
+    
+    # Query to filter contacts that have the matching tag in the list
+    filtered_contacts = db.query(Contacts.Contact).filter(
+        Contacts.Contact.user_id == get_current_user.id,
+        Contacts.Contact.tags.op('@>')([f"{search_tag}"])
+    ).all()
+
+    if not filtered_contacts:
+        raise HTTPException(status_code=404, detail="No contacts found with the specified tag")
+    
+    return filtered_contacts
