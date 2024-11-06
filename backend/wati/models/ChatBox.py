@@ -1,5 +1,5 @@
 
-from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean,BIGINT
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 from ..database import database
@@ -12,7 +12,7 @@ class Conversation(database.Base):
     id = Column(Integer, primary_key=True, index=True)
     wa_id = Column(String, index=True)  # WhatsApp ID of the user
     message_id = Column(String)  # Unique message ID
-    phone_number_id = Column(String)  # Phone number ID
+    phone_number_id = Column(BIGINT)  # Phone number ID
     message_content = Column(Text)  # Message body
     timestamp = Column(DateTime, default=datetime.utcnow)  # Message timestamp
     context_message_id = Column(String, nullable=True,default= None)  # ID of the message that this is replying to

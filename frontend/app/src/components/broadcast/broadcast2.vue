@@ -124,8 +124,10 @@
               </thead>
               <tbody>
                 <tr v-for="contact in contacts" :key="contact.id">
-                  <td class="text-center p-2 md:p-4 scale-125 "><input type="checkbox" v-model="selectedContacts"
-                      :value="contact.phone"></td>
+                  <td class="text-center p-2 md:p-4 scale-125">
+                    <input type="checkbox" v-model="selectedContacts" :value="`${contact.name}:${contact.phone}`">
+                  </td>
+                  
                   <td class="text-center p-2 md:p-4">{{ contact.name }}</td>
                   <td class="text-center p-2 md:p-4">{{ contact.phone }}</td>
                 </tr>

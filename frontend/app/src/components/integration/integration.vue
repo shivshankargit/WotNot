@@ -97,16 +97,15 @@
 
     </PopUp>
     <h3 class="text-xl md:text-2xs mb-4 text-gray-600"><b>Integration List</b></h3>
-    <div class="broadcastListContainer bg-gray-100 rounded-lg p-4 max-w-full mx-auto shadow-md custom-scrollbar">
-      <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
+    <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
         <table class="w-full rounded-lg border-collapse">
           <thead>
-            <tr class="bg-[#dddddd] text-center">
-              <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">ID</th>
-              <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Application</th>
-              <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Type</th>
-              <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">API Key</th>
-              <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Action</th>
+            <tr class=" text-center">
+              <th class="p-2 md:p-4 border-b-2 sticky top-0">ID</th>
+              <th class="p-2 md:p-4 border-b-2 sticky top-0">Application</th>
+              <th class="p-2 md:p-4 border-b-2 sticky top-0">Type</th>
+              <th class="p-2 md:p-4 border-b-2 sticky top-0">API Key</th>
+              <th class="p-2 md:p-4 border-b-2 sticky top-0">Action</th>
 
             </tr>
           </thead>
@@ -125,7 +124,7 @@
           </tbody>
         </table>
       </div>
-    </div>
+    
 
   </div>
 </template>

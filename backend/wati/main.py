@@ -11,9 +11,22 @@ from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 
 # Models creation
-database.Base.metadata.create_all(bind=database.engine)
+
+
+
+async def create_db_and_tables():
+    async with database.engine.begin() as conn:
+        await conn.run_sync(database.Base.metadata.create_all)
+
+
+
+# database.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI()
+
+@app.on_event("startup")
+async def startup_event():
+    await create_db_and_tables()
 
 # Adding the routes
 app.include_router(broadcast.router)
@@ -42,31 +55,31 @@ app.add_middleware(
 )
 
 # Set up the scheduler
-scheduler = BackgroundScheduler()
+# scheduler = BackgroundScheduler()
 
-def close_expired_chats():
-    db = next(database.get_db())  # Get the database session
-    now = datetime.now()
-    expired_conversations = db.query(ChatBox.Last_Conversation).filter(
-        ChatBox.Last_Conversation.active == True,
-        (now - ChatBox.Last_Conversation.last_chat_time) > timedelta(minutes=5)
-        # (now - ChatBox.Last_Conversation.first_chat_time) > timedelta(hours=24)
-    ).all()
+# def close_expired_chats():
+#     db = next(database.get_db())  # Get the database session
+#     now = datetime.now()
+#     expired_conversations = db.query(ChatBox.Last_Conversation).filter(
+#         ChatBox.Last_Conversation.active == True,
+#         (now - ChatBox.Last_Conversation.last_chat_time) > timedelta(minutes=5)
+#         # (now - ChatBox.Last_Conversation.first_chat_time) > timedelta(hours=24)
+#     ).all()
 
-    for conversation in expired_conversations:
-        conversation.active = False
+#     for conversation in expired_conversations:
+#         conversation.active = False
         
-    db.commit()
+#     db.commit()
 
-# Schedule the job (do not start the scheduler here)
-scheduler.add_job(close_expired_chats, 'interval', minutes=1)
+# # Schedule the job (do not start the scheduler here)
+# scheduler.add_job(close_expired_chats, 'interval', minutes=1)
 
-@app.on_event("startup")
-async def startup_event():
-    # Start the scheduler here
-    scheduler.start()
+# @app.on_event("startup")
+# async def startup_event():
+#     # Start the scheduler here
+#     scheduler.start()
 
-@app.on_event("shutdown")
-def shutdown_event():
-    # Shut down the scheduler
-    scheduler.shutdown()
+# @app.on_event("shutdown")
+# def shutdown_event():
+#     # Shut down the scheduler
+#     scheduler.shutdown()
