@@ -288,96 +288,6 @@ import json
 from typing import AsyncGenerator
 
 
-# @router.get("/sse/conversations/{contact_number}")
-# async def event_stream(
-#     contact_number: str,
-#     request: Request,
-#     background_tasks: BackgroundTasks,
-#     db: AsyncSession = Depends(database.get_db)  # Use AsyncSession for async DB operations
-# ) -> StreamingResponse:
-
-#     async def get_conversations() -> AsyncGenerator[str, None]:
-#         last_data = None  # Track last conversation data
-
-#         while True:
-#             async with db.begin():  # Use async context manager to handle the session
-#                 # Asynchronously fetch the conversations for the given contact number
-#                 result = await db.execute(
-#                     select(ChatBox.Conversation)
-#                     .filter(ChatBox.Conversation.wa_id == contact_number)
-#                     .order_by(ChatBox.Conversation.timestamp)
-#                 )
-#                 conversations = result.scalars().all()  # Get the list of conversation instances
-
-#             # Convert conversation instances to dictionaries
-#             conversation_data = [convert_to_dict(conversation) for conversation in conversations]
-
-#             # Send data only if there is a change
-#             if conversation_data != last_data:
-#                 yield f"data: {json.dumps(conversation_data)}\n\n"
-#                 last_data = conversation_data  # Update last known data
-
-#             # Check if the request has been aborted
-#             if await request.is_disconnected():
-#                 break  # Exit the loop if the client disconnects
-
-#             # Wait for a second before checking again
-#             await asyncio.sleep(1)  # Use await for non-blocking sleep
-
-#     return StreamingResponse(get_conversations(), media_type="text/event-stream")
-
-from fastapi.responses import StreamingResponse
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-import asyncio
-import json
-from typing import AsyncGenerator
-from fastapi import APIRouter, Request, BackgroundTasks, Depends
-
-
-
-# @router.get("/sse/conversations/{contact_number}")
-# async def event_stream(
-#     contact_number: str,
-#     request: Request,
-#     background_tasks: BackgroundTasks,
-#     db: AsyncSession = Depends(database.get_db)  # Use AsyncSession for async DB operations
-# ) -> StreamingResponse:
-
-#     async def get_conversations() -> AsyncGenerator[str, None]:
-#         last_data = None  # Track last conversation data
-
-#         # Send an empty initial response to avoid frontend timeouts
-#         yield f"data: []\n\n"
-
-#         while True:
-#             async with db.begin():  # Use async context manager to handle the session
-#                 # Fetch conversations for the given contact number
-#                 result = await db.execute(
-#                     select(ChatBox.Conversation)
-#                     .filter(ChatBox.Conversation.wa_id == contact_number)
-#                     .order_by(ChatBox.Conversation.timestamp)
-#                 )
-#                 conversations = result.scalars().all()  # Get the list of conversation instances
-
-#             # Convert conversation instances to dictionaries
-#             conversation_data = [convert_to_dict(conversation) for conversation in conversations]
-
-#             # Send data only if it has changed
-#             if conversation_data != last_data:
-#                 yield f"data: {json.dumps(conversation_data)}\n\n"
-#                 last_data = conversation_data  # Update the last known data
-
-#             # Check if the client is disconnected
-#             if await request.is_disconnected():
-#                 break
-
-#             # Wait for a second before checking again
-#             await asyncio.sleep(1)
-
-#     return StreamingResponse(get_conversations(), media_type="text/event-stream")
-
-
 @router.get("/sse/conversations/{contact_number}")
 async def event_stream(
     contact_number: str,
@@ -422,7 +332,6 @@ async def event_stream(
             await asyncio.sleep(2)
 
     return StreamingResponse(get_conversations(), media_type="text/event-stream")
-
 
 
 
