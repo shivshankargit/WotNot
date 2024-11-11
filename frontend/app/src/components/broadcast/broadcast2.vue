@@ -1,5 +1,5 @@
 <template>
-  <div class="content-section">
+  <div class="content-section md:ml-64">
     <div class="flex flex-col md:flex-row justify-between mb-4 border-b pb-5">
       <div>
         <h2 class="text-xl md:text-2xl font-bold">Broadcast Messages</h2>
@@ -124,8 +124,10 @@
               </thead>
               <tbody>
                 <tr v-for="contact in contacts" :key="contact.id">
-                  <td class="text-center p-2 md:p-4 scale-125 "><input type="checkbox" v-model="selectedContacts"
-                      :value="contact.phone"></td>
+                  <td class="text-center p-2 md:p-4 scale-125">
+                    <input type="checkbox" v-model="selectedContacts" :value="`${contact.name}:${contact.phone}`">
+                  </td>
+                  
                   <td class="text-center p-2 md:p-4">{{ contact.name }}</td>
                   <td class="text-center p-2 md:p-4">{{ contact.phone }}</td>
                 </tr>
@@ -919,7 +921,7 @@ export default {
 
 
     clearForm() {
-      this.contact = "",
+        this.contact = "",
         this.broadcastName = '',
         this.selectedTemplateHasParameters='',
         this.selectedTemplateHasImage=false,

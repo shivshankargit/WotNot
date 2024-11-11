@@ -8,12 +8,18 @@ import requests
 from ..Schemas import user,integration
 from ..oauth2 import get_current_user
 from typing import List
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+import httpx
+
+
+
 router=APIRouter(tags=['woocommerce'])
 
 
 
 # Function to verify API key from request headers or query params
-def verify_api_key(request: Request, db: Session ):
+async def verify_api_key(request: Request, db: AsyncSession ):
     api_key = request.headers.get("Authorization")
     
     # If the API key is passed as a query parameter
@@ -21,14 +27,16 @@ def verify_api_key(request: Request, db: Session ):
         api_key = request.query_params.get("api_key")
         
     # Remove "Bearer " if passed in the Authorization header
-    if api_key and api_key.startswith("Bearer "):
+    if api_key and api_key.startswith("Bearer"):
         api_key = api_key[7:]
     
     if not api_key:
         raise HTTPException(status_code=401, detail="API key missing")
 
     # Check if API key exists in the database
-    user = db.query(User.User).filter(User.User.api_key == api_key).first()
+    result =await db.execute(select(User.User).filter(User.User.api_key == api_key))
+
+    user=result.scalars().first()
     
     if not user:
         raise HTTPException(status_code=403, detail="Invalid API key")
@@ -37,14 +45,14 @@ def verify_api_key(request: Request, db: Session ):
 
 
 
-def send_order_confirmation_message(order_data, whatsapp_token, phone_id, db: Session,user_id):
+async def send_order_confirmation_message(order_data, whatsapp_token, phone_id, db: AsyncSession,user_id):
     """
     Sends a user-specific message template when a new order is created in WooCommerce.
     """
     
     # Fetch the integration details from the database
-    integration=db.query(Integration.WooIntegration).filter((Integration.WooIntegration.user_id==user_id)&(Integration.WooIntegration.type=="woo/order_confirmation")).first()
-    
+    result=await db.execute(select(Integration.WooIntegration).filter((Integration.WooIntegration.user_id==user_id)&(Integration.WooIntegration.type=="woo/order_confirmation")))
+    integration=result.scalars().first()
     if not integration:
         raise ValueError("No WooCommerce order confirmation integration found")
 
@@ -117,7 +125,8 @@ def send_order_confirmation_message(order_data, whatsapp_token, phone_id, db: Se
     }
     
     # Send message to WhatsApp API
-    response = requests.post(API_URL, headers=API_HEADERS, json=message_data)
+    async with httpx.AsyncClient() as client:
+        response = await client.post(API_URL, headers=API_HEADERS, json=message_data)
 
     if response.status_code == 200:
         print(f"Message sent successfully to {customer_phone}")
@@ -144,8 +153,8 @@ def send_order_confirmation_message(order_data, whatsapp_token, phone_id, db: Se
         
     )
     db.add(db_broadcastList)
-    db.commit()
-    db.refresh(db_broadcastList)
+    await db.commit()
+    await db.refresh(db_broadcastList)
 
 # webhook for the order cofirmation
 @router.post("/webhook/woocommerce")
@@ -172,7 +181,7 @@ async def handle_woocommerce_webhook(request: Request, db: Session = Depends(dat
 
 # route for fetchapi key
 @router.get("/webhooklink")
-def apikey(request:Request,get_current_user: user.newuser=Depends(get_current_user)):
+async def apikey(request:Request,get_current_user: user.newuser=Depends(get_current_user)):
     apikey=get_current_user.api_key
 
     base_url = request.url.scheme + "://" + request.url.netloc
@@ -183,11 +192,11 @@ def apikey(request:Request,get_current_user: user.newuser=Depends(get_current_us
     
 
 @router.post("/integrate/woocommerce")
-def saveWooIntegartion(request:integration.wooIntegration,get_current_user: user.newuser=Depends(get_current_user),db: Session = Depends(database.get_db)):
+async def saveWooIntegartion(request:integration.wooIntegration,get_current_user: user.newuser=Depends(get_current_user),db: AsyncSession = Depends(database.get_db)):
     parameters_list = [{"key": param.key} for param in request.parameters]
     
-    exixsting=db.query(Integration.WooIntegration).filter((Integration.WooIntegration.user_id==get_current_user.id)&(Integration.WooIntegration.type=="woo/order_confirmation")).first()
-
+    result=await db.execute(select(Integration.WooIntegration).filter((Integration.WooIntegration.user_id==get_current_user.id)&(Integration.WooIntegration.type=="woo/order_confirmation")))
+    exixsting=result.scalars().first()
     if exixsting:
         raise HTTPException(status_code=400, detail="Integration already exists")
    
@@ -200,11 +209,11 @@ def saveWooIntegartion(request:integration.wooIntegration,get_current_user: user
     )
     # Add and commit the data to the database
     db.add(integration)
-    db.commit()
-    db.refresh(integration)
+    await db.commit()
+    await db.refresh(integration)
 
-    integration_search=db.query(Integration.Integration).filter((Integration.Integration.user_id==get_current_user.id)&(Integration.Integration.type==request.type)).first()
-
+    result2=await db.execute(select(Integration.Integration).filter((Integration.Integration.user_id==get_current_user.id)&(Integration.Integration.type==request.type)))
+    integration_search=result2.scalars().first()
     woo_integration = Integration.WooIntegration(
         integration_id=integration_search.id,
         parameters=parameters_list,
@@ -217,8 +226,8 @@ def saveWooIntegartion(request:integration.wooIntegration,get_current_user: user
 
     # Add and commit the data to the database
     db.add(woo_integration)
-    db.commit()
-    db.refresh(woo_integration)
+    await db.commit()
+    await db.refresh(woo_integration)
 
     # Create the WooIntegrationDB model instance
    
