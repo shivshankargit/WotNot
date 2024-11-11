@@ -276,7 +276,7 @@
         const token = localStorage.getItem('token');
   
         // Create a new EventSource instance with the new wa_id
-        this.eventSource = new EventSource(`http://localhost:8000/sse/conversations/${wa_id}`, {
+        this.eventSource = new EventSource(`http://localhost:8000/sse/conversations/${wa_id}?token=${token}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -321,8 +321,6 @@
           }
         });
       },
-  
-  
   
   
       async sendChatMessage() {
