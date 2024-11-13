@@ -51,7 +51,7 @@
               <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.sub_category }}</td>
               <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.id }}</td>
               <td class=" border-[#ddd] p-2 md:p-4 text-center">
-                <button @click="deleteTemplate(template.id)" class="hover:bg-white rounded-full p-2 transition">
+                <button @click="deleteTemplate(template.name)" class="hover:bg-white rounded-full p-2 transition">
                   <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="hover"
                     colors="primary:#ff5757,secondary:#000000" style="width:32px;height:32px">
                   </lord-icon>
@@ -162,6 +162,7 @@
 
 <script>
 import axios from 'axios';
+import { useToast } from 'vue-toastification';
 
 export default {
   name: 'BroadCast1',
@@ -316,6 +317,39 @@ export default {
       } else {
         this.nameError = '';
       }
+    },
+
+    async deleteTemplate(template_name){
+      const toast = useToast();
+      const token = localStorage.getItem('token');
+      const confirmDelete = confirm("Are you sure you want to delete this contact?");
+      if (!confirmDelete) return;
+
+      try {
+        const response = await fetch(`http://localhost:8000/delete-template/${template_name}`, {
+          method:"DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+
+        if(response.ok){
+          toast.success("Template deleted successfully");
+          await this.fetchtemplateList();
+          this.closePopup();
+        }
+        else {
+          const errorData = await response.json();
+          toast.error(`Error: ${errorData.detail}`);
+        }
+
+
+      } catch (error) {
+        console.error('Error deleting template:', error.response ? error.response.data : error.message);
+      }
+
     },
 
     watch: {

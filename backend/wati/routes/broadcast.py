@@ -883,6 +883,28 @@ async def create_template(
         raise HTTPException(status_code=500, detail="An unexpected error occurred.")
 
 
+@router.delete("/delete-template/{template_name}")
+async def DeleteTemplate(   
+    template_name:str,
+    request: Request,
+    get_current_user: user.newuser = Depends(get_current_user)):
+
+        url = f"https://graph.facebook.com/v14.0/{get_current_user.WABAID}/message_templates?name={template_name}"
+        headers = {
+            "Authorization": f"Bearer {get_current_user.PAccessToken}",
+            "Content-Type": "application/json"
+        }
+
+
+        async with httpx.AsyncClient() as client:
+            response = await client.delete(url, headers=headers)
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=response.json())
+        
+        return {"Template deleted successfully"}
+
+
 @router.get("/broadcast-report/{broadcast_id}")
 async def BroadcastReport(
     broadcast_id: int,
