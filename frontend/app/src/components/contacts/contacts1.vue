@@ -6,14 +6,112 @@
         <p class="text-xsm md:text-base">Contact list stores the list of numbers that you've interacted with.
           You can even manually export or import contacts.</p>
       </div>
-      
 
-      <div>
-        <button @click="showPopup = true"
-          class="bg-[#075e54] text-[#f5f6fa] px-4 py-2 md:px-4 md:py-4 text-sm md:text-base rounded-md shadow-lg">
-          + Add Contact
-        </button>
+      <div class="flex justify-between">
+        <div>
+          <button @click="showPopup = true"
+            class="bg-[#075e54] text-[#f5f6fa] px-4 py-2 md:px-4 md:py-4 text-sm md:text-base rounded-md shadow-lg">
+            + Add Contact
+          </button>
+        </div>
+
+
+
       </div>
+
+
+
+      <PopUp v-if="showPopupimport" @close="closePopupimport()">
+        <div class="popup-content">
+          <h2 class="text-xl font-semibold mb-4">Bulk Import Contacts</h2>
+
+          <div class="flex justify-between items-center">
+            <input type="file" @change="onFileChange" accept=".csv" />
+            <button :disabled="!file" @click="uploadFile"
+              class="relative my-2 h-8 w-24 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200">
+              Upload
+            </button>
+          </div>
+
+
+
+
+          <div v-if="duplicates.length">
+            <h3>Duplicate Contacts</h3>
+
+            <div class="overflow-y-auto max-h-[20vh] custom-scrollbar">
+              <table v-if="duplicates.length">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Tags</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(contact, index) in duplicates" :key="index">
+                    <td>{{ contact.name }}</td>
+                    <td>{{ contact.email }}</td>
+                    <td>{{ contact.phone }}</td>
+                    <td>
+                      <div v-for="(value, key) in contact.tags" :key="key">
+                        {{ key }}: {{ value }}
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+
+          </div>
+
+
+          <div  v-if="importcontacts.length">
+            <h3>New Contacts</h3>
+
+            <div class="overflow-y-auto max-h-[20vh] custom-scrollbar" >
+              <table >
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Tags</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(contact, index) in importcontacts" :key="index">
+                    <td>{{ contact.name }}</td>
+                    <td>{{ contact.email }}</td>
+                    <td>{{ contact.phone }}</td>
+                    <td>
+                      <div v-for="(value, key) in contact.tags" :key="key">
+                        {{ key }}: {{ value }}
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+  
+            </div>
+
+          </div>
+
+          <div v-if="importcontacts.length" class="flex">
+            <button :disabled="!file" @click="ImportCSV"
+              class="relative my-2 h-8 w-24 border-2 border-solid border-green-500 text-green-500 ml-auto hover:text-gray-200">
+              Import
+            </button>
+          </div>
+
+
+
+
+        </div>
+      </PopUp>
+
     </div>
     <PopUp1 v-if="showPopup" @close="closePopup">
       <form @submit.prevent="submitForm" id="contactForm" class="p-6 w-[400px]">
@@ -22,7 +120,8 @@
 
         <div class="mb-4">
           <label for="name" class="block text-sm font-medium">Name<span class="text-red-800">*</span></label>
-          <input type="text" v-model="contact.name" id="name" placeholder="Name" required class="border border-gray-300 rounded px-3 py-2 w-full">
+          <input type="text" v-model="contact.name" id="name" placeholder="Name" required
+            class="border border-gray-300 rounded px-3 py-2 w-full">
         </div>
 
         <div class="mb-4">
@@ -33,33 +132,42 @@
               <option value="+44">+44</option>
               <option value="+91">+91</option>
             </select>
-            <input type="text" v-model="contact.phone" id="phone" placeholder="Phone Number" required class="border border-gray-300 rounded-r px-3 py-2 w-full">
+            <input type="text" v-model="contact.phone" id="phone" placeholder="Phone Number" required
+              class="border border-gray-300 rounded-r px-3 py-2 w-full">
           </div>
         </div>
         <label for="email" class="block text-sm font-medium">Email<span class="text-red-800">*</span></label>
-        <input type="email" v-model="contact.email" id="email" placeholder="Email" required class="border border-gray-300 rounded px-3 py-2 mb-2 w-full">
-        
+        <input type="email" v-model="contact.email" id="email" placeholder="Email" required
+          class="border border-gray-300 rounded px-3 py-2 mb-2 w-full">
+
         <div class="mb-4">
-  <label class="block text-sm font-medium">Tags</label>
-  <div class="custom-scrollbar tags-container-container">
+          <label class="block text-sm font-medium">Tags</label>
+          <div class="custom-scrollbar tags-container-container">
 
-  <div class="tags-container">
-    <div class="tag-input" v-for="(tag, index) in contact.tags" :key="index" style="display: flex; align-items: center;">
-      <input type="text" v-model="tag.key" placeholder="Key" required class="border border-gray-300 rounded px-3 py-2 mb-2 w-full" style="width: 60%;">
-      <input type="text" v-model="tag.value" placeholder="Value" required class="border border-gray-300 rounded px-3 py-2 mb-2 w-full" style="width: 60%; margin-left: 10px;">
-      <button type="button" @click="removeTag(index)" class="hover:bg-gray-100 rounded-full p-2 transition">
-        <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="hover" colors="primary:#ff5757,secondary:#000000" style="width:32px;height:32px"></lord-icon>
-      </button>
-    </div>
-  </div>
-<button type="button" @click="addTag" class="my-2 h-auto w-auto p-1 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200">Add Tag</button>
+            <div class="tags-container">
+              <div class="tag-input" v-for="(tag, index) in contact.tags" :key="index"
+                style="display: flex; align-items: center;">
+                <input type="text" v-model="tag.key" placeholder="Key" required
+                  class="border border-gray-300 rounded px-3 py-2 mb-2 w-full" style="width: 60%;">
+                <input type="text" v-model="tag.value" placeholder="Value" required
+                  class="border border-gray-300 rounded px-3 py-2 mb-2 w-full" style="width: 60%; margin-left: 10px;">
+                <button type="button" @click="removeTag(index)" class="hover:bg-gray-100 rounded-full p-2 transition">
+                  <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="hover"
+                    colors="primary:#ff5757,secondary:#000000" style="width:32px;height:32px"></lord-icon>
+                </button>
+              </div>
+            </div>
+            <button type="button" @click="addTag"
+              class="my-2 h-auto w-auto p-1 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200">Add
+              Tag</button>
 
-  </div>
-</div>
+          </div>
+        </div>
 
 
         <div class="flex justify-between mt-2">
-          <button @click="closePopup" type="button" class="border-[2px] border-gray-300 hover:bg-gray-200 text-black rounded-lg px-4 py-2">
+          <button @click="closePopup" type="button"
+            class="border-[2px] border-gray-300 hover:bg-gray-200 text-black rounded-lg px-4 py-2">
             Cancel
           </button>
           <button type="submit" class="bg-[#23a455] text-white px-4 py-2 rounded">
@@ -69,8 +177,8 @@
       </form>
     </PopUp1>
 
-    
-    
+
+
     <div class="bg-[#f5f6fa] p-5  filter-container space-x-2">
 
       <h3 class="text-xl md:text-2xs mb-0 text-gray-600"><b>Contact List</b></h3>
@@ -96,77 +204,94 @@
       </div> -->
 
 
-      
-      <div class="flex items-center space-x-2   tags-search-container">
-        <h3 class="text-l"><b>Filter by tags:</b></h3>
-        
-        <input type="text" v-model="tag_key" placeholder="Key" class="border border-gray-300 rounded px-3 py-2 w-40px">
-        <input type="text" v-model="tag_value" placeholder="Value" class="border border-gray-300 rounded px-3 py-2 w-40px">
-        
-        <button @click="fiterBytTags" class="relative my-2 h-auto w-auto p-1 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200">Apply filter</button>
-      </div>
-    </div> 
 
-    
-    
-      <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
-        <table class="w-full rounded-lg border-collapse block">
-          <thead>
-            <tr class="bg-[#ffffff] border-b-2 border-gray-300" >
-              <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Id</th>
-              <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Name</th>
-              <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Phone Number</th>
-              <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Email</th>
-              <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Tags</th>
-              <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Created at</th>
-              <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0 z-10">Action</th>
-            </tr>
-          </thead>
+      <div class="flex items-center space-x-2  justify-between">
 
-          <tbody class="bg-white">
-            <tr v-for="contact in contacts" :key="contact.id">
-              <td class="border-gray-300 py-5 px-3 contact-id-column">{{ contact.id }}</td>
-              <td class="border-gray-300 py-5 px-3 name-column">{{ contact.name }}</td>
-              <td class="border-gray-300 py-5 px-3">{{ contact.phone }}</td>
-              <td class="border-gray-300 py-5 px-3 contact-email-column">{{ contact.email }}</td>
-              <td class="border-gray-300 py-5 px-4 contact-tag-column">
-                <div v-for="(tag, index) in contact.tags" :key="index">
-                  <span class="font-bold">{{ tag.key }}:</span> {{ tag.value }}
-                </div>
-              </td>
-              <td class="border-gray-300 py-5 px-3">{{ formatDate(contact.created_at) }}</td>
-              <td class="border-gray-300 py-5 px-3">
-                <div class="flex justify-left">
-                  <button @click="modifyContact(contact)" class="hover:bg-white rounded-full p-2 transition">
-                    <lord-icon src="https://cdn.lordicon.com/wuvorxbv.json" trigger="hover"
-                      style="width:32px;height:32px">
-                    </lord-icon>
-                  </button>
-                  <button @click="deleteContact(contact.phone)"
-                    class="hover:bg-white rounded-full p-2 transition">
-                    <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="hover"
-                      colors="primary:#ff5757,secondary:#000000" style="width:32px;height:32px">
-                    </lord-icon>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="flex items-center space-x-2  justify-between">
+          <h3 class="text-l"><b>Filter by tags:</b></h3>
+
+          <input type="text" v-model="tag_key" placeholder="Key"
+            class="border border-gray-300 rounded px-3 py-2 w-40px">
+          <input type="text" v-model="tag_value" placeholder="Value"
+            class="border border-gray-300 rounded px-3 py-2 w-40px">
+
+          <button @click="fiterBytTags"
+            class="relative my-2 h-auto w-auto p-1 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200">Apply
+            filter</button>
+        </div>
+
+        <div>
+          <button @click="showPopupimport = true"
+            class="bg-[#ffffff] text-[#000000] px-4 py-2 md:px-4 md:py-4 text-xs md:text-base rounded-full shadow-lg ml-auto hover:text-gray-200">
+            <i class="bi bi-download"></i> Import CSV
+          </button>
+        </div>
       </div>
+    </div>
+
+
+
+    <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
+      <table class="w-full rounded-lg border-collapse block">
+        <thead>
+          <tr class="bg-[#ffffff] border-b-2 border-gray-300">
+            <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Id</th>
+            <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Name</th>
+            <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Phone Number</th>
+            <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Email</th>
+            <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Tags</th>
+            <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Created at</th>
+            <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0 z-10">Action</th>
+          </tr>
+        </thead>
+
+        <tbody class="bg-white">
+          <tr v-for="contact in contacts" :key="contact.id">
+            <td class="border-gray-300 py-5 px-3 contact-id-column">{{ contact.id }}</td>
+            <td class="border-gray-300 py-5 px-3 name-column">{{ contact.name }}</td>
+            <td class="border-gray-300 py-5 px-3">{{ contact.phone }}</td>
+            <td class="border-gray-300 py-5 px-3 contact-email-column">{{ contact.email }}</td>
+            <td class="border-gray-300 py-5 px-4 contact-tag-column">
+              <div v-for="(tag, index) in contact.tags" :key="index">
+                <span class="font-bold">{{ tag.key }}:</span> {{ tag.value }}
+              </div>
+            </td>
+            <td class="border-gray-300 py-5 px-3">{{ formatDate(contact.created_at) }}</td>
+            <td class="border-gray-300 py-5 px-3">
+              <div class="flex justify-left">
+                <button @click="modifyContact(contact)" class="hover:bg-white rounded-full p-2 transition">
+                  <lord-icon src="https://cdn.lordicon.com/wuvorxbv.json" trigger="hover"
+                    style="width:32px;height:32px">
+                  </lord-icon>
+                </button>
+                <button @click="deleteContact(contact.phone)" class="hover:bg-white rounded-full p-2 transition">
+                  <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="hover"
+                    colors="primary:#ff5757,secondary:#000000" style="width:32px;height:32px">
+                  </lord-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
 <script>
 import { useToast } from 'vue-toastification';
 import PopUp1 from "../popups/popup1";
+import PopUp from "../popups/popup";
+import axios from "axios";
 
 export default {
   components: {
     PopUp1,
+    PopUp
   },
   async mounted() {
     await this.fetchContactList();
+
 
     const script = document.createElement('script');
     script.src = "https://cdn.lordicon.com/lordicon.js";
@@ -176,7 +301,11 @@ export default {
   data() {
     return {
       showPopup: false,
+      showPopupimport: false,
       showActionPopup: false,
+      file: null,
+      importcontacts: [], // Initialize as an empty array
+      duplicates: [], // Initialize as an empty array
       contact: {
         id: "",
         name: "",
@@ -185,9 +314,9 @@ export default {
         countryCode: "+91",
         tags: [],
 
-      // Search Bar
+        // Search Bar
         tag_key: '',
-        tag_value:'',
+        tag_value: '',
       },
       selectedContact: null,
       contacts: [],
@@ -325,22 +454,23 @@ export default {
     },
 
     // Contacts Tags Filter
-    async fiterBytTags(){
+    async fiterBytTags() {
       const token = localStorage.getItem("token");
-      const tagValue=this.tag_value
-      const tagKey=this.tag_key
-      try{
-        
-        const response=await fetch(`http://localhost:8000/contacts-filter/filter?tag_key=${tagKey}&tag_value=${tagValue}`,{
-          method:"GET",
-          headers:{
+      const tagValue = this.tag_value
+      const tagKey = this.tag_key
+      try {
+
+        const response = await fetch(`http://localhost:8000/contacts-filter/filter?tag_key=${tagKey}&tag_value=${tagValue}`, {
+          method: "GET",
+          headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json"
-          }});
+          }
+        });
 
 
-          const contactsList= await response.json()
-          this.contacts = contactsList.map((contact) => ({
+        const contactsList = await response.json()
+        this.contacts = contactsList.map((contact) => ({
           id: contact.id,
           name: contact.name,
           phone: contact.phone,
@@ -353,12 +483,12 @@ export default {
           updated_at: contact.updated_at // Store updated_at too
         }));
 
-          if(!response.ok){
-            throw new Error("Network response not ok")
-          }
+        if (!response.ok) {
+          throw new Error("Network response not ok")
+        }
 
-      }catch(error){
-        console.error("Error filtering contacts",error)
+      } catch (error) {
+        console.error("Error filtering contacts", error)
       }
     },
     closeActionPopup() {
@@ -412,7 +542,68 @@ export default {
     },
     filterContacts() {
       this.fetchContactList();
-    }
+    },
+
+    onFileChange(event) {
+      this.file = event.target.files[0];
+    },
+    async uploadFile() {
+      if (!this.file) return;
+
+      const formData = new FormData();
+      const token = localStorage.getItem("token");
+      formData.append("file", this.file);
+
+      try {
+        const response = await axios.post("http://localhost:8000/contacts/csv/", formData, {
+          headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` },
+        });
+
+        // Update the table with imported contacts
+        this.importcontacts = response.data.contacts || [];
+        this.duplicates = response.data.duplicates || [];
+      } catch (error) {
+        console.error("Error importing contacts:", error.response?.data?.detail || error.message);
+      }
+    },
+
+
+    async ImportCSV() {
+      const toast = useToast();
+      if (!this.file) return;
+
+      const formData = new FormData();
+      const token = localStorage.getItem("token");
+      formData.append("file", this.file);
+
+      try {
+        const response = await axios.post("http://localhost:8000/contacts/bulk_import/", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Handle the response directly
+        if (response.status >= 200 && response.status < 300) {
+          toast.success("Contact created successfully");
+          this.fetchContactList();
+        } else {
+          toast.error(`Error: ${response.data?.detail || "Unknown error"}`);
+        }
+      } catch (error) {
+        console.error("Error importing contacts:", error.response?.data?.detail || error.message);
+        toast.error(`Error: ${error.response?.data?.detail || "Something went wrong"}`);
+      }
+    },
+
+    closePopupimport() {
+      this.showPopupimport = false;
+      this.file = null;
+      this.importcontacts = [];
+      this.duplicates = [];
+    },
+
   },
 };
 </script>
@@ -439,8 +630,10 @@ export default {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
 .tags-container {
-  max-height: 120px; /* adjust this value based on the height of your attribute rows */
+  max-height: 120px;
+  /* adjust this value based on the height of your attribute rows */
   overflow-y: auto;
 }
 
@@ -464,43 +657,54 @@ export default {
 .tags-container::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
 table {
   width: 100%;
   border-collapse: collapse;
 }
 
-thead, tbody {
+thead,
+tbody {
   width: 100%;
 }
 
-thead th, tbody td {
-  width: 2.28%; /* 100% / 7 columns */
+thead th,
+tbody td {
+  width: 2.28%;
+  /* 100% / 7 columns */
   padding: 10px;
   text-align: left;
   border: 1px solid #ffffff;
 }
 
 tbody td {
-  height: 50px; /* adjust this value to change the row height */
+  height: 50px;
+  /* adjust this value to change the row height */
 }
 
 td {
   word-break: keep-all;
 }
+
 .name-column {
-  max-width: 130px; /* Adjust based on your needs */
+  max-width: 130px;
+  /* Adjust based on your needs */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .contact-id-column {
-    font-size: 1.0rem; /* Adjust the font size as needed */
-    max-width: 20px; /* Optional: Adjust width if needed */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .controls-container {
+  font-size: 1.0rem;
+  /* Adjust the font size as needed */
+  max-width: 20px;
+  /* Optional: Adjust width if needed */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.controls-container {
   @apply flex items-center p-5 gap-5 shadow;
 }
 
@@ -512,16 +716,15 @@ td {
   @apply p-1 flex flex-col items-start w-1/3;
 }
 
-.controls-container label, 
+.controls-container label,
 .search-container label {
   @apply text-sm mb-1;
 }
 
-.controls-container select, 
+.controls-container select,
 .search-container input[type="text"] {
   @apply w-full p-2 text-sm border border-gray-300 rounded;
-} 
-
+}
 </style>
 
 
