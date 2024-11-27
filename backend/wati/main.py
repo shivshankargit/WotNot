@@ -9,6 +9,19 @@ from wati.models.ChatBox import Last_Conversation
 from .models import ChatBox
 from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import datetime, timedelta
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from fastapi import FastAPI
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, func
+from datetime import datetime, timedelta
+
+# Assuming `ChatBox` and `database` are already imported
+app = FastAPI()
+scheduler = AsyncIOScheduler()
 
 # Models creation
 
@@ -51,32 +64,72 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Set up the scheduler
-# scheduler = BackgroundScheduler()
+# Set up the schedule
+from datetime import datetime, timedelta, timezone
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from contextlib import asynccontextmanager
 
-# def close_expired_chats():
-#     db = next(database.get_db())  # Get the database session
-#     now = datetime.now()
-#     expired_conversations = db.query(ChatBox.Last_Conversation).filter(
-#         ChatBox.Last_Conversation.active == True,
-#         (now - ChatBox.Last_Conversation.last_chat_time) > timedelta(minutes=5)
-#         # (now - ChatBox.Last_Conversation.first_chat_time) > timedelta(hours=24)
-#     ).all()
+scheduler = AsyncIOScheduler()
+scheduler_started = False
 
-#     for conversation in expired_conversations:
-#         conversation.active = False
-        
-#     db.commit()
 
-# # Schedule the job (do not start the scheduler here)
-# scheduler.add_job(close_expired_chats, 'interval', minutes=1)
+async def close_expired_chats() -> None:
+    """
+    Close chats that have been inactive for more than 5 minutes.
+    """
+    try:
+        # Properly acquire an AsyncSession from the generator
+        async for session in database.get_db():  # Assuming `get_db` is an async generator
+            now = datetime.now()  
+            
+            # Query for expired conversations
+            result = await session.execute(
+                select(ChatBox.Last_Conversation).where(
+                    ChatBox.Last_Conversation.active == True,
+                    now - ChatBox.Last_Conversation.last_chat_time > timedelta(minutes=1440)
+                )
+            )
+            expired_conversations = result.scalars().all()
 
-# @app.on_event("startup")
-# async def startup_event():
-#     # Start the scheduler here
-#     scheduler.start()
+            # Update the `active` status for each conversation
+            for conversation in expired_conversations:
+                conversation.active = False
+            
+            # Commit changes
+            await session.commit()
 
-# @app.on_event("shutdown")
-# def shutdown_event():
-#     # Shut down the scheduler
-#     scheduler.shutdown()
+            print(f"Successfully closed {len(expired_conversations)} expired chats.")
+            break  # Exit after acquiring the first session
+
+    except Exception as e:
+        # Log the error
+        print(f"Error in close_expired_chats: {e}")
+
+
+@app.on_event("startup")
+async def startup_event() -> None:
+    """
+    Event triggered when the application starts.
+    Starts the scheduler if not already started.
+    """
+    global scheduler_started
+    if not scheduler_started:
+        scheduler.add_job(close_expired_chats, 'interval', minutes=1)
+        scheduler.start()
+        scheduler_started = True
+        print("Scheduler started.")
+
+
+@app.on_event("shutdown")
+async def shutdown_event() -> None:
+    """
+    Event triggered when the application shuts down.
+    Properly stops the scheduler to clean up resources.
+    """
+    global scheduler_started
+    if scheduler_started:
+        scheduler.shutdown(wait=False)  # Ensures shutdown is non-blocking
+        scheduler_started = False
+        print("Scheduler shut down.")

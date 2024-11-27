@@ -47,14 +47,14 @@ async def integrationlist(
 
 @router.delete("/integration/{id}")
 async def deleteIntegration(
-    id: str,
+    id: int,
     db: AsyncSession = Depends(database.get_db),
     get_current_user: user.newuser = Depends(get_current_user)
 ):
     # Find the WooIntegration object asynchronously
     result = await db.execute(
         select(Integration.WooIntegration).filter(
-            (Integration.WooIntegration.integration_id == id) &
+            (Integration.WooIntegration.integration_id == int(id)) &
             (Integration.WooIntegration.user_id == get_current_user.id)
         )
     )
@@ -70,7 +70,7 @@ async def deleteIntegration(
     # Find the Integration object asynchronously
     result = await db.execute(
         select(Integration.Integration).filter(
-            (Integration.Integration.id == id) &
+            (Integration.Integration.id == int(id)) &
             (Integration.Integration.user_id == get_current_user.id)
         )
     )

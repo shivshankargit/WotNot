@@ -1,5 +1,5 @@
 <template>
-  <div class="content-section md:ml-64">
+  <div class="content-section m-8 md:ml-72">
     <div class="flex flex-col md:flex-row justify-between mb-4 border-b pb-5">
       <div>
         <h2 class="text-xl md:text-2xl font-bold ">Manage Contacts</h2>
@@ -128,9 +128,9 @@
           <label for="phone" class="block text-sm font-medium">Phone Number<span class="text-red-800">*</span></label>
           <div class="flex">
             <select v-model="contact.countryCode" class="border border-gray-300 rounded-l px-3 py-2 w-20 mr-2">
-              <option value="+1">+1</option>
-              <option value="+44">+44</option>
-              <option value="+91">+91</option>
+              <option value="1">+1</option>
+              <option value="44">+44</option>
+              <option value="91">+91</option>
             </select>
             <input type="text" v-model="contact.phone" id="phone" placeholder="Phone Number" required
               class="border border-gray-300 rounded-r px-3 py-2 w-full">
@@ -260,12 +260,12 @@
             <td class="border-gray-300 py-5 px-3">
               <div class="flex justify-left">
                 <button @click="modifyContact(contact)" class="hover:bg-white rounded-full p-2 transition">
-                  <lord-icon src="https://cdn.lordicon.com/wuvorxbv.json" trigger="hover"
+                  <lord-icon src="https://cdn.lordicon.com/wuvorxbv.json" trigger="none"
                     style="width:32px;height:32px">
                   </lord-icon>
                 </button>
                 <button @click="deleteContact(contact.phone)" class="hover:bg-white rounded-full p-2 transition">
-                  <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="hover"
+                  <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="none"
                     colors="primary:#ff5757,secondary:#000000" style="width:32px;height:32px">
                   </lord-icon>
                 </button>
@@ -361,7 +361,7 @@ export default {
 
       let fullPhoneNumber = phone;
       if (countryCode && countryCode.trim() !== '') {
-        fullPhoneNumber = `${countryCode} ${phone}`;
+        fullPhoneNumber = `${countryCode}${phone}`;
       }
 
       if (tags.some(tag => tag.key === '' || tag.value === '')) {

@@ -1,5 +1,5 @@
 <template>
-  <div class="content-section md:ml-64">
+  <div class="content-section m-8 md:ml-72">
     <!-- Section Header -->
     <div class="flex flex-col md:flex-row justify-between mb-4 border-b pb-5">
       <div>

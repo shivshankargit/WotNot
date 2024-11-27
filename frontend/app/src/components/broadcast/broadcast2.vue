@@ -1,5 +1,5 @@
 <template>
-  <div class="content-section md:ml-64">
+  <div class="content-section m-8 md:ml-72">
     <div class="flex flex-col md:flex-row justify-between mb-4 border-b pb-5">
       <div>
         <h2 class="text-xl md:text-2xl font-bold">Broadcast Messages</h2>
@@ -16,185 +16,193 @@
 
     <PopUp v-if="showPopup" @close="showPopup = false, clearForm()">
 
-      <div></div>
 
-      <h2 class="text-xl font-semibold mb-4">New Broadcast</h2>
-      <hr class="mb-4" />
-
-
-      <form @submit.prevent="handleBroadcast" id="messageForm">
+          <h2 class="text-xl font-semibold mb-4">New Broadcast</h2>
+          <hr class="mb-4" />
 
 
-        <h4><b>What message do you want to send?</b></h4>
-        <p class="text-sm mb-2 ">Add broadcast name and template below</p>
+          <form @submit.prevent="handleBroadcast" id="messageForm">
+
+
+            <h4><b>What message do you want to send?</b></h4>
+            <p class="text-sm mb-2 ">Add broadcast name and template below</p>
 
 
 
-        <div class="p-4 bg-[#f5f6fa] mb-4">
+            <div class="p-4 bg-[#f5f6fa] mb-4">
 
-          <!-- Input Bradacast Name -->
-          <div class="mb-2">
-            <label for="broadcastName" class="block text-sm font-medium">Broadcast Name<span
-                class="text-red-800">*</span></label>
-            <input type="text" v-model="broadcastName" id="broadcastName" placeholder="Broadcast Name" required
-              class="border border-gray-300 rounded px-3 py-2 w-full">
-          </div>
+              <!-- Input Bradacast Name -->
+              <div class="mb-2">
+                <label for="broadcastName" class="block text-sm font-medium">Broadcast Name<span
+                    class="text-red-800">*</span></label>
+                <input type="text" v-model="broadcastName" id="broadcastName" placeholder="Broadcast Name" required
+                  class="border border-gray-300 rounded px-3 py-2 w-full">
+              </div>
 
-          <!-- input template -->
-          <div class="mb-2 ">
-            <label for="templates" class="block text-sm font-medium">Choose a template<span
-                class="text-red-800">*</span></label>
-            <!-- <select v-model="selectedTemplate" id="templates" required
+              <!-- input template -->
+              <div class="mb-2 ">
+                <label for="templates" class="block text-sm font-medium">Choose a template<span
+                    class="text-red-800">*</span></label>
+                <!-- <select v-model="selectedTemplate" id="templates" required
               class="border border-gray-300 rounded px-3 py-2 w-full">
               <option value="" disabled>Select your option</option>
               <option v-for="template in templates" :key="template.id" :value="template.id">{{ template.name }}</option>
             </select> -->
 
-            <!-- New select field-->
-            <select id="template-select" v-model="selectedTemplateId" @change="onTemplateSelect"
-              class="border border-gray-300 rounded px-3 py-2 w-full ">
-              <option v-for="template in templates" :key="template.id" :value="template.id">
-                {{ template.name }}
-              </option>
-            </select>
+                <!-- New select field-->
+                <select id="template-select" v-model="selectedTemplateId" @change="onTemplateSelect"
+                  class="border border-gray-300 rounded px-3 py-2 w-full ">
+                  <option v-for="template in templates" :key="template.id" :value="template.id">
+                    {{ template.name }}
+                  </option>
+                </select>
 
-            <!-- Conditional Image URL input field -->
-            <div v-if="selectedTemplateHasImage">
-              <label for="" class="block text-sm font-semibold">Upload Media</label>
-              <input type="file" @change="onFileChange" class="mb-2 w-[60%] mr-1">
+                <!-- Conditional Image URL input field -->
+                <div v-if="selectedTemplateHasImage">
+                  <label for="" class="block text-sm font-semibold">Upload Media</label>
+                  <input type="file" @change="onFileChange" class="mb-2 w-[60%] mr-1">
+                </div>
+                <div v-if="uploadedMedia">{{ this.mediaId }}</div>
+
+                <div v-if="selectedTemplateHasParameters">
+                  <label for="">Select Parameter</label>
+                  <select name="" id="" v-model="bodyParameter">
+                    <option value="Name">Cotact_Name</option>
+                  </select>
+                </div>
+
+
+              </div>
+
             </div>
-            <div v-if="uploadedMedia">{{ this.mediaId }}</div>
+            <h4><b>Who do you want to send it to?</b></h4>
+            <p class="text-sm mb-2 ">Select contacts below or <a
+                href="https://drive.google.com/file/d/1hVQErwmNN6eGN1zLBoniW_34-GzAtMwm/view?usp=sharing"
+                target="_blank" class="text-blue-500"><u>Download sample format for contact upload</u></a></p>
 
-            <div v-if="selectedTemplateHasParameters">
-              <label for="">Select Parameter</label>
-              <select name="" id="" v-model="bodyParameter">
-                <option value="Name">Cotact_Name</option>
-              </select>
+            <div class="p-4 bg-[#f5f6fa] mb-4">
+
+              <div class="mb-2">
+                <label for="recipients" class="block text-sm font-medium">Recipients<span
+                    class="text-red-800">*</span></label>
+                <input type="text" v-model="recipients" id="recipients"
+                  placeholder="Enter phone numbers, comma-separated" required
+                  class="border border-gray-300 rounded px-3 py-2 w-full">
+              </div>
+
+
+              <div class="mb-1">
+                <label for="csvFile" class="block text-sm font-semibold">Upload CSV for Contacts:</label>
+                <input type="file" @change="handleFileUpload" class="mb-2 w-[60%] mr-1" />
+
+              </div>
+            </div>
+            <div v-if="csvUploaded">
+              <h4><b>Imported Contacts</b></h4>
+              <p class="text-sm mb-2 ">Imported contacts are not saved to your contacts directory</p>
+            </div>
+
+            <div v-else>
+              <h4><b>Contacts</b></h4>
+              <p class="text-sm mb-2 ">Select from your saved contacts</p>
             </div>
 
 
-          </div>
 
-        </div>
-        <h4><b>Who do you want to send it to?</b></h4>
-        <p class="text-sm mb-2 ">Select contacts below or <a
-            href="https://drive.google.com/file/d/1hVQErwmNN6eGN1zLBoniW_34-GzAtMwm/view?usp=sharing" target="_blank"
-            class="text-blue-500"><u>Download sample format for contact upload</u></a></p>
+            <div class="p-4 bg-[#f5f6fa] mb-4">
+              <div class="overflow-x-auto max-h-[20vh] custom-scrollbar">
+                <table class="contact-table w-full rounded-lg border-collapse">
+                  <thead>
+                    <tr class="bg-[#dddddd] text-center">
+                      <th class="z-10 p-2 bg-[#dddddd] sticky top-0">
+                        <input type="checkbox" @change="selectAll($event)" v-model="allSelected"
+                          class=" scale-150 m-2 z-10">Select
+                      </th>
+                      <th class="p-2 bg-[#dddddd]  sticky top-0">Name</th>
+                      <th class="p-2 bg-[#dddddd]  sticky top-0">Phone Number</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="contact in contacts" :key="contact.id">
+                      <td class="text-center p-2 md:p-4 scale-125">
+                        <input type="checkbox" v-model="selectedContacts" :value="`${contact.name}:${contact.phone}`">
+                      </td>
 
-        <div class="p-4 bg-[#f5f6fa] mb-4">
-
-          <div class="mb-2">
-            <label for="recipients" class="block text-sm font-medium">Recipients<span
-                class="text-red-800">*</span></label>
-            <input type="text" v-model="recipients" id="recipients" placeholder="Enter phone numbers, comma-separated"
-              required class="border border-gray-300 rounded px-3 py-2 w-full">
-          </div>
-
-
-          <div class="mb-1">
-            <label for="csvFile" class="block text-sm font-semibold">Upload CSV for Contacts:</label>
-            <input type="file" @change="handleFileUpload" class="mb-2 w-[60%] mr-1" />
-
-          </div>
-        </div>
-        <div v-if="csvUploaded">
-          <h4><b>Imported Contacts</b></h4>
-          <p class="text-sm mb-2 ">Imported contacts are not saved to your contacts directory</p>
-        </div>
-
-        <div v-else>
-          <h4><b>Contacts</b></h4>
-          <p class="text-sm mb-2 ">Select from your saved contacts</p>
-        </div>
-
-
-
-        <div class="p-4 bg-[#f5f6fa] mb-4">
-          <div class="overflow-x-auto max-h-[20vh] custom-scrollbar">
-            <table class="contact-table w-full rounded-lg border-collapse">
-              <thead>
-                <tr class="bg-[#dddddd] text-center">
-                  <th class="z-10 p-2 bg-[#dddddd] sticky top-0">
-                    <input type="checkbox" @change="selectAll($event)" v-model="allSelected"
-                      class=" scale-150 m-2 z-10">Select
-                  </th>
-                  <th class="p-2 bg-[#dddddd]  sticky top-0">Name</th>
-                  <th class="p-2 bg-[#dddddd]  sticky top-0">Phone Number</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="contact in contacts" :key="contact.id">
-                  <td class="text-center p-2 md:p-4 scale-125">
-                    <input type="checkbox" v-model="selectedContacts" :value="`${contact.name}:${contact.phone}`">
-                  </td>
-                  
-                  <td class="text-center p-2 md:p-4">{{ contact.name }}</td>
-                  <td class="text-center p-2 md:p-4">{{ contact.phone }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <h4><b>When do you want to send the message ?</b></h4>
-        <p class="text-sm mb-2 ">Select from the options below </p>
-
-
-        <div class="p-4 bg-[#f5f6fa] mb-4">
-
-
-          <p class=" text-sm font-semibold mb-1"><input type="radio" v-model="isScheduled" :value="false"
-              class="scale-150 text-green-500 m-2">Send Now</p>
-
-          <p class="text-sm font-semibold mb-1"><input type="radio" v-model="isScheduled" :value="true"
-              class="scale-150 text-green-500 m-2" @click="currentDateTime">Schedule </p>
-
-          <div v-if="isScheduled" class="flex justify-between">
-            <div class="w-[50%]">
-              <label for="scheduleDate" class="block text-sm font-medium">Date<span
-                  class="text-red-800">*</span></label>
-              <input type="date" v-model="scheduleDate" id="scheduleDate" required
-                class="border border-gray-300 rounded px-3 py-2 w-full">
+                      <td class="text-center p-2 md:p-4">{{ contact.name }}</td>
+                      <td class="text-center p-2 md:p-4">{{ contact.phone }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <div class="w-[50%]">
-              <label for="scheduleTime" class="block text-sm font-medium">Time<span class="text-red-800">*</span>(GMT
-                +5:30)</label>
-              <input type="time" v-model="scheduleTime" id="scheduleTime" required
-                class="border border-gray-300 rounded px-3 py-2 w-full">
+
+            <h4><b>When do you want to send the message ?</b></h4>
+            <p class="text-sm mb-2 ">Select from the options below </p>
+
+
+            <div class="p-4 bg-[#f5f6fa] mb-4">
+
+
+              <p class=" text-sm font-semibold mb-1"><input type="radio" v-model="isScheduled" :value="false"
+                  class="scale-150 text-green-500 m-2">Send Now</p>
+
+              <p class="text-sm font-semibold mb-1"><input type="radio" v-model="isScheduled" :value="true"
+                  class="scale-150 text-green-500 m-2" @click="currentDateTime">Schedule </p>
+
+              <div v-if="isScheduled" class="flex justify-between">
+                <div class="w-[50%]">
+                  <label for="scheduleDate" class="block text-sm font-medium">Date<span
+                      class="text-red-800">*</span></label>
+                  <input type="date" v-model="scheduleDate" id="scheduleDate" required
+                    class="border border-gray-300 rounded px-3 py-2 w-full">
+                </div>
+                <div class="w-[50%]">
+                  <label for="scheduleTime" class="block text-sm font-medium">Time<span
+                      class="text-red-800">*</span>(GMT
+                    +5:30)</label>
+                  <input type="time" v-model="scheduleTime" id="scheduleTime" required
+                    class="border border-gray-300 rounded px-3 py-2 w-full">
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+            <button type="submit" class="bg-[#23a455] text-[#f5f6fa] px-4 py-2 rounded">{{ isScheduled ? 'ScheduleMessage':'Send Message' }}</button>
+          </form>
 
 
 
-        <button type="submit" class="bg-[#23a455] text-[#f5f6fa] px-4 py-2 rounded">{{ isScheduled ? 'Schedule Message'
-          : 'Send Message' }}</button>
-      </form>
       <div id="response"></div>
     </PopUp>
 
 
-    <div class=" bg-[#f5f6fa] p-4  filter-container space-x-2">
-      <h3 class="text-xl md:text-2xs mb-2 text-gray-600"><b>Broadcast List</b></h3>
+    <div class="bg-[#f5f6fa] p-4  filter-container space-x-2">
 
-      <div class="flex items-center filter-container space-x-2">
-        <h3><b>Filter by:</b></h3>
-
-        <div class="w-40px">
-          <select name="" id="" @change="filterBroadcastsByStatus" class="border border-gray-300 rounded px-3 py-2 ">
-            <option value="">Status</option>
-            <option value="Successful">Successful</option>
-            <option value="Cancelled">Cancelled</option>
-            <option value="Partially Successful">Partially Successful</option>
-          </select>
+      <div class="flex items-center">
+        <h3 class="text-xl md:text-2xs mb-2 text-gray-600"><b>Broadcast List </b></h3>
+        <div class="pb-2 pl-2">
+          <button class="text-blue-500 underline hover:text-blue-700 hover:bg-transparent"
+            @click="fetchBroadcastList()">
+            <i class="bi bi-arrow-clockwise"></i> Refresh
+          </button>
         </div>
+
       </div>
 
+      <div class="flex justify-between">
+        <div class="flex items-center filter-container space-x-2">
+          <h3><b>Filter by:</b></h3>
+          <div class="w-40px">
+            <select name="" id="" @change="filterBroadcastsByStatus" class="border border-gray-300 rounded px-3 py-2 ">
+              <option value="">Status</option>
+              <option value="Successful">Successful</option>
+              <option value="Cancelled">Cancelled</option>
+              <option value="Partially Successful">Partially Successful</option>
+            </select>
+          </div>
+        </div>
 
+      </div>
     </div>
 
-
-    <!-- <div class="broadcastListContainer bg-gray-100 rounded-lg p-4 max-w-full mx-auto shadow-md custom-scrollbar"> -->
     <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
       <table class="w-full rounded-lg border-collapse">
         <thead>
@@ -229,9 +237,11 @@
                 {{ broadcast.status }}
               </div>
             </td>
-            <td class="border-[#ddd] p-2 md:p-4 text-center"><button
-                class="my-2 h-auto w-auto p-1 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200"
-                @click="showReportPopup = true, fetchBroadcastReport(broadcast.id)"> View Report</button>
+            <td class="border-[#ddd] p-2 md:p-4 text-center">
+              <button class="text-blue-500 underline hover:text-blue-700 hover:bg-transparent"
+                @click="showReportPopup = true, fetchBroadcastReport(broadcast.id)">
+                View Report
+              </button>
             </td>
           </tr>
         </tbody>
@@ -239,7 +249,7 @@
     </div>
 
 
-    <!-- </div> -->
+
     <PopUp v-if="showReportPopup" @close="showReportPopup = false, broadcastReports = ['']">
 
       <h3 class="text-xl md:text-2xs mb-4"><b>Broadcast Report</b></h3>
@@ -351,39 +361,55 @@
         </div>
       </div>
 
-      <div class="broadcastListContainer bg-gray-100 rounded-lg p-4 max-w-full mx-auto shadow-md custom-scrollbar">
-        <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
-          <table class="w-full rounded-lg border-collapse">
-            <thead>
-              <tr class="bg-[#dddddd] text-center">
-                <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Name</th>
-                <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Phone No</th>
-                <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Status</th>
-                <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Sent</th>
-                <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Delivered</th>
-                <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Read</th>
-                <th class="p-2 md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Replied</th>
 
-              </tr>
-            </thead>
-            <tbody class="bg-white">
-              <tr v-for="contactReport in broadcastReports" :key="contactReport.id">
-                <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.contact_name}}</td>
-                <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.phone_no }}</td>
-                
-                <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.status }}</td>
-                <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.sent }}</td>
-                <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.delivered }}</td>
-                <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.read }}</td>
-                <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.replied }}</td>
+      <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
+        <table class="w-full rounded-lg border-collapse">
+          <thead>
+            <tr class="text-center">
+              <th class="p-2 md:p-4 border-b-2 sticky top-0">Name</th>
+              <th class="p-2 md:p-4 border-b-2 sticky top-0">Phone No</th>
+              <th class="p-2 md:p-4 border-b-2 sticky top-0">Status</th>
+              <th class="p-2 md:p-4 border-b-2 sticky top-0">Sent</th>
+              <th class="p-2 md:p-4 border-b-2 sticky top-0">Delivered</th>
+              <th class="p-2 md:p-4 border-b-2 sticky top-0">Read</th>
+              <th class="p-2 md:p-4 border-b-2 sticky top-0">Replied</th>
+              <th class="p-2 md:p-4 border-b-2 sticky top-0">Failure Reason</th>
 
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-
+            </tr>
+          </thead>
+          <tbody class="bg-white">
+            <tr v-for="(contactReport, index) in broadcastReports" :key="contactReport.id">
+              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.contact_name }}</td>
+              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.phone_no }}</td>
+              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.status }}</td>
+              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.sent }}</td>
+              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.delivered }}</td>
+              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.read }}</td>
+              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.replied }}</td>
+              <td class="border-[#ddd] p-2 md:p-4 text-center">
+                <div class="relative flex justify-center items-center">
+                  <button
+                    v-if="contactReport.error_reason"
+                    @mouseenter="showTooltip(index, $event)"
+                    @mouseleave="hideTooltip"
+                    class="info-button">
+                    ℹ️
+                  </button>
+                  <div
+                    v-if="tooltipVisible === index"
+                    class="tooltip-container absolute bg-gray-700 text-white p-2 rounded text-sm"
+                    :style="tooltipStyles">
+                    {{ contactReport.error_reason }}
+                  </div>
+                </div>
+              </td>
+            </tr>
+        </tbody>
+        </table>
       </div>
+
+
+
 
     </PopUp>
   </div>
@@ -399,8 +425,16 @@ export default {
     PopUp
   }
   ,
+  props: {
+    contactReport: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {
+      tooltipVisible: null, // Index of the row with a visible tooltip
+      tooltipStyles: {},
       mediafile: null,
       mediaId: "",
       uploadedMedia: false,
@@ -434,8 +468,8 @@ export default {
       selectedTemplateHasImage: false, // Boolean to control if image URL input should appear
       imageUrl: '',// To store the input value for the image URL
       selectedTemplateHasParameters: false,
-      bodyParameters:[],
-      bodyParameter:''
+      bodyParameters: [],
+      bodyParameter: ''
 
     };
   },
@@ -451,28 +485,35 @@ export default {
   },
   methods: {
 
+    showTooltip(index, event) {
+      this.tooltipVisible = index; // Set the visible tooltip to the current row index
+      const { clientX: x, clientY: y } = event;
+      this.tooltipStyles = {
+        left: `${x}px`,
+        top: `${y + 15}px`, // Offset for better visibility
+      };
+    },
+    hideTooltip() {
+      this.tooltipVisible = null; // Hide the tooltip
+    },
 
-    // async fetchTemplates() {
-    //   try {
-    //     const token = localStorage.getItem('token');
-    //     const response = await fetch('http://localhost:8000/templates/', {
-    //       method: 'GET',
-    //       headers: {
-    //         'Authorization': `Bearer ${token}`,
-    //         'Content-Type': 'application/json',
-    //       },
-    //     });
-
-    //     if (!response.ok) {
-    //       throw new Error('Network response was not ok');
-    //     }
-
-    //     const templateNames = await response.json();
-    //     this.templates = templateNames.map(name => ({ id: name, name }));
-    //   } catch (error) {
-    //     console.error('Error fetching templates:', error);
-    //   }
+    // showTooltip(event) {
+    //   this.tooltipVisible = true;
+    //   const buttonRect = event.target.getBoundingClientRect();
+    //   this.tooltipStyles = {
+    //     top: `${buttonRect.bottom + 8}px`, // Position below the button with a small gap
+    //     left: `${buttonRect.left + buttonRect.width / 2 - 85}px`, // Center horizontally, adjust for half of 170px width
+    //     width: "170px", // Tooltip width
+    //     height: "100px", // Tooltip height
+    //   };
     // },
+
+    // hideTooltip() {
+    //   this.tooltipVisible = false;
+    // },
+
+
+
 
     async fetchtemplateList() {
       const token = localStorage.getItem('token');
@@ -601,12 +642,16 @@ export default {
           .filter(broadcast => {
             return statusFilter ? broadcast.status === statusFilter : true;
           });
+          
 
       } catch (error) {
         console.error('Error fetching broadcasts:', error);
       }
 
     },
+
+
+
 
     filterBroadcastsByStatus(event) {
       const status = event.target.value;
@@ -671,72 +716,7 @@ export default {
     },
 
 
-    // async sendBroadcast() {
-    //   // Logic for scheduling a broadcast
-
-    //   const toast = useToast();
-    //   const phoneNumbers = this.recipients.split(',').map(num => num.trim());
-    //   const Template = this.templates.find(template => template.id === this.selectedTemplateId);
-    //   const selectedTemplate = Template.name
-    //   const formattedDate = this.formatDateTime(new Date());
-    //   const broadcastNameWithDate = `${this.broadcastName} - ${formattedDate}`;
-    //   const responseDiv = document.getElementById('response');
-    //   const mediaID = this.mediaId
-    //   // responseDiv.textContent = 'Scheduling...';
-    //   const token = localStorage.getItem('token');
-    //   try {
-
-    //     this.showPopup = false;
-    //     this.clearForm();
-    //     this.fetchBroadcastList();
-
-    //     const requestBody = {
-    //       name: broadcastNameWithDate,
-    //       recipients: phoneNumbers,
-    //       template: selectedTemplate,
-    //       type: "Broadcast",
-    //       status: 'Save',
-    //     };
-
-    //     // Add image header if user has selected one
-    //     if (mediaID) {
-    //       requestBody.image_id = mediaID;
-    //     }
-
-    //     // Add body parameters if provided (array of parameters)
-    //     // if (this.bodyParameters && this.bodyParameters.length > 0) {
-    //     //     requestBody.body_parameters = this.bodyParameters;
-    //     // }
-
-
-    //     const response = await fetch('http://localhost:8000/send-template-message/', {
-    //       method: 'POST',
-    //       headers: {
-    //         'Authorization': `Bearer ${token}`,
-    //         'Content-Type': 'application/json',
-    //       },
-    //       body: JSON.stringify(requestBody),
-
-
-    //     });
-
-    //     if (!response.ok) {
-    //       throw new Error('Network response was not ok');
-    //     }
-    //     else {
-    //       this.fetchBroadcastList();
-    //       toast.success("'Broadcast sent successfully");
-    //       responseDiv.textContent = 'Broadcast sent successfully.';
-    //     }
-
-    //     const result = await response.json();
-    //     responseDiv.textContent = `Success: ${result.successful_messages}, Errors: ${result.errors.length}`;
-
-    //   } catch (error) {
-    //     console.error('Error sending broadcast:', error);
-    //     responseDiv.textContent = 'Error sending broadcast.';
-    //   }
-    // },
+   
     async sendBroadcast() {
       const toast = useToast();
 
@@ -753,7 +733,7 @@ export default {
       const responseDiv = document.getElementById('response');
       const mediaID = this.mediaId;
       const token = localStorage.getItem('token');
-      const bodyparamter=this.bodyParameter
+      const bodyparamter = this.bodyParameter
 
       try {
         this.showPopup = false;
@@ -827,8 +807,8 @@ export default {
           sent: report.sent,
           delivered: report.delivered,
           read: report.read,
-          replied: report.replied
-
+          replied: report.replied,
+          error_reason: report.error_reason
 
         }));
 
@@ -864,7 +844,7 @@ export default {
       // responseDiv.textContent = 'Scheduling...';
       const token = localStorage.getItem('token');
       const mediaID = this.mediaId;
-      const bodyparamter=this.bodyParameter
+      const bodyparamter = this.bodyParameter
 
       // Combine date and time for scheduling
       const scheduledDatetime = new Date(`${this.scheduleDate}T${this.scheduleTime}`).toISOString();
@@ -881,11 +861,11 @@ export default {
 
         const requestBody = {
           name: broadcastNameWithDate,
-            recipients: contacts,
-            template: selectedTemplate,
-            type: "Scheduled",
-            status: 'Saved',
-            scheduled_time: scheduledDatetime
+          recipients: contacts,
+          template: selectedTemplate,
+          type: "Scheduled",
+          status: 'Saved',
+          scheduled_time: scheduledDatetime
         };
 
         if (mediaID) {
@@ -921,12 +901,12 @@ export default {
 
 
     clearForm() {
-        this.contact = "",
+      this.contact = "",
         this.broadcastName = '',
-        this.selectedTemplateHasParameters='',
-        this.selectedTemplateHasImage=false,
-        this.selectedTemplateId='',
-        this.bodyParameter='',
+        this.selectedTemplateHasParameters = '',
+        this.selectedTemplateHasImage = false,
+        this.selectedTemplateId = '',
+        this.bodyParameter = '',
         this.recipients = '',
         this.selectedTemplate = '',
         this.csvFile = null,
@@ -985,40 +965,6 @@ export default {
       }
     },
 
-
-    // async importCSV() {
-    //   const toast = useToast();
-    //   if (!this.csvFile) {
-    //     alert('Please select a file to import.');
-    //     return;
-    //   }
-
-    //   const formData = new FormData();
-    //   formData.append('file', this.csvFile);
-
-    //   try {
-    //     const response = await fetch('http://localhost:8000/import-contacts', {
-    //       method: 'POST',
-    //       body: formData,
-    //     });
-
-    //     if (!response.ok) {
-    //       throw new Error('Network response was not ok');
-    //     }
-
-    //     const data = await response.json();
-    //     this.contacts = data.contacts;
-    //     this.csvUploaded = true
-    //     toast.success('Contacts imported successfully!');
-
-    //     // Append phone numbers to the recipients input field
-    //     const phoneNumbers = this.contacts.map(contact => contact.phone).join(',');
-    //     this.recipients = this.recipients ? this.recipients + ',' + phoneNumbers : phoneNumbers;
-    //   } catch (error) {
-    //     console.error(error);
-    //     toast.error('Failed to import contacts.');
-    //   }
-    // },
 
     selectAll(event) {
       // Check if the "Select All" checkbox is checked or unchecked
@@ -1082,6 +1028,53 @@ export default {
 </script>
 
 <style scoped>
+.tooltip-container {
+  display: flex;
+  position: fixed;
+  /* Ensure the tooltip floats independently */
+  align-items: center;
+  /* Vertically center content */
+  justify-content: center;
+  /* Horizontally center content */
+  width: 170px;
+  /* Fixed width */
+  height: 100px;
+  /* Fixed height */
+  background-color: #444;
+  /* Background color for visibility */
+  color: white;
+  /* Text color */
+  border-radius: 8px;
+  /* Rounded corners */
+  z-index: 100000;
+  /* Ensure it's above other elements */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  /* Add shadow */
+  padding: 8px;
+  /* Inner spacing */
+  text-align: center;
+  /* Center text alignment */
+  overflow: hidden;
+  /* Prevent text from spilling out */
+  word-wrap: break-word;
+  /* Ensure long words break */
+  white-space: normal;
+  /* Wrap text onto the next line */
+  line-height: 1.2;
+  /* Adjust line spacing for readability */
+  box-sizing: border-box;
+  /* Include padding in dimensions */
+}
+
+
+
+.info-button {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: blue;
+}
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;
 }

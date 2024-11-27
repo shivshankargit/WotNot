@@ -295,23 +295,24 @@ async def read_contacts(
     contacts = contacts_query.offset(skip).limit(limit).all()
     return contacts
 
-@router.get("/contacts/{phone_no}", response_model=contacts.ContactRead)
-async def read_contact(
-    phone_no: str,
-    db: AsyncSession = Depends(database.get_db),
-    get_current_user: user.newuser = Depends(get_current_user)
-):
-    result = await db.execute(
-        select(Contacts.Contact).filter(
-            Contacts.Contact.phone == phone_no,
-            Contacts.Contact.user_id == get_current_user.id
-        )
-    )
-    contact = result.scalars().first()
+@router.get("/contacts/{phone_no}")
+async def getContactDetails(
+    phone_no:str,
+    get_current_user: user.newuser = Depends(get_current_user),
+    db: AsyncSession = Depends(database.get_db)
+    ):
 
-    if contact is None:
+    query=await db.execute(select(Contacts.Contact).filter(Contacts.Contact.phone==phone_no,Contacts.Contact.user_id == get_current_user.id))
+
+
+    contact_data = query.scalars().first()
+
+    if not contact_data:
         raise HTTPException(status_code=404, detail="Contact not found")
-    return contact
+
+    return contact_data
+
+
 
 @router.delete("/contacts/{phone}")
 async def delete_contact(
@@ -372,6 +373,8 @@ async def update_contact(
     await db.commit()
     await db.refresh(db_contact)
     return db_contact
+
+
 
 @router.get("/contacts-filter/filter", response_model=List[contacts.ContactRead])
 async def filter_contacts_by_tags(

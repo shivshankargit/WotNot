@@ -131,7 +131,7 @@
 
 
       <!-- Main Content-->
-      <div class="flex-1 mt-16 p-8 bg-white overflow-y-auto h-[calc(100vh-65px)] ">
+      <div class="flex-1 mt-16 bg-white overflow-y-auto h-[calc(100vh-65px)] ">
         <router-view></router-view>
       </div>
 
@@ -628,4 +628,45 @@ button:hover {
   }
 }
 
+
+.emoji-picker-container {
+  max-width: 300px;
+  margin:0 auto;
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+.emoji-button {
+  background-color:transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  margin:3px;
+}
+
+.emoji-button:hover {
+background-color: transparent;
+color: #25d366;
+}
+
+/* Emoji Picker Styles */
+.custom-picker {
+  position: absolute;
+  z-index: 100;
+  margin: 10px 60px 310px 450px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 270px; /* Customize width */
+  max-height: 240px; /* Customize height */
+  overflow: auto;
+  padding: 10px; /* Add padding for better layout */
+}
+
+/* Adjust emoji size */
+.v3-emojis button img{
+  height:35px;
+  margin:1px;
+}
 </style>

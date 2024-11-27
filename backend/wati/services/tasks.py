@@ -145,6 +145,7 @@ async def send_broadcast(
                     MessageIdLog = Broadcast.BroadcastAnalysis(
                         user_id=user_id,
                         broadcast_id=broadcastId,
+                        error_reason="",
                         message_id=wamid,
                         status="sent",
                         phone_no=phone_num,
@@ -158,6 +159,7 @@ async def send_broadcast(
                     conversation = Conversation(
                         wa_id=recipient_phone,
                         message_id=wamid,
+                        media_id="",
                         phone_number_id=Phone_id,
                         message_content=f"#template_message# {template_name}",
                         timestamp=datetime.utcnow(),
@@ -168,9 +170,14 @@ async def send_broadcast(
                     db.add(conversation)
                     await db.commit()
                     await db.refresh(conversation)
-                    
+
+
                 else:
                     failed_count += 1
+                    error_detail = response_data.get("error", {}).get("message", "Unknown error")
+                    error_code = response_data.get("error", {}).get("code", "N/A")
+                    error_reason = f"Error Code: {error_code}, Detail: {error_detail}"
+                
                     errors.append({"recipient": recipient_phone, "error": response_data})
                     
                     MessageIdLog = Broadcast.BroadcastAnalysis(
@@ -178,7 +185,8 @@ async def send_broadcast(
                         broadcast_id=broadcastId,
                         status="failed",
                         phone_no=recipient_phone,
-                        contact_name=recipient_name  
+                        contact_name=recipient_name,
+                        error_reason=error_reason
                     )
                     db.add(MessageIdLog)
                     await db.commit()
@@ -210,128 +218,9 @@ async def send_broadcast(
         await db.close()  # Ensure db is closed
 
    
-# @dramatiq.actor(max_retries=0)
-# async def send_template_messages_task(
-#     broadcast_id: int,
-#     recipients: list,
-#     template: str,
-#     image_id: str,
-#     body_parameters: str,
-#     phone_id: str,
-#     access_token: str,
-#     user_id: int,
-# ):
-#     db = await anext(get_db())
-#     try:
-        
-#         success_count = 0
-#         failed_count = 0
-#         errors = []
-        
-#         API_url = f"https://graph.facebook.com/v20.0/{phone_id}/messages"
-#         headers = {
-#             "Authorization": f"Bearer {access_token}",
-#             "Content-Type": "application/json"
-#         }
 
-#         async with httpx.AsyncClient() as client:
-#             for contact in recipients:
-#                 recipient_name = contact["name"]  # Adjusted to access the dictionary
-#                 recipient_phone = contact["phone"]
 
-#                 data = {
-#                     "messaging_product": "whatsapp",
-#                     "to": recipient_phone,
-#                     "type": "template",
-#                     "template": {
-#                         "name": template,
-#                         "language": {"code": "en_US"},
-#                     }
-#                 }
 
-#                 if image_id:
-#                     data["template"]["components"] = [
-#                         {
-#                             "type": "header",
-#                             "parameters": [
-#                                 {
-#                                     "type": "image",
-#                                     "image": {"id": image_id}
-#                                 }
-#                             ]
-#                         }
-#                     ]
-
-#                 if body_parameters:
-#                     body_params = [{"type": "text", "text": f"{recipient_name}"}] if body_parameters == "Name" else []
-#                     data["template"].setdefault("components", []).append({
-#                         "type": "body",
-#                         "parameters": body_params
-#                     })
-
-#                 response = await client.post(API_url, headers=headers, json=data)
-#                 response_data = response.json()
-
-#                 if response.status_code == 200:
-#                     success_count += 1
-#                     wamid = response_data['messages'][0]['id']
-#                     phone_num = response_data['contacts'][0]["wa_id"]
-
-#                     message_log = Broadcast.BroadcastAnalysis(
-#                         user_id=user_id,
-#                         broadcast_id=broadcast_id,
-#                         message_id=wamid,
-#                         status="sent",
-#                         phone_no=phone_num,
-#                         contact_name=recipient_name,
-#                     )
-#                     db.add(message_log)
-
-#                     # Save the sent message data in conversations table
-#                     conversation = Conversation(
-#                         wa_id=recipient_phone,
-#                         message_id=wamid,
-#                         phone_number_id=phone_id,
-#                         message_content=f"#template_message# {template}",
-#                         timestamp=datetime.utcnow(),
-#                         context_message_id=None,
-#                         message_type="text",
-#                         direction="sent"
-#                     )
-#                     db.add(conversation)
-
-#                 else:
-#                     failed_count += 1
-#                     errors.append({"recipient": recipient_phone, "error": response_data})
-
-#                     message_log = Broadcast.BroadcastAnalysis(
-#                         user_id=user_id,
-#                         broadcast_id=broadcast_id,
-#                         status="failed",
-#                         phone_no=recipient_phone,
-#                         contact_name=recipient_name,
-#                     )
-#                     db.add(message_log)
-
-#         # Commit all changes in one go after the loop
-#         await db.commit()
-
-#         # Update broadcast status
-#         result = await db.execute(
-#             select(Broadcast.BroadcastList).filter(Broadcast.BroadcastList.id == broadcast_id)
-#         )
-#         broadcast = result.scalars().first()
-#         if broadcast:
-#             broadcast.success = success_count
-#             broadcast.status = "Successful" if failed_count == 0 else "Partially Successful"
-#             broadcast.failed = failed_count
-#             await db.commit()
-#     except Exception as e:
-#         await db.rollback()  # Rollback in case of an error
-#         print(f"Error in broadcast: {str(e)}")
-#         raise e
-#     finally:
-#         await db.close()  # Ensure db is closed
 
 @dramatiq.actor(max_retries=0)
 async def send_template_messages_task(
@@ -405,6 +294,7 @@ async def send_template_messages_task(
                         user_id=user_id,
                         broadcast_id=broadcast_id,
                         message_id=wamid,
+                        error_reason="",
                         status="sent",
                         phone_no=phone_num,
                         contact_name=recipient_name,
@@ -417,6 +307,7 @@ async def send_template_messages_task(
                     conversation = Conversation(
                         wa_id=recipient_phone,
                         message_id=wamid,
+                        media_id="",
                         phone_number_id=phone_id,
                         message_content=f"#template_message# {template}",
                         timestamp=datetime.utcnow(),
@@ -430,6 +321,10 @@ async def send_template_messages_task(
 
                 else:
                     failed_count += 1
+                    error_detail = response_data.get("error", {}).get("message", "Unknown error")
+                    error_code = response_data.get("error", {}).get("code", "N/A")
+                    error_reason = f"Error Code: {error_code}, Detail: {error_detail}"
+
                     errors.append({"recipient": recipient_phone, "error": response_data})
 
                     message_log = Broadcast.BroadcastAnalysis(
@@ -438,6 +333,7 @@ async def send_template_messages_task(
                         status="failed",
                         phone_no=recipient_phone,
                         contact_name=recipient_name,
+                        error_reason=error_reason  # Log error details here
                     )
                     db.add(message_log)
                     await db.commit()

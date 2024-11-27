@@ -15,10 +15,13 @@
     "@fortawesome/vue-fontawesome": "^3.0.8",
     "axios": "^1.7.5",
     "core-js": "^3.8.3",
+    "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "install": "^0.13.0",
     "vue": "^3.2.13",
     "vue-router": "^4.4.0",
     "vue-toastification": "^2.0.0-rc.5",
+    "vue3-emoji-picker": "^1.1.8",
     "yarn": "^1.22.22"
   },
   "devDependencies": {

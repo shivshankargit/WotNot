@@ -134,6 +134,8 @@ async def receive_meta_webhook(request: Request, db: AsyncSession = Depends(data
                         message_read=False
                         message_delivered=False
                         message_sent=False
+                        error_reason = None
+                        
 
                         
                         if(message_status=="read"):
@@ -142,18 +144,30 @@ async def receive_meta_webhook(request: Request, db: AsyncSession = Depends(data
                             message_sent=True
                             
                         
-                        if(message_status=="delivered"):
+                        elif(message_status=="delivered"):
                             message_read=False
                             message_delivered=True
                             message_sent=True
                             
 
 
-                        if(message_status=="sent"):
+                        elif(message_status=="sent"):
                             message_read=False
                             message_delivered=False
                             message_sent=True
+
+
+                        
+                        elif (message_status == "failed"):
+                            # Log the error reason from the status
+                            if "errors" in status and status["errors"]:
+                                error_details = status["errors"][0]
+                                error_data_details = status["errors"][0].get("error_data", {}).get("details", "No details available") # Assuming only one error is present
+                                error_reason = f"Error Code: {error_details.get('code', 'N/A')}, " \
+                                            f"Title: {error_details.get('title', 'N/A')}, " \
+                                            f"Details: {error_data_details}"
                             
+                                
 
 
 
@@ -171,6 +185,8 @@ async def receive_meta_webhook(request: Request, db: AsyncSession = Depends(data
                                 broadcast_report.delivered=message_delivered
                                 broadcast_report.sent=message_sent
                                 broadcast_report.status=message_status
+                                if error_reason is not None:
+                                    broadcast_report.error_reason = error_reason 
 
                         db.add(broadcast_report)
                         await db.commit()
@@ -190,16 +206,17 @@ async def receive_meta_webhook(request: Request, db: AsyncSession = Depends(data
                                 
                             broadcast_report=result2.scalars().first()
                             
-                            if not broadcast_report:
-                                    raise HTTPException(status_code=404,detail="Broadcast not found")
+                            # if not broadcast_report:                                    
+                            #         raise HTTPException(status_code=404,detail="Broadcast not found")
 
-                            if wamid:
-                                    broadcast_report.replied=message_sent=message_reply
-                                    broadcast_report.status=message_status
 
-                            db.add(broadcast_report)
-                            await db.commit()
-                            await db.refresh(broadcast_report)
+                           
+                            if broadcast_report:
+                                broadcast_report.replied=message_sent=message_reply
+                                broadcast_report.status=message_status
+                                db.add(broadcast_report)
+                                await db.commit()
+                                await db.refresh(broadcast_report)
                 # Handle incoming messages and replies
                 if "messages" in value:
                     await handle_incoming_messages(value, db)
@@ -1001,3 +1018,69 @@ async def upload_file(
     except Exception as e:
         logging.error(f"Unexpected error: {e}")
         raise HTTPException(status_code=500, detail="An unexpected error occurred while uploading the media.")
+
+
+
+from fastapi import APIRouter, Depends, HTTPException, Response
+from sqlalchemy.ext.asyncio import AsyncSession
+import requests
+import mimetypes
+
+
+
+# Configuration for the API
+
+
+@router.get("/download-media/{media_id}")
+async def load_media(
+    media_id: str,  # Media ID from the client
+    get_current_user: user.newuser = Depends(get_current_user),  # User validation
+    db: AsyncSession = Depends(database.get_db)  # Database session
+):
+    """
+    Downloads media from WhatsApp using its media ID and serves it to the client.
+    """
+    try:
+        # Step 1: Get the media URL
+        response = requests.get(
+            f"https://graph.facebook.com/v20.0/{media_id}",
+            headers={"Authorization": f"Bearer {get_current_user.PAccessToken}"}
+        )
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=404, detail="Media not found")
+
+        media_url = response.json().get("url")
+        if not media_url:
+            raise HTTPException(status_code=404, detail="Unable to retrieve media URL")
+
+        # Step 2: Download the media
+        media_response = requests.get(
+            media_url,
+            headers={"Authorization": f"Bearer {get_current_user.PAccessToken}"}
+        )
+
+        if media_response.status_code != 200:
+            raise HTTPException(status_code=500, detail="Failed to download media")
+
+        # Determine the MIME type from the response headers
+        content_type = media_response.headers.get("Content-Type", "application/octet-stream")
+        extension = mimetypes.guess_extension(content_type) or ".bin"  # Default to binary if unknown
+
+        # Serve the media file as a response
+        return Response(
+            content=media_response.content,
+            media_type=content_type,
+            headers={
+                "Content-Disposition": f"attachment; filename=downloaded_media{extension}"
+            }
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    
+
+
+
+

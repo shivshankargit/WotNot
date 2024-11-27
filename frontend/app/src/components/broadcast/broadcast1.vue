@@ -1,5 +1,5 @@
 <template>
-  <div class="content-section md:ml-64">
+  <div class="content-section m-8 md:ml-72">
     <div class="flex flex-col md:flex-row justify-between mb-4 border-b pb-5">
       <div>
         <h2 class="text-xl md:text-2xl font-bold">Manage Templates</h2>
@@ -16,59 +16,80 @@
     </div>
 
     <h3 class="text-xl md:text-2xs mb-4 text-gray-600"><b>Template List</b></h3>
-    
+
+
+    <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
+
+      <table class="w-full rounded-md border-collapse">
+        <thead>
+          <tr class="border-b-2 bg-[#ffffff] text-center">
+            <th class="p-2 text-left md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Name</th>
+            <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Language</th>
+            <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Status</th>
+            <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Category</th>
+            <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Sub Category</th>
+            <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">ID</th>
+            <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 z-10">Preview</th>
+            <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 z-10">Actions</th>
+
+
+
+
+          </tr>
+        </thead>
+        <tbody class="bg-white">
+          <tr v-for="template in templates" :key="template.id">
+            <td class=" border-[#ddd] p-2 md:p-4 text-left">{{ template.name }}</td>
+            <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.language }}</td>
+            <!-- <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.status }}</td> -->
+            <td class="p-2 md:p-4 text-center">
+              <div :class="{
+                'bg-[#e9f6ee] text-green-500 ': template.status === 'APPROVED',
+                'bg-blue-100 text-blue-500 ': template.status === 'PENDING',
+                'bg-red-100 text-red-500 ': template.status === 'REJECTED',
+                'border-[#ddd]': true
+              }" class="text-[80%] lg:text-[100%] rounded-lg">
+                {{ template.status }}
+              </div>
+            </td>
+            <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.category }}</td>
+            <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.sub_category }}</td>
+            <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.id }}</td>
+            <td class=" border-[#ddd] p-2 md:p-4 text-center">
+            <button class="text-blue-500 underline hover:text-blue-700 hover:bg-transparent"
+              @click="showpreview(template.preview)">Preview</button>
+            </td>
+            <td class=" border-[#ddd] p-2 md:p-4 text-center">
+              <button @click="deleteTemplate(template.name)" class="hover:bg-white rounded-full p-2 transition">
+                <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="hover"
+                  colors="primary:#ff5757,secondary:#000000" style="width:32px;height:32px">
+                </lord-icon>
+              </button>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <PopUp_preview  v-if="showPreview" @close="showPreview = false">
       
-      <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
-        
-        <table class="w-full rounded-md border-collapse">
-          <thead>
-            <tr class="border-b-2 bg-[#ffffff] text-center">
-              <th class="p-2 text-left md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Name</th>
-              <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Language</th>
-              <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Status</th>
-              <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Category</th>
-              <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Sub Category</th>
-              <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">ID</th>
-              <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 z-10">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white">
-            <tr v-for="template in templates" :key="template.id">
-              <td class=" border-[#ddd] p-2 md:p-4 text-left">{{ template.name }}</td>
-              <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.language }}</td>
-              <!-- <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.status }}</td> -->
-              <td class="p-2 md:p-4 text-center">
-                <div :class="{
-                  'bg-[#e9f6ee] text-green-500 ': template.status === 'APPROVED',
-                  'bg-blue-100 text-blue-500 ': template.status === 'PENDING',
-                  'bg-red-100 text-red-500 ': template.status === 'REJECTED',
-                  'border-[#ddd]': true
-                }" class="text-[80%] lg:text-[100%] rounded-lg">
-                  {{ template.status }}
-                </div>
-              </td>
-              <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.category }}</td>
-              <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.sub_category }}</td>
-              <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.id }}</td>
-              <td class=" border-[#ddd] p-2 md:p-4 text-center">
-                <button @click="deleteTemplate(template.name)" class="hover:bg-white rounded-full p-2 transition">
-                  <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="hover"
-                    colors="primary:#ff5757,secondary:#000000" style="width:32px;height:32px">
-                  </lord-icon>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    
+          <div class="flex flex-col aspect-[10/19] p-3 max-h-[670px] bg-[url('@/assets/chat-bg.jpg')] bg-cover bg-center custom-scrollbar">
+            <div class="message">
+              <span style="white-space: pre-line;" v-html="preview_data"></span>
+            </div>
+          </div>
+      
+    </PopUp_preview>
+
 
     <div v-if="showPopup" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[1000]"
       @click.self="closePopup">
       <div class="max-w-3xl mx-auto p-6 bg-white shadow rounded-lg">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold">Create Message Template</h2>
-          <hr class="mb-4"/>
+          <hr class="mb-4" />
           <span class="relative bottom-1 text-4xl cursor-pointer text-black" @click="closePopup">&times;</span>
         </div>
 
@@ -90,7 +111,8 @@
 
             <div>
               <label class="block text-sm font-medium">Category<span class="text-red-800">*</span></label>
-              <select v-model="selectedCategory" class="mt-1 p-2 w-full border border-gray-300 rounded-md h-10" required>
+              <select v-model="selectedCategory" class="mt-1 p-2 w-full border border-gray-300 rounded-md h-10"
+                required>
                 <option value="Marketing">Marketing</option>
                 <option value="Utility">Utility</option>
               </select>
@@ -99,7 +121,7 @@
             <!-- Language -->
             <div class="mb-4">
               <label class="block text-sm font-medium">Language</label>
-              <select class="mt-1 p-2 w-full border border-gray-300 rounded-md h-10" >
+              <select class="mt-1 p-2 w-full border border-gray-300 rounded-md h-10">
                 <option>English</option>
                 <!-- Add other languages here -->
               </select>
@@ -109,7 +131,7 @@
 
 
 
-       
+
 
           <label for="">Header</label>
           <input v-model="headerComponent.text" placeholder="Header Text (optional)"
@@ -163,11 +185,31 @@
 <script>
 import axios from 'axios';
 import { useToast } from 'vue-toastification';
+import PopUp_preview from "../popups/template_preview";
 
 export default {
+  components: {
+
+    PopUp_preview
+  },
   name: 'BroadCast1',
+  props: {
+    contactReport: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {
+      showPreview: false,
+      preview_data: '',
+      tooltipVisible: false,
+      tooltipStyles: {
+        top: "0px",
+        left: "0px",
+        width: "170px", // Set square dimensions
+        height: "100px",
+      },
       templateName: '',
       isTemplateNameValid: true,
       templates: [],
@@ -202,6 +244,8 @@ export default {
     };
   },
 
+
+
   async mounted() {
     await this.fetchtemplateList();
 
@@ -212,6 +256,14 @@ export default {
   },
 
   methods: {
+
+    showpreview(preview) {
+
+
+      this.showPreview = true;
+      this.preview_data = preview;
+
+    },
     addbutton() {
       this.addButton = !this.addButton;
     },
@@ -222,6 +274,29 @@ export default {
     },
 
 
+
+
+    // async fetchtemplateList() {
+    //   const token = localStorage.getItem('token');
+    //   try {
+    //     const response = await fetch("http://localhost:8000/template", {
+    //       method: 'GET',
+    //       headers: {
+    //         'Authorization': `Bearer ${token}`,
+    //         'Content-Type': 'application/json',
+    //       }
+    //     });
+
+    //     if (!response.ok) {
+    //       throw new Error('Network response was not ok');
+    //     }
+
+    //     const templatelist = await response.json();
+    //     this.templates = templatelist.data;
+    //   } catch (error) {
+    //     console.error("There was an error fetching the templates:", error);
+    //   }
+    // },
     async fetchtemplateList() {
       const token = localStorage.getItem('token');
       try {
@@ -230,7 +305,7 @@ export default {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
-          }
+          },
         });
 
         if (!response.ok) {
@@ -239,10 +314,75 @@ export default {
 
         const templatelist = await response.json();
         this.templates = templatelist.data;
+
+        // Generate previews for templates
+        this.templates = this.templates.map(template => {
+          return {
+            ...template,
+            preview: this.generateTemplatePreview(template.components),
+          };
+        });
       } catch (error) {
         console.error("There was an error fetching the templates:", error);
       }
     },
+
+
+    generateTemplatePreview(components) {
+      let previewMessage = '';
+
+
+      // Loop through components and construct the preview message
+      components.forEach(component => {
+        switch (component.type) {
+          case 'HEADER': {
+            if (component.format === 'TEXT') {
+              previewMessage += `<strong>${component.text}</strong> `;
+            } else if (component.format === 'IMAGE' && component.example?.header_handle) {
+              previewMessage += `<div style="width: auto; height: 200px; overflow: hidden; position: relative; border-radius: 5px">
+  <img src="${component.example.header_handle[0]}" alt="Description of image" 
+       style="width: 100%; height: 100%; object-fit: cover; object-position: start; display: block ; border-radius: 4px">
+</div>`;
+
+            }
+            break;
+          }
+          case 'BODY': {
+            let bodyText = component.text;
+            // Check if the body contains dynamic placeholders like {{1}}
+            bodyText = this.replacePlaceholders(bodyText, component.example?.body_text);
+            previewMessage += bodyText;
+
+            break;
+          }
+          case 'FOOTER': {
+            previewMessage += `<span style="font-weight: lighter;">${component.text}</span> `;
+            break;
+          }
+          default: {
+            previewMessage += `[Unknown Component Type] `;
+            break;
+          }
+        }
+      });
+
+      return previewMessage;
+    },
+
+    // Replace placeholders with example data (or default values if not available)
+    replacePlaceholders(bodyText, example) {
+      if (example && example.length > 0) {
+        // Assuming example contains placeholder names like "Name"
+        example.forEach((param, index) => {
+          const placeholder = `${index + 1}`;
+          bodyText = bodyText.replace(placeholder, param[0]); // Replace with the actual placeholder value
+        });
+      }
+      // console.log(bodyText);
+      return bodyText;
+    },
+
+    // Helper function to generate the preview by replacing placeholders
 
     async submitTemplate() {
       if (this.nameError) {
@@ -319,7 +459,7 @@ export default {
       }
     },
 
-    async deleteTemplate(template_name){
+    async deleteTemplate(template_name) {
       const toast = useToast();
       const token = localStorage.getItem('token');
       const confirmDelete = confirm("Are you sure you want to delete this contact?");
@@ -327,7 +467,7 @@ export default {
 
       try {
         const response = await fetch(`http://localhost:8000/delete-template/${template_name}`, {
-          method:"DELETE",
+          method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -335,7 +475,7 @@ export default {
         });
 
 
-        if(response.ok){
+        if (response.ok) {
           toast.success("Template deleted successfully");
           await this.fetchtemplateList();
           this.closePopup();
@@ -377,6 +517,28 @@ export default {
 </script>
 
 <style scoped>
+.message {
+  font-size: small;
+  display: flex;
+  justify-content: space-between;
+  background-color: #dcf8c6;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 90%;
+  min-width: 80px;
+  height: auto;
+  max-height: 650px;
+  word-wrap: break-word;
+  word-break: break-word;
+  width: fit-content;
+  overflow: hidden;
+
+}
+
+
+
+
 /* Custom Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;

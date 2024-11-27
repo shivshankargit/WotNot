@@ -30,13 +30,14 @@ from sqlalchemy.ext.declarative import declarative_base
 
 
 
-engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True)
+engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True,pool_recycle=120,pool_pre_ping=True)
 
 # Create a session factory
 AsyncSessionLocal = sessionmaker(
     bind=engine,
     class_=AsyncSession,
     expire_on_commit=False,
+    
 )
 
 # Base class for declarative models
