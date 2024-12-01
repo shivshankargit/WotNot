@@ -1,6 +1,6 @@
 from pydantic import BaseModel
-from typing import Optional
-
+from pydantic import BaseModel
+from typing import List, Optional
 
 
 
@@ -28,3 +28,16 @@ class register_user(BaseModel):
 class LoginUser(BaseModel):
     username:str
     password:str
+
+
+# User Business Profile Update 
+class BusinessProfile(BaseModel):
+    messaging_product: str = "whatsapp"  # Fixed value
+    address: str
+    description: str
+    vertical: str
+    about: str
+    email: str
+    websites: List[str]
+    profile_picture_url: Optional[str]
+

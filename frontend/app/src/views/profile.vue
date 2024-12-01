@@ -48,11 +48,6 @@
           />
         </div>
 
-        <div class="mt-4">
-          <button type="submit" class="w-full px-4 py-2 text-white bg-teal-600 hover:bg-teal-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
-            Save
-          </button>
-        </div>
       </form>
     </div>
   </div>

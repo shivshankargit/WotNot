@@ -9,6 +9,7 @@ import LoginPage from './components/login/login.vue';
 import SignupPage from './components/signup/signup.vue';
 import DashboardView from './views/dashboardview.vue';
 import Profile from './views/profile.vue';
+import Settings from './views/profileSettings.vue';
 import PurchaseHistory from './components/PurchaseHistory/PurchaseHistory.vue';
 import ChatbotView from './components/chatbot/chatbotview.vue'; // Ensure this path is correct
 
@@ -32,6 +33,7 @@ const routes = [
       { path: '/contacts/contacts2', component: ContActs2, name: 'Contacts2' },
       { path: '/integration/integration1', component: AppIntegration, name: 'Integration1' },
       { path: '/profile', component: Profile },
+      { path: '/settings', component: Settings },
       { path: '', redirect: '/broadcast/broadcast2' },
       { path: '/chatbot/chatbotview', component: ChatbotView, name: 'ChatbotView' }, // Updated path
       // Add more routes within the dashboard as needed

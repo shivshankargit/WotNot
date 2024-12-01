@@ -17,156 +17,175 @@
     <PopUp v-if="showPopup" @close="showPopup = false, clearForm()">
 
 
-          <h2 class="text-xl font-semibold mb-4">New Broadcast</h2>
-          <hr class="mb-4" />
+      <h2 class="text-xl font-semibold mb-4">New Broadcast</h2>
+      <hr class="mb-4" />
 
 
-          <form @submit.prevent="handleBroadcast" id="messageForm">
+      <form @submit.prevent="handleBroadcast" id="messageForm">
 
 
-            <h4><b>What message do you want to send?</b></h4>
-            <p class="text-sm mb-2 ">Add broadcast name and template below</p>
+        <h4><b>What message do you want to send?</b></h4>
+        <p class="text-sm mb-2 ">Add broadcast name and template below</p>
 
 
 
-            <div class="p-4 bg-[#f5f6fa] mb-4">
+        <div class="p-4 bg-[#f5f6fa] mb-4">
 
-              <!-- Input Bradacast Name -->
-              <div class="mb-2">
-                <label for="broadcastName" class="block text-sm font-medium">Broadcast Name<span
-                    class="text-red-800">*</span></label>
-                <input type="text" v-model="broadcastName" id="broadcastName" placeholder="Broadcast Name" required
-                  class="border border-gray-300 rounded px-3 py-2 w-full">
-              </div>
+          <!-- Input Bradacast Name -->
+          <div class="mb-2">
+            <label for="broadcastName" class="block text-sm font-medium">Broadcast Name<span
+                class="text-red-800">*</span></label>
+            <input type="text" v-model="broadcastName" id="broadcastName" placeholder="Broadcast Name" required
+              class="border border-gray-300 rounded px-3 py-2 w-full">
+          </div>
 
-              <!-- input template -->
-              <div class="mb-2 ">
-                <label for="templates" class="block text-sm font-medium">Choose a template<span
-                    class="text-red-800">*</span></label>
-                <!-- <select v-model="selectedTemplate" id="templates" required
+          <!-- input template -->
+          <div class="mb-2 ">
+            <label for="templates" class="block text-sm font-medium">Choose a template<span
+                class="text-red-800">*</span></label>
+            <!-- <select v-model="selectedTemplate" id="templates" required
               class="border border-gray-300 rounded px-3 py-2 w-full">
               <option value="" disabled>Select your option</option>
               <option v-for="template in templates" :key="template.id" :value="template.id">{{ template.name }}</option>
             </select> -->
 
-                <!-- New select field-->
-                <select id="template-select" v-model="selectedTemplateId" @change="onTemplateSelect"
-                  class="border border-gray-300 rounded px-3 py-2 w-full ">
-                  <option v-for="template in templates" :key="template.id" :value="template.id">
-                    {{ template.name }}
-                  </option>
-                </select>
+            <!-- New select field-->
+            <select id="template-select" v-model="selectedTemplateId" @change="onTemplateSelect"
+              class="border border-gray-300 rounded px-3 py-2 w-full ">
+              <option v-for="template in templates" :key="template.id" :value="template.id">
+                {{ template.name }}
+              </option>
+            </select>
 
-                <!-- Conditional Image URL input field -->
-                <div v-if="selectedTemplateHasImage">
-                  <label for="" class="block text-sm font-semibold">Upload Media</label>
-                  <input type="file" @change="onFileChange" class="mb-2 w-[60%] mr-1">
-                </div>
-                <div v-if="uploadedMedia">{{ this.mediaId }}</div>
-
-                <div v-if="selectedTemplateHasParameters">
-                  <label for="">Select Parameter</label>
-                  <select name="" id="" v-model="bodyParameter">
-                    <option value="Name">Cotact_Name</option>
-                  </select>
-                </div>
-
-
-              </div>
-
+            <!-- Conditional Image URL input field -->
+            <div v-if="selectedTemplateHasImage">
+              <label for="" class="block text-sm font-semibold">Upload Media</label>
+              <input type="file" @change="onFileChange" class="mb-2 w-[60%] mr-1">
             </div>
-            <h4><b>Who do you want to send it to?</b></h4>
-            <p class="text-sm mb-2 ">Select contacts below or <a
-                href="https://drive.google.com/file/d/1hVQErwmNN6eGN1zLBoniW_34-GzAtMwm/view?usp=sharing"
-                target="_blank" class="text-blue-500"><u>Download sample format for contact upload</u></a></p>
+            <div v-if="uploadedMedia">{{ this.mediaId }}</div>
 
-            <div class="p-4 bg-[#f5f6fa] mb-4">
-
-              <div class="mb-2">
-                <label for="recipients" class="block text-sm font-medium">Recipients<span
-                    class="text-red-800">*</span></label>
-                <input type="text" v-model="recipients" id="recipients"
-                  placeholder="Enter phone numbers, comma-separated" required
-                  class="border border-gray-300 rounded px-3 py-2 w-full">
-              </div>
-
-
-              <div class="mb-1">
-                <label for="csvFile" class="block text-sm font-semibold">Upload CSV for Contacts:</label>
-                <input type="file" @change="handleFileUpload" class="mb-2 w-[60%] mr-1" />
-
-              </div>
-            </div>
-            <div v-if="csvUploaded">
-              <h4><b>Imported Contacts</b></h4>
-              <p class="text-sm mb-2 ">Imported contacts are not saved to your contacts directory</p>
-            </div>
-
-            <div v-else>
-              <h4><b>Contacts</b></h4>
-              <p class="text-sm mb-2 ">Select from your saved contacts</p>
+            <div v-if="selectedTemplateHasParameters">
+              <label for="">Select Parameter</label>
+              <select name="" id="" v-model="bodyParameter">
+                <option value="Name">Cotact_Name</option>
+              </select>
             </div>
 
 
+          </div>
 
-            <div class="p-4 bg-[#f5f6fa] mb-4">
-              <div class="overflow-x-auto max-h-[20vh] custom-scrollbar">
-                <table class="contact-table w-full rounded-lg border-collapse">
-                  <thead>
-                    <tr class="bg-[#dddddd] text-center">
-                      <th class="z-10 p-2 bg-[#dddddd] sticky top-0">
-                        <input type="checkbox" @change="selectAll($event)" v-model="allSelected"
-                          class=" scale-150 m-2 z-10">Select
-                      </th>
-                      <th class="p-2 bg-[#dddddd]  sticky top-0">Name</th>
-                      <th class="p-2 bg-[#dddddd]  sticky top-0">Phone Number</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="contact in contacts" :key="contact.id">
-                      <td class="text-center p-2 md:p-4 scale-125">
-                        <input type="checkbox" v-model="selectedContacts" :value="`${contact.name}:${contact.phone}`">
-                      </td>
+        </div>
+        <h4><b>Who do you want to send it to?</b></h4>
+        <p class="text-sm mb-2 ">Select contacts below or <a
+            href="https://drive.google.com/file/d/1hVQErwmNN6eGN1zLBoniW_34-GzAtMwm/view?usp=sharing" target="_blank"
+            class="text-blue-500"><u>Download sample format for contact upload</u></a></p>
 
-                      <td class="text-center p-2 md:p-4">{{ contact.name }}</td>
-                      <td class="text-center p-2 md:p-4">{{ contact.phone }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+        <div class="p-4 bg-[#f5f6fa] mb-4">
+
+          <div class="mb-2">
+            <label for="recipients" class="block text-sm font-medium">Recipients<span
+                class="text-red-800">*</span></label>
+            <input type="text" v-model="recipients" id="recipients" placeholder="Enter phone numbers, comma-separated"
+              required class="border border-gray-300 rounded px-3 py-2 w-full">
+          </div>
+
+
+          <div class="mb-1">
+            <label for="csvFile" class="block text-sm font-semibold">Upload CSV for Contacts:</label>
+            <input type="file" @change="handleFileUpload" class="mb-2 w-[60%] mr-1" />
+
+          </div>
+        </div>
+        <div v-if="csvUploaded">
+          <h4><b>Imported Contacts</b></h4>
+          <p class="text-sm mb-2 ">Imported contacts are not saved to your contacts directory</p>
+        </div>
+
+        <div v-else>
+          <h4><b>Contacts</b></h4>
+          <p class="text-sm mb-2 ">Select from your saved contacts</p>
+        </div>
+
+        <!-- Contacts Filter -->
+        <div class="flex bg-[#f5f6fa] items-center space-x-2 p-2 justify-between">
+          <h3 class="text-l"><b>Filter by tags:</b></h3>
+
+          <input type="text" v-model="tag_key" placeholder="Key"
+            class="border border-gray-300 rounded px-3 py-2 w-30px">
+          <input type="text" v-model="tag_value" placeholder="Value"
+            class="border border-gray-300 rounded px-3 py-2 w-30px">
+
+          <button @click.prevent="fiterBytTags"
+            class="relative my-2 h-auto w-auto p-1 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200">Apply
+            filter</button>
+        </div>
+
+        
+          <div class="overflow-x-auto max-h-[20vh] mb-8 custom-scrollbar">
+            <table class="contact-table w-full rounded-lg border-collapse">
+              <thead>
+                <tr class="bg-[#ffffff] text-center">
+                  <th class="z-10 p-2 bg-[#ffffff] sticky top-0">
+                    <input type="checkbox" @change="selectAll($event)" v-model="allSelected" 
+                      class=" scale-150 m-2 z-10">Select
+                  </th>
+                  <th class="p-2  bg-[#ffffff] sticky top-0">Name</th>
+                  <th class="p-2  bg-[#ffffff] sticky top-0">Phone Number</th>
+                  <th class="p-2  bg-[#ffffff] sticky top-0">Tags</th>
+
+
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="contact in contacts" :key="contact.id">
+                  <td class="text-center p-2 md:p-4 scale-125">
+                    <input type="checkbox" v-model="selectedContacts" :value="`${contact.name}:${contact.phone}`">
+                  </td>
+
+                  <td class="text-center p-2 md:p-4">{{ contact.name }}</td>
+                  <td class="text-center p-2 md:p-4">{{ contact.phone }}</td>
+                  <td class="text-center p-2 md:p-4">
+                    <div v-for="(tag, index) in contact.tags" :key="index">
+                      <span class="font-bold">{{ tag.key }}:</span> {{ tag.value }}
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        
+
+        <h4><b>When do you want to send the message ?</b></h4>
+        <p class="text-sm mb-2 ">Select from the options below </p>
+
+
+        <div class="p-4 bg-[#f5f6fa] mb-4">
+
+
+          <p class=" text-sm font-semibold mb-1"><input type="radio" v-model="isScheduled" :value="false"
+              class="scale-150 text-green-500 m-2">Send Now</p>
+
+          <p class="text-sm font-semibold mb-1"><input type="radio" v-model="isScheduled" :value="true"
+              class="scale-150 text-green-500 m-2" @click="currentDateTime">Schedule </p>
+
+          <div v-if="isScheduled" class="flex justify-between">
+            <div class="w-[50%]">
+              <label for="scheduleDate" class="block text-sm font-medium">Date<span
+                  class="text-red-800">*</span></label>
+              <input type="date" v-model="scheduleDate" id="scheduleDate" required
+                class="border border-gray-300 rounded px-3 py-2 w-full">
             </div>
-
-            <h4><b>When do you want to send the message ?</b></h4>
-            <p class="text-sm mb-2 ">Select from the options below </p>
-
-
-            <div class="p-4 bg-[#f5f6fa] mb-4">
-
-
-              <p class=" text-sm font-semibold mb-1"><input type="radio" v-model="isScheduled" :value="false"
-                  class="scale-150 text-green-500 m-2">Send Now</p>
-
-              <p class="text-sm font-semibold mb-1"><input type="radio" v-model="isScheduled" :value="true"
-                  class="scale-150 text-green-500 m-2" @click="currentDateTime">Schedule </p>
-
-              <div v-if="isScheduled" class="flex justify-between">
-                <div class="w-[50%]">
-                  <label for="scheduleDate" class="block text-sm font-medium">Date<span
-                      class="text-red-800">*</span></label>
-                  <input type="date" v-model="scheduleDate" id="scheduleDate" required
-                    class="border border-gray-300 rounded px-3 py-2 w-full">
-                </div>
-                <div class="w-[50%]">
-                  <label for="scheduleTime" class="block text-sm font-medium">Time<span
-                      class="text-red-800">*</span>(GMT
-                    +5:30)</label>
-                  <input type="time" v-model="scheduleTime" id="scheduleTime" required
-                    class="border border-gray-300 rounded px-3 py-2 w-full">
-                </div>
-              </div>
+            <div class="w-[50%]">
+              <label for="scheduleTime" class="block text-sm font-medium">Time<span class="text-red-800">*</span>(GMT
+                +5:30)</label>
+              <input type="time" v-model="scheduleTime" id="scheduleTime" required
+                class="border border-gray-300 rounded px-3 py-2 w-full">
             </div>
-            <button type="submit" class="bg-[#23a455] text-[#f5f6fa] px-4 py-2 rounded">{{ isScheduled ? 'ScheduleMessage':'Send Message' }}</button>
-          </form>
+          </div>
+        </div>
+        <button type="submit" class="bg-[#23a455] text-[#f5f6fa] px-4 py-2 rounded">{{ isScheduled ?
+          'ScheduleMessage' : 'Send Message' }}</button>
+      </form>
 
 
 
@@ -388,15 +407,11 @@
               <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.replied }}</td>
               <td class="border-[#ddd] p-2 md:p-4 text-center">
                 <div class="relative flex justify-center items-center">
-                  <button
-                    v-if="contactReport.error_reason"
-                    @mouseenter="showTooltip(index, $event)"
-                    @mouseleave="hideTooltip"
-                    class="info-button">
+                  <button v-if="contactReport.error_reason" @mouseenter="showTooltip(index, $event)"
+                    @mouseleave="hideTooltip" class="info-button">
                     ℹ️
                   </button>
-                  <div
-                    v-if="tooltipVisible === index"
+                  <div v-if="tooltipVisible === index"
                     class="tooltip-container absolute bg-gray-700 text-white p-2 rounded text-sm"
                     :style="tooltipStyles">
                     {{ contactReport.error_reason }}
@@ -404,7 +419,7 @@
                 </div>
               </td>
             </tr>
-        </tbody>
+          </tbody>
         </table>
       </div>
 
@@ -417,7 +432,8 @@
 
 <script>
 import { useToast } from 'vue-toastification';
-import PopUp from "../popups/popup"
+import PopUp from "../popups/popup";
+import axios from "axios";
 export default {
   name: 'BroadCast2',
 
@@ -603,7 +619,11 @@ export default {
         this.contacts = contactList.map(contact => ({
           id: contact.id,
           name: contact.name,
-          phone: contact.phone
+          phone: contact.phone,
+          tags: contact.tags.map(tag => {
+            const [key, value] = tag.split(":");
+            return { key, value };
+          }),
         }));
       } catch (error) {
         console.error('Error fetching contacts:', error);
@@ -642,7 +662,7 @@ export default {
           .filter(broadcast => {
             return statusFilter ? broadcast.status === statusFilter : true;
           });
-          
+
 
       } catch (error) {
         console.error('Error fetching broadcasts:', error);
@@ -716,7 +736,7 @@ export default {
     },
 
 
-   
+
     async sendBroadcast() {
       const toast = useToast();
 
@@ -743,7 +763,8 @@ export default {
         const requestBody = {
           name: broadcastNameWithDate,
           recipients: contacts, // Now sending both name and number
-          template: selectedTemplate,
+          template:selectedTemplate ,
+          template_data:JSON.stringify(Template),
           type: "Broadcast",
           status: 'Saved',
         };
@@ -863,6 +884,7 @@ export default {
           name: broadcastNameWithDate,
           recipients: contacts,
           template: selectedTemplate,
+          template_data:JSON.stringify(Template),
           type: "Scheduled",
           status: 'Saved',
           scheduled_time: scheduledDatetime
@@ -928,49 +950,142 @@ export default {
 
     },
 
+
     async importCSV() {
       const toast = useToast();
-      if (!this.csvFile) {
-        alert('Please select a file to import.');
-        return;
-      }
+      if (!this.csvFile) return;
 
       const formData = new FormData();
-      formData.append('file', this.csvFile);
+      const token = localStorage.getItem("token");
+      formData.append("file", this.csvFile);
 
       try {
-        const response = await fetch('http://localhost:8000/import-contacts', {
-          method: 'POST',
-          body: formData,
+        const response = await axios.post("http://localhost:8000/contacts/bulk_import/", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
         });
 
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
+        // Handle the response directly
+        if (response.status >= 200 && response.status < 300) {
+          toast.success("Contact created successfully");
 
-        const data = await response.json();
-        this.contacts = data.contacts;
-        this.csvUploaded = true;
-        toast.success('Contacts imported successfully!');
-
-        // Format and append contacts in the required format 'Name:1234567890'
-        const formattedContacts = this.contacts.map(contact => `${contact.name}:${contact.phone}`).join(',');
+          const { contacts, duplicates } = response.data; // Extract contacts and duplicates
+    this.contacts = [...contacts, ...duplicates]; // Merge contacts and duplicates
+    this.csvUploaded = true;
+         
+                  // Format and append contacts in the required format 'Name:1234567890'
+        const formattedContacts = this.contacts
+          .map((contact) => `${contact.name}:${contact.phone}`)
+          .join(',');
 
         // Update recipients with formatted contact list
-        this.recipients = this.recipients ? `${this.recipients},${formattedContacts}` : formattedContacts;
-
+        this.recipients = this.recipients
+          ? `${this.recipients},${formattedContacts}`
+          : formattedContacts;
+        } else {
+          toast.error(`Error: ${response.data?.detail || "Unknown error"}`);
+        }
       } catch (error) {
-        console.error(error);
-        toast.error('Failed to import contacts.');
+        console.error("Error importing contacts:", error.response?.data?.detail || error.message);
+        toast.error(`Error: ${error.response?.data?.detail || "Something went wrong"}`);
       }
     },
 
+    // async importCSV() {
+    //   const toast = useToast();
+    //   const token = localStorage.getItem("token");
+
+    //   if (!this.csvFile) {
+    //     alert('Please select a file to import.');
+    //     return;
+    //   }
+
+    //   const formData = new FormData();
+    //   formData.append('file', this.csvFile);
+
+    //   try {
+    //     const response = await fetch('http://localhost:8000/contacts/bulk_import/', {
+    //       headers: {
+    //         Authorization: `Bearer ${token}`, // Let FormData handle Content-Type
+    //       },
+    //       method: 'POST',
+    //       body: formData,
+    //     });
+
+    //     // Parse response
+    //     if (!response.ok) {
+    //       const errorData = await response.json(); // Try parsing server's error response
+    //       throw new Error(errorData?.message || 'Network response was not ok');
+    //     }
+
+    //     const data = await response.json();
+    //     this.contacts = data.contacts;
+    //     this.csvUploaded = true;
+
+    //     // Display success toast
+    //     toast.success('Contacts imported successfully!');
+
+    //     // Format and append contacts in the required format 'Name:1234567890'
+    //     const formattedContacts = this.contacts
+    //       .map((contact) => `${contact.name}:${contact.phone}`)
+    //       .join(',');
+
+    //     // Update recipients with formatted contact list
+    //     this.recipients = this.recipients
+    //       ? `${this.recipients},${formattedContacts}`
+    //       : formattedContacts;
+
+    //   } catch (error) {
+    //     console.error('Error importing contacts:', error);
+    //     toast.error(error.message || 'Failed to import contacts.');
+    //   }
+    // },
+
+    async fiterBytTags() {
+      const token = localStorage.getItem("token");
+      const tagValue = this.tag_value
+      const tagKey = this.tag_key
+      try {
+
+        const response = await fetch(`http://localhost:8000/contacts-filter/filter?tag_key=${tagKey}&tag_value=${tagValue}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+
+
+        const contactsList = await response.json()
+        this.contacts = contactsList.map((contact) => ({
+          id: contact.id,
+          name: contact.name,
+          phone: contact.phone,
+          email: contact.email,
+          tags: contact.tags.map(tag => {
+            const [key, value] = tag.split(":");
+            return { key, value };
+          }),
+          created_at: contact.created_at, // Store raw dates for sorting
+          updated_at: contact.updated_at // Store updated_at too
+        }));
+
+        if (!response.ok) {
+          throw new Error("Network response not ok")
+        }
+
+      } catch (error) {
+        console.error("Error filtering contacts", error)
+      }
+    },
 
     selectAll(event) {
       // Check if the "Select All" checkbox is checked or unchecked
       if (event.target.checked) {
         // Select all contacts by pushing all contact phone numbers to the selectedContacts array
-        this.selectedContacts = this.contacts.map(contact => contact.phone);
+        this.selectedContacts = this.contacts.map(contact => `${contact.name}:${contact.phone}`);
       } else {
         // Deselect all contacts by clearing the selectedContacts array
         this.selectedContacts = [];
@@ -991,7 +1106,43 @@ export default {
       const hours = now.getHours().toString().padStart(2, '0');
       const minutes = now.getMinutes().toString().padStart(2, '0');
       this.scheduleTime = `${hours}:${minutes}`;
-    }
+    },
+
+    async ImportCSV() {
+      const toast = useToast();
+      if (!this.file) return;
+
+      const formData = new FormData();
+      const token = localStorage.getItem("token");
+      formData.append("file", this.file);
+
+      try {
+        const response = await axios.post("http://localhost:8000/contacts/bulk_import/", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Handle the response directly
+        if (response.status >= 200 && response.status < 300) {
+          toast.success("Contact created successfully");
+
+
+          // Format and append contacts in the required format 'Name:1234567890'
+          const formattedContacts = this.contacts.map(contact => `${contact.name}:${contact.phone}`).join(',');
+
+          // Update recipients with formatted contact list
+          this.recipients = this.recipients ? `${this.recipients},${formattedContacts}` : formattedContacts;
+
+        } else {
+          toast.error(`Error: ${response.data?.detail || "Unknown error"}`);
+        }
+      } catch (error) {
+        console.error("Error importing contacts:", error.response?.data?.detail || error.message);
+        toast.error(`Error: ${error.response?.data?.detail || "Something went wrong"}`);
+      }
+    },
 
 
   },

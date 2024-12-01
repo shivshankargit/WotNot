@@ -79,7 +79,8 @@ dramatiq.set_broker(redis_broker)
 
 @dramatiq.actor(max_retries=0)
 async def send_broadcast(
-    template_name, 
+    template_name,
+    template_data, 
     recipients, 
     broadcastId, 
     API_url,
@@ -161,7 +162,7 @@ async def send_broadcast(
                         message_id=wamid,
                         media_id="",
                         phone_number_id=Phone_id,
-                        message_content=f"#template_message# {template_name}",
+                        message_content=f"#template_message# {template_data}",
                         timestamp=datetime.utcnow(),
                         context_message_id=None,
                         message_type="text",
@@ -227,6 +228,7 @@ async def send_template_messages_task(
     broadcast_id: int,
     recipients: list,
     template: str,
+    template_data:str,
     image_id: str,
     body_parameters: str,
     phone_id: str,
@@ -309,7 +311,7 @@ async def send_template_messages_task(
                         message_id=wamid,
                         media_id="",
                         phone_number_id=phone_id,
-                        message_content=f"#template_message# {template}",
+                        message_content=f"#template_message# {template_data}",
                         timestamp=datetime.utcnow(),
                         context_message_id=None,
                         message_type="text",

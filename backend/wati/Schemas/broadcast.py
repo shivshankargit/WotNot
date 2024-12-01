@@ -11,6 +11,7 @@ class input(BaseModel):
     name:str
     recipients: List[Contact]
     template:str
+    template_data:str
     status:str
     scheduled_time:str
     type:str
@@ -21,6 +22,7 @@ class input(BaseModel):
 class input_broadcast(BaseModel):
     recipients: List[Contact]
     template:str
+    template_data:str
     status:str
     name:str
     type:str

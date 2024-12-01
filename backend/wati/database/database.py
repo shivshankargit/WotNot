@@ -30,7 +30,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 
 
-engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True,pool_recycle=120,pool_pre_ping=True)
+engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True,pool_recycle=120,pool_pre_ping=True,pool_size=30 )
 
 # Create a session factory
 AsyncSessionLocal = sessionmaker(

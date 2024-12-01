@@ -182,26 +182,7 @@
     <div class="bg-[#f5f6fa] p-5  filter-container space-x-2">
 
       <h3 class="text-xl md:text-2xs mb-0 text-gray-600"><b>Contact List</b></h3>
-      <!-- <div class="dropdown-container">
-        <b><label for="sort-by">Sort by:</label></b>
-        <select v-model="sortBy" @change="fetchContactList">
-          <option value="created_at">Created At</option>
-          <option value="updated_at">Updated_at</option>
-        </select>
-      </div>
 
-      <div class="dropdown-container">
-        <b><label for="order">Order:</label></b>
-        <select v-model="order" @change="fetchContactList">
-          <option value="desc">Descending</option>
-          <option value="asc">Ascending</option>
-        </select>
-      </div>
-
-      <div class="search-container">
-      <b><label for="search">Search by phone number:</label></b>
-      <input type="text" v-model="searchQuery" placeholder="Search by phone number" @input="fetchContactList">
-      </div> -->
 
 
 

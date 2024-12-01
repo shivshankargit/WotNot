@@ -409,6 +409,77 @@ async def get_active_conversations(
 
 
 
+
+
+
+@router.post("/send-text-message-reply/")
+async def send_message(
+    payload: chatbox.MessagePayload,
+    db: AsyncSession = Depends(database.get_db),  # Use async db dependency
+    get_current_user: user.newuser = Depends(get_current_user)
+):
+    # Construct the URL for sending the message
+    whatsapp_url = f"https://graph.facebook.com/v20.0/{get_current_user.Phone_id}/messages"
+
+    # Set up headers with the access token provided by the frontend
+    headers = {
+        "Authorization": f"Bearer {get_current_user.PAccessToken}",
+        "Content-Type": "application/json"
+    }
+
+    # Construct the message payload to be sent to the WhatsApp Business API
+
+
+    data={
+    "messaging_product": "whatsapp",
+    "recipient_type": "individual",
+    "to": payload.wa_id,
+    "context": {
+        "message_id": payload.context_message_id
+    },
+    "type": "text",
+    "text": {
+        "preview_url": False,
+        "body": payload.body
+    }
+}
+
+    async with httpx.AsyncClient() as client:
+        # Send POST request to WhatsApp API
+        response = await client.post(whatsapp_url, headers=headers, json=data)
+
+    # Check for errors in the response
+    if response.status_code != 200:
+        print(response.json())
+        raise HTTPException(status_code=response.status_code, detail=response.json())
+
+    # Parse the response JSON to get message details
+    response_data = response.json()
+
+    try:
+        # Save the sent message data in conversations table
+        conversation = Conversation(
+            wa_id=payload.wa_id,
+            message_id=response_data.get("messages")[0].get("id"),
+            phone_number_id=get_current_user.Phone_id,
+            message_content=payload.body,
+            timestamp=datetime.utcnow(),
+            context_message_id=payload.context_message_id,  # Set based on your needs
+            message_type="text",
+            direction="sent"  # Set direction to "sent"
+        )
+
+        db.add(conversation)
+        await db.commit()  # Commit changes asynchronously
+        await db.refresh(conversation)  # Refresh asynchronously
+
+        return {"status": "Message sent", "response": response_data}
+
+    except Exception as e:
+        await db.rollback()  # Rollback in case of any error asynchronously
+        print(f"Error storing message in conversation table: {e}")
+        raise HTTPException(status_code=500, detail="Error storing message in database")
+
 @router.post("/send-text-message/")
 async def send_message(
     payload: chatbox.MessagePayload,
@@ -484,6 +555,7 @@ async def send_template_message(
     db: AsyncSession = Depends(database.get_db)
 ):
     # Save broadcast details
+    print(request.template)
     broadcast_list = Broadcast.BroadcastList(
         user_id=get_current_user.id,
         name=request.name,
@@ -505,6 +577,7 @@ async def send_template_message(
         broadcast_id=broadcast_list.id,
         recipients=contacts,
         template=request.template,
+        template_data=request.template_data,
         image_id=request.image_id,
         body_parameters=request.body_parameters,
         phone_id=get_current_user.Phone_id,
@@ -520,12 +593,15 @@ async def send_template_messages_task(
     broadcast_id: int,
     recipients: list,
     template: str,
+    template_data:str,
     image_id: str,
     body_parameters: str,
     phone_id: str,
     access_token: str,
     user_id: int,
 ):
+
+
     async with database.get_db() as db:
         success_count = 0
         failed_count = 0
@@ -537,10 +613,13 @@ async def send_template_messages_task(
             "Content-Type": "application/json"
         }
 
+
         async with httpx.AsyncClient() as client:
             for contact in recipients:
                 recipient_name = contact.name
                 recipient_phone = contact.phone
+
+
 
                 data = {
                     "messaging_product": "whatsapp",
@@ -595,7 +674,7 @@ async def send_template_messages_task(
                         wa_id=recipient_phone,
                         message_id=wamid,
                         phone_number_id=phone_id,
-                        message_content=f"#template_message# {template}",
+                        message_content=f"#template_message# {template_data}",
                         timestamp=datetime.utcnow(),
                         context_message_id=None,
                         message_type="text",

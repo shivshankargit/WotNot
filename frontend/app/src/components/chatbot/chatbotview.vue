@@ -23,8 +23,8 @@
 
               <div class="">
 
-                <p>{{ chat.sender_name }}</p>
-                <p>{{ chat.message_content }}</p>
+                <p><strong>{{ chat.sender_name }}</strong></p>
+                <div v-html="truncateMessage(chat.message_content)"></div>
               </div>
 
 
@@ -76,19 +76,22 @@
             </div>
 
             <!-- Message Bubble -->
-            <div :class="{ 'message': true, 'sent-message': message.direction == 'sent' }">
+            <div :class="{ 'message': true, 'sent-message': message.direction == 'sent' }"
+              @contextmenu.prevent="showContextMenu($event, message)">
+
               <div>
                 <div v-if="message.context_message_id" class="replied-message-context mb-2 text-sm text-gray-600">
-                  
+
                   <div class="replied-message">
-                    <p><strong>Replied to:</strong> {{ getRepliedMessageContent(message.context_message_id) }}</p>
+
+                    <p><strong>Replied to:</strong></p>
+                    <div class="p-2 border border-gray-300 rounded-md"
+                      v-html="getRepliedMessageContent(message.context_message_id)"></div>
                   </div>
 
                 </div>
-
-                <div>
-                  <p>{{ message.message_content }}</p>
-                </div>
+                <!-- Message Content -->
+                <div v-html="processMessageContent(message.message_content)"></div>
 
                 <div class="messageTime">
                   <p>{{ message.timestamp.split('T')[1].substring(0, 5) }}</p>
@@ -96,12 +99,34 @@
 
               </div>
             </div>
+
+          </div>
+          <!-- Custom Context Menu -->
+          <div v-if="contextMenuVisible"
+            :style="{ top: contextMenuPosition.y + 'px', left: contextMenuPosition.x + 'px' }"
+            class="custom-context-menu">
+            <ul>
+              <li @click="replyToMessage">Reply</li>
+            </ul>
           </div>
         </div>
 
-</div>
-        <!-- Message Input Area -->
-        <div class="message-input-area" v-if="selectedRemainingTime != 'Chat is expired'">
+
+
+      </div>
+      <!-- Message Input Area -->
+      <div v-if="selectedRemainingTime != 'Chat is expired'">
+
+        <div v-if="replyMessage" class="flex justify-between p-4 ">
+          <div>
+            <b>Replying to: </b>
+            <p v-html="this.getRepliedMessageContent(selectedMessage.message_id)"></p>
+          </div>
+
+          <span class="relative bottom-1 text-xl cursor-pointer text-black mr-4"
+            @click="replyMessageClose">&times;</span>
+        </div>
+        <div class="message-input-area">
           <input type="text" v-model="newMessage" @keyup.enter="sendMessage" placeholder="Type a message..." />
           <label for="file-upload" class="upload-label">
             <i class="bi bi-paperclip"></i>
@@ -115,66 +140,74 @@
           </div>
 
           <input type="file" id="file-upload" @change="FileUpload" class="file-input" />
-          <button id="send-button" @click="sendChatMessage()">Send</button>
-        </div>
-        <div v-else class="message-input-area flex justify-center text-center">
 
-          <h2>Chats are marked as expired 24 hours after the last received customer message.
-            <br>WhatsApp allows only template messages to be sent in such chats.
-          </h2>
+          <button id="send-button" @click="sendChatMessage()" v-if="!replyMessage">Send</button>
+          <button id="send-button" @click="sendChatMessageReply()" v-if="replyMessage">Reply</button>
+
 
         </div>
+
+
+
       </div>
+      <div v-else class="message-input-area flex justify-center text-center">
 
-      <!-- Contact Information -->
-      <div class="contact-info">
-
-        <div class="inner-container bg-white p-4 border-radius-4 h-inherit">
-          <h4><i class="bi bi-person-vcard"
-              style=" font-size:18px; color: gray; font-weight: 300; margin-right:2px"></i><strong> Contact
-              Details</strong> </h4>
-          <table class="contact-table">
-            <tbody>
-              <tr>
-                <td style=" color: gray; font-weight: 300;">Name</td>
-                <td>{{ contactInfo.name }}</td>
-              </tr>
-              <tr>
-                <td style=" color: gray; font-weight: 300;">Phone</td>
-                <td>{{ contactInfo.phone }}</td>
-              </tr>
-              <tr>
-                <td style=" color: gray; font-weight: 300;">Email</td>
-                <td>{{ contactInfo.email }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="inner-container bg-white p-4 border-radius-4 h-inherit">
-          <h4><i class="bi bi-at" style=" color: gray; font-weight: 300; margin-right:2px"></i><strong>Contact
-              Attributes</strong></h4>
-          <table class="contact-table">
-            <tbody>
-              <tr>
-                <td style=" color: gray; font-weight: 300;">Created at</td>
-                <td>{{ contactInfo.created_at }}</td>
-              </tr>
-              <tr>
-                <div v-for="(tag, index) in contactInfo.tags" :key="index">
-                  <td style=" color: gray; font-weight: 300;">{{ tag.split(':')[0] }}</td>
-                  <td>{{ tag.split(':')[1] }}</td>
-                </div>
-              </tr>
-
-            </tbody>
-          </table>
-        </div>
-
+        <h2>Chats are marked as expired 24 hours after the last received customer message.
+          <br>WhatsApp allows only template messages to be sent in such chats.
+        </h2>
 
       </div>
     </div>
- 
+
+    <!-- Contact Information -->
+    <div class="contact-info">
+
+      <div class="inner-container bg-white p-4 border-radius-4 h-inherit">
+        <h4><i class="bi bi-person-vcard"
+            style=" font-size:18px; color: gray; font-weight: 300; margin-right:2px"></i><strong> Contact
+            Details</strong> </h4>
+        <table class="contact-table">
+          <tbody>
+            <tr>
+              <td style=" color: gray; font-weight: 300;">Name</td>
+              <td>{{ contactInfo.name }}</td>
+            </tr>
+            <tr>
+              <td style=" color: gray; font-weight: 300;">Phone</td>
+              <td>{{ contactInfo.phone }}</td>
+            </tr>
+            <tr>
+              <td style=" color: gray; font-weight: 300;">Email</td>
+              <td>{{ contactInfo.email }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="inner-container bg-white p-4 border-radius-4 h-inherit">
+        <h4><i class="bi bi-at" style=" color: gray; font-weight: 300; margin-right:2px"></i><strong>Contact
+            Attributes</strong></h4>
+        <table class="contact-table">
+          <tbody>
+            <tr>
+              <td style=" color: gray; font-weight: 300;">Created at</td>
+              <td>{{ contactInfo.created_at }}</td>
+            </tr>
+            <tr>
+              <div v-for="(tag, index) in contactInfo.tags" :key="index">
+                <td style=" color: gray; font-weight: 300;">{{ tag.split(':')[0] }}</td>
+                <td>{{ tag.split(':')[1] }}</td>
+              </div>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+
+    </div>
+  </div>
+
 </template>
 
 <script>
@@ -186,6 +219,11 @@ export default {
 
   data() {
     return {
+      contextMenuVisible: false,
+      contextMenuPosition: { x: 0, y: 0 },
+      selectedMessage: null,
+      replyMessage: false,
+      parsedTemplate: null,
       // Default to first item
       chatStatusFilter: "",
       showPicker: false,
@@ -212,14 +250,134 @@ export default {
     // Add click event listener when component is mounted
     document.addEventListener('click', this.handleClickOutside);
     await this.fetchActiveChatlist();
+    // Close context menu on click outside
+    document.addEventListener("click", () => {
+      this.contextMenuVisible = false;
+    });
 
   },
 
   methods: {
 
+    truncateMessage(message) {
+      if (message.length > 60) {
+        return `${message.slice(0, 60)} <span style="color: gray; cursor: pointer;">...read more</span>`;
+      }
+      return message;
+    },
+
+    processMessageContent(content) {
+      const templatePrefix = "#template_message# ";
+
+      // Check if it's a template message
+      if (content.startsWith(templatePrefix)) {
+        const templateString = content.replace(templatePrefix, "");
+        try {
+          const parsedTemplate = JSON.parse(templateString);
+
+          // Validate the template structure
+          if (!parsedTemplate.components || !Array.isArray(parsedTemplate.components)) {
+            console.error("Invalid template structure:", parsedTemplate);
+            return "<div>Error: Invalid template message structure.</div>";
+          }
+
+          // Generate the template HTML
+          return parsedTemplate.components
+            .map((component) => {
+
+              if (component.type === "HEADER") {
+                if (component.format === 'TEXT') {
+                  return `<strong>${component.text}</strong> `;
+                } else if (component.format === 'IMAGE' && component.example?.header_handle) {
+                  return `<div style="width: auto; height: 200px; overflow: hidden; position: relative; border-radius: 5px">
+                          <img src="${component.example.header_handle[0]}" alt="Description of image" 
+                          style="width: 100%; height: 100%; object-fit: cover; object-position: start; display: block ; border-radius: 4px">
+                          </div>`;
+                }
+              } else if (component.type === "BODY") {
+                return `<div class="template-body mb-2">${component.text}</div>`;
+              } else if (component.type === "FOOTER") {
+                return `<div class="template-footer text-sm text-gray-500">${component.text}</div>`;
+              } else if (component.type === "BUTTONS") {
+                return component.buttons.map(button => {
+                  if (button.type === 'URL') {
+                    return `
+      <div style="text-align: left; font-size:16px;">
+        <a href="${button.url}" target="_blank" 
+           style="display: inline-flex; align-items: center; 
+           text-decoration: none; font-weight: bold; color: #007bff; 
+           border-top: 1px solid #ddd;">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="#007bff" width="19" height="19" viewBox="0 0 24 24" style="margin-right: 5px;">
+            <path d="M14 3v2h3.586l-8.293 8.293 1.414 1.414 8.293-8.293v3.586h2v-7h-7z"/>
+            <path d="M5 5h6v-2h-6c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2v-6h-2v6h-14v-14z"/>
+          </svg>
+          <span style="padding: 5px">${button.text}</span>
+        </a>
+      </div>`;
+                  } else if (button.type === 'REPLY') {
+                    return `
+      <div style="text-align: left;">
+        <button style="display: inline-block; margin: 5px 0; padding: 10px 15px; 
+                       background-color: #007bff; color: white; border: none; 
+                       border-radius: 20px; cursor: pointer; font-weight: bold;">
+          ${button.text}
+        </button>
+      </div>`;
+                  }
+                  return ''; // Default return in case of an unknown button type
+                }).join(''); // Join all the HTML strings into one
+              }
+
+
+              return "";
+            })
+            .join("");
+        } catch (error) {
+          console.error("Failed to parse template message:", error);
+          return "<div>Error: Unable to parse template message.</div>";
+        }
+      }
+
+      // Return as plain text for non-template messages
+      return `<p>${content}</p>`;
+    },
+
+    replyMessageClose() {
+      this.replyMessage = false;
+      this, this.selectedMessage = '';
+    },
+
+    showContextMenu(event, message) {
+      this.contextMenuVisible = true;
+      this.contextMenuPosition = { x: event.clientX, y: event.clientY };
+      this.selectedMessage = message;
+    },
+    replyToMessage() {
+      if (this.selectedMessage) {
+
+        this.replyMessage = true;
+
+        // Add your reply logic here
+        console.log("Replying to:", this.getRepliedMessageContent(this.selectedMessage.message_id));
+      }
+      this.contextMenuVisible = false;
+    },
+
+
     getRepliedMessageContent(replyToId) {
+      if (!Array.isArray(this.selectedchat)) {
+        console.error("selectedchat is not defined or is not an array");
+        return '';
+      }
+
       const repliedMessage = this.selectedchat.find(message => message.message_id === replyToId);
-      return repliedMessage ? repliedMessage.message_content : '';
+
+      if (!repliedMessage) {
+        console.warn(`Message with ID ${replyToId} not found in selectedchat`);
+        return '';
+      }
+
+      return this.processMessageContent(repliedMessage.message_content);
     },
 
     shouldShowDate(index) {
@@ -359,11 +517,13 @@ export default {
             sender_wa_id: activechat.sender_wa_id,
             last_chat_time: activechat.last_chat_time
           })).filter(activechat => {
-            if (chatStatusFilter !== null) {
-              return activechat.active == (chatStatusFilter === 'true');
-            }
-            return true;
-          });
+  if (chatStatusFilter === null || chatStatusFilter === '') {
+    // No filter applied, return all items
+    return true;
+  }
+  // Apply the filter based on the value of chatStatusFilter
+  return activechat.active == (chatStatusFilter === 'true');
+});
 
         };
 
@@ -527,9 +687,47 @@ export default {
       } catch (error) {
         console.error("Error sending message")
       }
+    },
+
+    async sendChatMessageReply() {
+      const message = this.newMessage
+      const reciever = this.ActiveWaid
+      try {
+        const token = localStorage.getItem("token");
+
+        const requestBody = {
+          wa_id: reciever,
+          body: message,
+          context_message_id: this.selectedMessage.message_id
+
+        }
+
+        const response = await fetch("http://localhost:8000/send-text-message-reply/", {
+          method: "POST",
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody)
+
+        })
+        if (!response.ok) {
+          throw new Error("Network response not okay");
+        }
+        else {
+          this.newMessage = "";
+          this.selectedMessage = '';
+          this.replyMessage = false;
+        }
+
+      } catch (error) {
+        console.error("Error sending message")
+      }
     }
 
   },
+
+
 
 
   beforeUnmount() {
@@ -557,6 +755,33 @@ export default {
 
 <style scoped>
 /* Main container layout */
+.custom-context-menu {
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  list-style: none;
+  padding: 5px 0;
+  margin: 0;
+  width: 150px;
+}
+
+
+
+.custom-context-menu ul {
+  margin: 0;
+  padding: 0;
+}
+
+.custom-context-menu li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.custom-context-menu li:hover {
+  background-color: #f5f5f5;
+}
 
 
 .main-container {

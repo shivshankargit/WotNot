@@ -56,8 +56,8 @@
             <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.sub_category }}</td>
             <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.id }}</td>
             <td class=" border-[#ddd] p-2 md:p-4 text-center">
-            <button class="text-blue-500 underline hover:text-blue-700 hover:bg-transparent"
-              @click="showpreview(template.preview)">Preview</button>
+              <button class="text-blue-500 underline hover:text-blue-700 hover:bg-transparent"
+                @click="showpreview(template.preview)">Preview</button>
             </td>
             <td class=" border-[#ddd] p-2 md:p-4 text-center">
               <button @click="deleteTemplate(template.name)" class="hover:bg-white rounded-full p-2 transition">
@@ -73,14 +73,15 @@
     </div>
 
 
-    <PopUp_preview  v-if="showPreview" @close="showPreview = false">
-      
-          <div class="flex flex-col aspect-[10/19] p-3 max-h-[670px] bg-[url('@/assets/chat-bg.jpg')] bg-cover bg-center custom-scrollbar">
-            <div class="message">
-              <span style="white-space: pre-line;" v-html="preview_data"></span>
-            </div>
-          </div>
-      
+    <PopUp_preview v-if="showPreview" @close="showPreview = false">
+
+      <div
+        class="flex flex-col aspect-[10/19] p-3 max-h-[670px] bg-[url('@/assets/chat-bg.jpg')] bg-cover bg-center custom-scrollbar">
+        <div class="message">
+          <span style="white-space: pre-line;" v-html="preview_data"></span>
+        </div>
+      </div>
+
     </PopUp_preview>
 
 
@@ -274,29 +275,6 @@ export default {
     },
 
 
-
-
-    // async fetchtemplateList() {
-    //   const token = localStorage.getItem('token');
-    //   try {
-    //     const response = await fetch("http://localhost:8000/template", {
-    //       method: 'GET',
-    //       headers: {
-    //         'Authorization': `Bearer ${token}`,
-    //         'Content-Type': 'application/json',
-    //       }
-    //     });
-
-    //     if (!response.ok) {
-    //       throw new Error('Network response was not ok');
-    //     }
-
-    //     const templatelist = await response.json();
-    //     this.templates = templatelist.data;
-    //   } catch (error) {
-    //     console.error("There was an error fetching the templates:", error);
-    //   }
-    // },
     async fetchtemplateList() {
       const token = localStorage.getItem('token');
       try {
@@ -337,7 +315,7 @@ export default {
         switch (component.type) {
           case 'HEADER': {
             if (component.format === 'TEXT') {
-              previewMessage += `<strong>${component.text}</strong> `;
+              previewMessage += `<strong>${component.text}\n</strong> `;
             } else if (component.format === 'IMAGE' && component.example?.header_handle) {
               previewMessage += `<div style="width: auto; height: 200px; overflow: hidden; position: relative; border-radius: 5px">
   <img src="${component.example.header_handle[0]}" alt="Description of image" 
@@ -356,9 +334,40 @@ export default {
             break;
           }
           case 'FOOTER': {
-            previewMessage += `<span style="font-weight: lighter;">${component.text}</span> `;
+            previewMessage += `<span style="font-weight: lighter; color:gray;">\n${component.text}</span> `;
             break;
           }
+          case 'BUTTONS': {
+  if (component.buttons && Array.isArray(component.buttons)) {
+    previewMessage += `<div style=" text-align: left;">`;
+    component.buttons.forEach(button => {
+      if (button.type === 'URL') {
+        previewMessage += `
+          <a href="${button.url}" target="_blank" 
+             style="display: inline-flex; align-items: center; 
+                    text-decoration: none; font-weight: bold; color: #007bff; 
+                     border-top: 1px solid #ddd;">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="#007bff" width="19" height="19" viewBox="0 0 24 24" style="margin-right: 5px;">
+              <path d="M14 3v2h3.586l-8.293 8.293 1.414 1.414 8.293-8.293v3.586h2v-7h-7z"/>
+              <path d="M5 5h6v-2h-6c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2v-6h-2v6h-14v-14z"/>
+            </svg>
+            <span style="padding:5px">${button.text}</span>
+            
+          </a>`;
+      } else if (button.type === 'REPLY') {
+        previewMessage += `
+          <button style="display: inline-block; margin: 5px 0; padding: 10px 15px; 
+                         background-color: #007bff; color: white; border: none; 
+                         border-radius: 20px; cursor: pointer; font-weight: bold;">
+            ${button.text}
+          </button>`;
+      }
+    });
+    previewMessage += `</div>`;
+  }
+  break;
+}
+
           default: {
             previewMessage += `[Unknown Component Type] `;
             break;
@@ -521,7 +530,7 @@ export default {
   font-size: small;
   display: flex;
   justify-content: space-between;
-  background-color: #dcf8c6;
+  background-color: #ffffff;
   margin-bottom: 10px;
   padding: 10px;
   border-radius: 10px;
