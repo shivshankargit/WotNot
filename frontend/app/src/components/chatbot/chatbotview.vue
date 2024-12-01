@@ -91,7 +91,7 @@
 
                 </div>
                 <!-- Message Content -->
-                <div v-html="processMessageContent(message.message_content)"></div>
+                <div style="white-space: pre-line;" v-html="processMessageContent(message.message_content)"></div>
 
                 <div class="messageTime">
                   <p>{{ message.timestamp.split('T')[1].substring(0, 5) }}</p>
