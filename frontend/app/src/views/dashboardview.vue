@@ -134,7 +134,7 @@
 
 
       <!-- Main Content-->
-      <div class="flex-1 mt-16 bg-white overflow-y-auto h-[calc(100vh-65px)] ">
+      <div class="flex-1 mt-16 bg-white h-[calc(100vh-65px)] ">
         <router-view></router-view>
       </div>
 

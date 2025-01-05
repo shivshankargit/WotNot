@@ -1,7 +1,7 @@
 
 
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException,Query
 from ..models import Contacts, User
 from ..Schemas import contacts, user
 from ..database import database
@@ -37,6 +37,37 @@ async def bulk_import_contacts(
 
     content = (await file.read()).decode("utf-8")
     csv_reader = csv.DictReader(StringIO(content))
+
+
+# from fastapi import APIRouter, File, UploadFile, HTTPException, Depends
+# from sqlalchemy.ext.asyncio import AsyncSession
+# from io import BytesIO, StringIO
+# import csv
+# from typing import Union
+
+# @router.post("/contacts/csv/")
+# async def bulk_import_contacts(
+#     file: Union[UploadFile, BytesIO] = File(...),
+#     db: AsyncSession = Depends(database.get_db),
+#     get_current_user: user.newuser = Depends(get_current_user)
+# ):
+#     # Handle the content type for UploadFile
+#     if isinstance(file, UploadFile):
+#         if file.content_type != "text/csv":
+#             raise HTTPException(status_code=400, detail="Invalid file format. Please upload a CSV file.")
+#         content = (await file.read()).decode("utf-8")
+#     # Handle the case where file is provided as a buffer (BytesIO)
+#     elif isinstance(file, BytesIO):
+#         content = file.getvalue().decode("utf-8")
+#     else:
+#         raise HTTPException(status_code=400, detail="Invalid file input. Please provide a CSV file or buffer.")
+
+#     try:
+#         csv_reader = csv.DictReader(StringIO(content))
+#         if not csv_reader.fieldnames:
+#             raise HTTPException(status_code=400, detail="CSV file is empty or has invalid headers.")
+#     except Exception as e:
+#         raise HTTPException(status_code=400, detail=f"Error reading CSV file: {str(e)}")
 
     contacts_to_create = []
     duplicate_records = []
@@ -243,8 +274,8 @@ async def create_contact(
 
 @router.get("/contacts/", response_model=list[contacts.ContactRead])
 async def read_contacts(
-    skip: int = 0,
-    limit: int = 1000,
+    limit: int = Query(10),
+    offset: int = Query(0),
     tag: str = None,
     db: AsyncSession = Depends(database.get_db),
     get_current_user: user.newuser = Depends(get_current_user)
@@ -257,7 +288,7 @@ async def read_contacts(
         query = query.filter(Contacts.Contact.tags.contains([tag]))
 
     # Apply pagination
-    query = query.offset(skip).limit(limit)
+    query = query.offset(offset).limit(limit)
 
     # Execute the query
     result = await db.execute(query)

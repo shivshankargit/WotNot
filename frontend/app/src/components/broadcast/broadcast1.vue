@@ -131,9 +131,6 @@
           </div>
 
 
-
-
-
           <label for="">Header</label>
           <input v-model="headerComponent.text" placeholder="Header Text (optional)"
             class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
@@ -142,6 +139,14 @@
             <label class="block text-sm font-medium">Body<span class="text-red-800">*</span></label>
             <textarea v-model="bodyComponent.text" class="mt-1 p-2 w-full border border-gray-300 rounded-md h-12"
               placeholder="Template Message..." rows="4" required></textarea>
+          </div>
+          <div>
+            <button @click="addVariable">add variable</button>
+          </div>
+          <div v-if="variableCounter">
+            <div v-for="index in variableCounter" :key="index">
+              <input type="text" :placeholder="'Variable ' + index" v-model="variables[index - 1]" />
+            </div>
           </div>
 
           <label for="">Footer</label>
@@ -241,7 +246,10 @@ export default {
         text: '',
         url: ''
       },
-      nameError: ''
+      nameError: '',
+
+      variableCounter: null,
+      variables:[],
     };
   },
 
@@ -258,9 +266,19 @@ export default {
 
   methods: {
 
+    addVariable() {
+      // Count existing variables in the text
+      const currentVariables = this.bodyComponent.text.match(/{{\d+}}/g) || [];
+
+      // Determine the next variable number
+      const nextVariableNumber = currentVariables.length + 1;
+
+      // Append the new variable to the text
+      this.bodyComponent.text += `{{${nextVariableNumber}}}`;
+      this.variableCounter=nextVariableNumber;
+    },
+
     showpreview(preview) {
-
-
       this.showPreview = true;
       this.preview_data = preview;
 
@@ -338,11 +356,11 @@ export default {
             break;
           }
           case 'BUTTONS': {
-  if (component.buttons && Array.isArray(component.buttons)) {
-    previewMessage += `<div style=" text-align: left;">`;
-    component.buttons.forEach(button => {
-      if (button.type === 'URL') {
-        previewMessage += `
+            if (component.buttons && Array.isArray(component.buttons)) {
+              previewMessage += `<div style=" text-align: left;">`;
+              component.buttons.forEach(button => {
+                if (button.type === 'URL') {
+                  previewMessage += `
           <a href="${button.url}" target="_blank" 
              style="display: inline-flex; align-items: center; 
                     text-decoration: none; font-weight: bold; color: #007bff; 
@@ -354,19 +372,19 @@ export default {
             <span style="padding:5px">${button.text}</span>
             
           </a>`;
-      } else if (button.type === 'REPLY') {
-        previewMessage += `
+                } else if (button.type === 'REPLY') {
+                  previewMessage += `
           <button style="display: inline-block; margin: 5px 0; padding: 10px 15px; 
                          background-color: #007bff; color: white; border: none; 
                          border-radius: 20px; cursor: pointer; font-weight: bold;">
             ${button.text}
           </button>`;
-      }
-    });
-    previewMessage += `</div>`;
-  }
-  break;
-}
+                }
+              });
+              previewMessage += `</div>`;
+            }
+            break;
+          }
 
           default: {
             previewMessage += `[Unknown Component Type] `;
@@ -516,6 +534,7 @@ export default {
     closePopup() {
       this.template.name = '';
       this.showPopup = false;
+      this.variableCounter = null;
     },
 
     closeSelectionPopup() {

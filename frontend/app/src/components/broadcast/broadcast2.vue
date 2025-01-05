@@ -199,7 +199,7 @@
         <h3 class="text-xl md:text-2xs mb-2 text-gray-600"><b>Broadcast List </b></h3>
         <div class="pb-2 pl-2">
           <button class="text-blue-500 underline hover:text-blue-700 hover:bg-transparent"
-            @click="fetchBroadcastList()">
+            @click="fetchBroadcastList(this.filterStatus,1)">
             <i class="bi bi-arrow-clockwise"></i> Refresh
           </button>
         </div>
@@ -211,7 +211,7 @@
           <h3><b>Filter by:</b></h3>
           <div class="w-40px">
             <select name="" id="" @change="filterBroadcastsByStatus" class="border border-gray-300 rounded px-3 py-2 ">
-              <option value="">Status</option>
+              <option value="null">Status</option>
               <option value="Successful">Successful</option>
               <option value="Cancelled">Cancelled</option>
               <option value="Partially Successful">Partially Successful</option>
@@ -265,6 +265,15 @@
           </tr>
         </tbody>
       </table>
+    </div>
+    <div class="flex justify-end">
+      <div class="flex justify-between items-center">
+        <button class="p-2 text-blue-500 underline hover:text-blue-700 hover:bg-transparent" 
+        @click="loadPreviousPage" :disabled="currentPage === 1">Previous</button>
+        <div class="border-2">{{ currentPage }}</div>
+        <button class="p-2 text-blue-500 underline hover:text-blue-700 hover:bg-transparent" 
+        @click="loadNextPage">Next</button>
+      </div>
     </div>
 
 
@@ -449,6 +458,8 @@ export default {
   },
   data() {
     return {
+
+      currentPage: 1,
       tooltipVisible: null, // Index of the row with a visible tooltip
       tooltipStyles: {},
       mediafile: null,
@@ -485,7 +496,10 @@ export default {
       imageUrl: '',// To store the input value for the image URL
       selectedTemplateHasParameters: false,
       bodyParameters: [],
-      bodyParameter: ''
+      bodyParameter: '',
+
+
+      filterStatus:null,
 
     };
   },
@@ -500,6 +514,17 @@ export default {
     // Fetch contacts when the component is mounted
   },
   methods: {
+
+    async loadNextPage() {
+      this.currentPage += 1;
+      await this.fetchBroadcastList(this.filterStatus,this.currentPage);
+    },
+    async loadPreviousPage() {
+      if (this.currentPage > 1) {
+        this.currentPage -= 1;
+        await this.fetchBroadcastList(this.filterStatus,this.currentPage);
+      }
+    },
 
     showTooltip(index, event) {
       this.tooltipVisible = index; // Set the visible tooltip to the current row index
@@ -630,45 +655,54 @@ export default {
       }
     },
 
-    async fetchBroadcastList(statusFilter = null) {
-      const token = localStorage.getItem('token');
-      try {
-        const response = await fetch('http://localhost:8000/broadcast/', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
+    async fetchBroadcastList(statusFilter = null, page = 1) {
+  const token = localStorage.getItem('token'); // Retrieve token from localStorage
+  const itemsPerPage = 10;
+  this.currentPage=page;
+  this.filterStatus=statusFilter;// Number of items to display per page
+  const url = `http://localhost:8000/broadcast/?limit=${itemsPerPage}&offset=${(page - 1) * itemsPerPage}&statusfilter=${this.filterStatus}`;
 
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
+  try {
+    // Fetch data from the backend
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
-        const broadcastList = await response.json();
+    // Check if the response is OK
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
 
-        // Filter broadcasts based on the statusFilter if it's provided
-        this.broadcasts = broadcastList
-          .map(broadcast => ({
-            id: broadcast.id,
-            name: broadcast.name,
-            type: broadcast.type,
-            template: broadcast.template,
-            contacts: broadcast.contacts,
-            success: broadcast.success,
-            failed: broadcast.failed,
-            status: broadcast.status
-          }))
-          .filter(broadcast => {
-            return statusFilter ? broadcast.status === statusFilter : true;
-          });
+    // Parse JSON response
+    const broadcastList = await response.json();
 
+    // Process and optionally filter broadcasts
+    this.broadcasts = broadcastList
+      .map((broadcast) => ({
+        id: broadcast.id,
+        name: broadcast.name,
+        type: broadcast.type,
+        template: broadcast.template,
+        contacts: broadcast.contacts,
+        success: broadcast.success,
+        failed: broadcast.failed,
+        status: broadcast.status,
+        created_at: broadcast.created_at, // Include for sorting
+        updated_at: broadcast.updated_at, // Include for sorting
+      }))
+      // .filter((broadcast) => {
+      //   return statusFilter ? broadcast.status === statusFilter : true;
+      // }); 
 
-      } catch (error) {
-        console.error('Error fetching broadcasts:', error);
-      }
-
-    },
+    console.log('Broadcasts:', this.broadcasts); // Debug: Log the fetched broadcasts
+  } catch (error) {
+    console.error('Error fetching broadcasts:', error); // Log errors
+  }
+},
 
 
 

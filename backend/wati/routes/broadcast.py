@@ -805,9 +805,10 @@ async def broadcastList(
 # Route to fetch the broadcastlist
 @router.get('/broadcast')  # Use your response model here
 async def fetchbroadcastList(
-    skip: int = 0,
-    limit: int = 10,
-    tag: str = None,
+    limit: int = Query(10),
+    offset: int = Query(0),
+    statusfilter: str | None = Query(None),
+    tag: str | None = Query(None),
     db: AsyncSession = Depends(database.get_db),  # Ensure this is your async db session dependency
     get_current_user: user.newuser = Depends(get_current_user)
 ):
@@ -819,7 +820,12 @@ async def fetchbroadcastList(
 
     # Apply tag filtering if provided
     if tag:
-        query = query.filter(Broadcast.BroadcastList.template.ilike(f"%{tag}%"))  # Adjust field as needed
+        query = query.filter(Broadcast.BroadcastList.template.ilike(f"%{tag}%")) # Adjust field as needed
+
+    if statusfilter!="null" :
+        query=query.filter(Broadcast.BroadcastList.status==statusfilter)
+    # Apply pagination
+    query = query.offset(offset).limit(limit)
 
     # Execute the query
     result = await db.execute(query)

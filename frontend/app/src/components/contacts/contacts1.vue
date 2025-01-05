@@ -62,17 +62,18 @@
                   </tr>
                 </tbody>
               </table>
+              
             </div>
 
 
           </div>
 
 
-          <div  v-if="importcontacts.length">
+          <div v-if="importcontacts.length">
             <h3>New Contacts</h3>
 
-            <div class="overflow-y-auto max-h-[20vh] custom-scrollbar" >
-              <table >
+            <div class="overflow-y-auto max-h-[20vh] custom-scrollbar">
+              <table>
                 <thead>
                   <tr>
                     <th>Name</th>
@@ -93,10 +94,9 @@
                     </td>
                   </tr>
                 </tbody>
-              </table>
-  
-            </div>
 
+              </table>
+            </div>
           </div>
 
           <div v-if="importcontacts.length" class="flex">
@@ -212,7 +212,7 @@
 
 
 
-    <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
+    <div class="overflow-x-auto max-h-[54vh] custom-scrollbar">
       <table class="w-full rounded-lg border-collapse block">
         <thead>
           <tr class="bg-[#ffffff] border-b-2 border-gray-300">
@@ -241,8 +241,7 @@
             <td class="border-gray-300 py-5 px-3">
               <div class="flex justify-left">
                 <button @click="modifyContact(contact)" class="hover:bg-white rounded-full p-2 transition">
-                  <lord-icon src="https://cdn.lordicon.com/wuvorxbv.json" trigger="none"
-                    style="width:32px;height:32px">
+                  <lord-icon src="https://cdn.lordicon.com/wuvorxbv.json" trigger="none" style="width:32px;height:32px">
                   </lord-icon>
                 </button>
                 <button @click="deleteContact(contact.phone)" class="hover:bg-white rounded-full p-2 transition">
@@ -255,6 +254,15 @@
           </tr>
         </tbody>
       </table>
+    </div>
+    <div class="flex justify-end">
+      <div class="flex justify-between items-center">
+        <button class="p-2 text-blue-500 underline hover:text-blue-700 hover:bg-transparent" 
+        @click="loadPreviousPage" :disabled="currentPage === 1">Previous</button>
+        <div class="border-2">{{ currentPage }}</div>
+        <button class="p-2 text-blue-500 underline hover:text-blue-700 hover:bg-transparent" 
+        @click="loadNextPage">Next</button>
+      </div>
     </div>
   </div>
 </template>
@@ -281,6 +289,7 @@ export default {
   name: "ContActs1",
   data() {
     return {
+      currentPage: 1,
       showPopup: false,
       showPopupimport: false,
       showActionPopup: false,
@@ -336,6 +345,18 @@ export default {
     }
   },
   methods: {
+
+    async loadNextPage() {
+      this.currentPage += 1;
+      await this.fetchContactList(this.currentPage);
+    },
+    async loadPreviousPage() {
+      if (this.currentPage > 1) {
+        this.currentPage -= 1;
+        await this.fetchContactList(this.currentPage);
+      }
+    },
+
     async submitForm() {
       const toast = useToast();
       const { id, name, email, phone, countryCode, tags } = this.contact;
@@ -398,41 +419,44 @@ export default {
       const date = new Date(dateString);
       return date.toLocaleDateString('en-US', options).replace(/,/g, '');
     },
-    async fetchContactList() {
-      const token = localStorage.getItem("token");
-      const url = `http://localhost:8000/contacts/?sort_by=${this.sortBy}&order=${this.order}`;
 
-      try {
-        const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
 
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
+    async fetchContactList(page = 1) {
+  const token = localStorage.getItem("token");
+  const itemsPerPage = 10; // Number of contacts per page
+  const url = `http://localhost:8000/contacts/?sort_by=${this.sortBy}&order=${this.order}&limit=${itemsPerPage}&offset=${(page - 1) * itemsPerPage}`;
 
-        const contactsList = await response.json();
-        console.log(contactsList);
-        this.contacts = contactsList.map((contact) => ({
-          id: contact.id,
-          name: contact.name,
-          phone: contact.phone,
-          email: contact.email,
-          tags: contact.tags.map(tag => {
-            const [key, value] = tag.split(":");
-            return { key, value };
-          }),
-          created_at: contact.created_at, // Store raw dates for sorting
-          updated_at: contact.updated_at // Store updated_at too
-        }));
-      } catch (error) {
-        console.error("Error fetching contacts:", error);
-      }
-    },
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const contactsList = await response.json();
+    console.log(contactsList);
+    this.contacts = contactsList.map((contact) => ({
+      id: contact.id,
+      name: contact.name,
+      phone: contact.phone,
+      email: contact.email,
+      tags: contact.tags.map(tag => {
+        const [key, value] = tag.split(":");
+        return { key, value };
+      }),
+      created_at: contact.created_at, // Store raw dates for sorting
+      updated_at: contact.updated_at // Store updated_at too
+    }));
+  } catch (error) {
+    console.error("Error fetching contacts:", error);
+  }
+},
 
     // Contacts Tags Filter
     async fiterBytTags() {

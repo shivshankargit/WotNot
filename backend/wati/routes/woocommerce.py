@@ -11,12 +11,13 @@ from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 import httpx
+from datetime import datetime, timedelta
+import pytz
+from ..services import tasks
 
 
 
 router=APIRouter(tags=['woocommerce'])
-
-
 
 # Function to verify API key from request headers or query params
 async def verify_api_key(request: Request, db: AsyncSession ):
@@ -41,8 +42,8 @@ async def verify_api_key(request: Request, db: AsyncSession ):
     if not user:
         raise HTTPException(status_code=403, detail="Invalid API key")
     
+    print(user)
     return user
-
 
 
 async def send_order_confirmation_message(order_data, whatsapp_token, phone_id, db: AsyncSession,user_id):
@@ -158,9 +159,9 @@ async def send_order_confirmation_message(order_data, whatsapp_token, phone_id, 
 
 # webhook for the order cofirmation
 @router.post("/webhook/woocommerce")
-async def handle_woocommerce_webhook(request: Request, db: Session = Depends(database.get_db)):
+async def handle_woocommerce_webhook(request: Request, db: AsyncSession = Depends(database.get_db)):
     # Verify API key
-    user = verify_api_key(request, db)
+    user = await verify_api_key(request, db)
 
     body = await request.body()
     print(f"Webhook received: {body.decode('utf-8')},user id is {user.id}")  # Log the raw body for debugging
@@ -169,7 +170,7 @@ async def handle_woocommerce_webhook(request: Request, db: Session = Depends(dat
     try:
         
         payload = await request.json()
-        send_order_confirmation_message(payload,user.PAccessToken,user.Phone_id,db,user.id)
+        await send_order_confirmation_message(payload,user.PAccessToken,user.Phone_id,db,user.id)
     except Exception as e:
         return {"error": "Invalid JSON", "detail": str(e)}
 
@@ -191,7 +192,7 @@ async def apikey(request:Request,get_current_user: user.newuser=Depends(get_curr
     return{"webkook_link":webhooklink}
     
 
-@router.post("/integrate/woocommerce")
+@router.post("/integrate/woo_order_cnf")
 async def saveWooIntegartion(request:integration.wooIntegration,get_current_user: user.newuser=Depends(get_current_user),db: AsyncSession = Depends(database.get_db)):
     parameters_list = [{"key": param.key} for param in request.parameters]
     
@@ -220,7 +221,7 @@ async def saveWooIntegartion(request:integration.wooIntegration,get_current_user
         api_key=get_current_user.api_key,
         type=request.type,
         template=request.template_id,
-        user_id=get_current_user.id
+        user_id=get_current_user.id,
 
     )
 
@@ -231,5 +232,117 @@ async def saveWooIntegartion(request:integration.wooIntegration,get_current_user
 
     # Create the WooIntegrationDB model instance
    
+
+    return {"template": request.template_id, "parameters": request.parameters}
+
+
+
+
+from datetime import datetime, timedelta
+import pytz
+
+def calculate_next_execution_time(repeat_days, time_str):
+    """
+    Calculate the next execution time based on repeat_days and time in IST.
+    """
+    # Define IST and UTC timezones
+    ist = pytz.timezone('Asia/Kolkata')
+    utc = pytz.utc
+
+    # Map days of the week to integers
+    days_mapping = {"Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3,
+                    "Friday": 4, "Saturday": 5, "Sunday": 6}
+    repeat_days = [days_mapping[day] for day in repeat_days]
+
+    # Current time in UTC
+    now = datetime.now(utc)
+    current_day = now.weekday()
+    current_time = now.time()
+    current_date = datetime.now().strftime("%Y-%m-%d")
+
+    # Convert target time string (in IST) to UTC
+    target_time_ist = datetime.strptime(time_str, "%H:%M")
+    target_time_ist = datetime.strptime(f"{current_date} {time_str}", "%Y-%m-%d %H:%M")
+    target_time_utc = target_time_ist.astimezone(utc).time()
+    print(target_time_utc)
+
+    # Find the next valid day and time
+    days_until_next = None
+    for day in repeat_days:
+        day_difference = (day - current_day) % 7
+        if day == current_day and target_time_utc >= current_time:
+            days_until_next = day_difference
+            break
+        elif days_until_next is None or day_difference < days_until_next:
+            days_until_next = day_difference
+
+    # Calculate the next execution datetime
+    next_date = now + timedelta(days=days_until_next)
+    next_execution = datetime.combine(next_date.date(), target_time_utc, tzinfo=utc)
+
+    return next_execution
+
+
+
+
+
+
+@router.post("/integrate/woo_pwn")
+async def saveWooIntegartion(request:integration.wooIntegration,get_current_user: user.newuser=Depends(get_current_user),db: AsyncSession = Depends(database.get_db)):
+    parameters_list = [{"key": param.key} for param in request.parameters]
+    
+    # result=await db.execute(select(Integration.WooIntegration).filter((Integration.WooIntegration.user_id==get_current_user.id)&(Integration.WooIntegration.type=="woo/pwn")))
+    # exixsting=result.scalars().first()
+    # if exixsting:
+    #     raise HTTPException(status_code=400, detail="Integration already exists")
+   
+   # Create the WooIntegrationDB model instance
+    integration=Integration.Integration(
+        user_id=get_current_user.id,
+        type=request.type,
+        api_key=get_current_user.api_key,
+        app="woocommerce"
+    )
+    # Add and commit the data to the database
+    db.add(integration)
+    await db.commit()
+    await db.refresh(integration)
+
+    # result2=await db.execute(select(Integration.Integration).filter((Integration.Integration.id==integration.id)&(Integration.Integration.type==request.type)))
+    # integration_search=result2.scalars().first()
+    woo_integration = Integration.WooIntegration(
+        integration_id=integration.id,
+        parameters=parameters_list,
+        api_key=get_current_user.api_key,
+        type=request.type,
+        template=request.template_id,
+        template_data=request.template_data,
+        user_id=get_current_user.id,
+        contacts_start_date=request.contacts_start_date.replace(tzinfo=None),
+        contacts_end_date=request.contacts_end_date.replace(tzinfo=None),
+        repeat_days=request.repeat_days,
+        time=request.time,
+        rest_key=request.rest_key,
+        rest_secret=request.rest_secret,
+        product_id=request.product_id,
+        status=request.status,
+        base_url=request.base_url
+
+
+    )
+
+    # Add and commit the data to the database
+    db.add(woo_integration)
+    await db.commit()
+    await db.refresh(woo_integration)
+ 
+
+    next_execution_time = calculate_next_execution_time(request.repeat_days, request.time)
+    delay_seconds = (next_execution_time - datetime.now(pytz.utc)).total_seconds()
+    print(f"This the delay time {delay_seconds/(60)}")
+
+    # Schedule the task
+    tasks.schedule_woo_task.send_with_options(args=(woo_integration.id,), delay=delay_seconds*1000) #delay in miliseconds
+
 
     return {"template": request.template_id, "parameters": request.parameters}
