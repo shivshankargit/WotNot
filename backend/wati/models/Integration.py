@@ -16,11 +16,25 @@ class Integration(database.Base):
     updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
     type=Column(String)
 
+# Integration Credentials
+class Integration_credentials(database.Base):
+    __tablename__="integration_credentials"
+    id=Column(Integer,primary_key=True)
+    user_id= Column(Integer,ForeignKey(User.User.id))
+    app=Column(String) #"WooCommerce", "Shopify", etc.
+    store_name=Column(String)
+    client_key= Column(String)
+    client_secret =Column(String)
+    base_url=Column(String)
+    created_at = Column(TIMESTAMP, server_default=func.now())
+    updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
 
+# WooCommerce
 class WooIntegration(database.Base):
     __tablename__="Woo_Integration"
     id=Column(Integer,primary_key=True)
     integration_id=Column(Integer,ForeignKey(Integration.id))
+    description=Column(String,nullable=True)
     user_id=Column(Integer,ForeignKey(User.User.id))
     api_key=Column(String,nullable=True)
     rest_key=Column(String,nullable=True) 
@@ -38,3 +52,5 @@ class WooIntegration(database.Base):
     product_id=Column(Integer,nullable=True)
     status=Column(String,nullable=True)
     base_url=Column(String,nullable=True)
+
+

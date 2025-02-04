@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException,Query
 from sqlalchemy.orm import Session
 import requests
 from datetime import datetime
@@ -7,7 +7,7 @@ from ..Schemas import user
 from ..database import database 
 import logging
 from ..models import User
-
+from typing import Optional
 router = APIRouter(tags=['Wallet'])
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -46,29 +46,54 @@ async def get_conversation_analytics(account_id: int, db: AsyncSession = Depends
     return response.json()
 
 
-@router.get("/conversation-cost-history/{account_id}")
-async def get_conversation_cost_history(account_id: int, db: AsyncSession = Depends(database.get_db), get_current_user: user.newuser = Depends(get_current_user)):
+@router.get("/conversation-cost-history/")
+async def get_conversation_cost_history(
+    
+    start_date: Optional[str] = Query(None, description="Start date in YYYY-MM-DD format"),
+    end_date: Optional[str] = Query(None, description="End date in YYYY-MM-DD format"),
+    db: AsyncSession = Depends(database.get_db),
+    get_current_user: user.newuser = Depends(get_current_user),
+):
     ACCESS_TOKEN = get_current_user.PAccessToken
 
     # Fetch account creation time asynchronously
-    result = await db.execute(select(User.User).filter(User.User.WABAID == account_id))
+    result = await db.execute(select(User.User).filter(User.User.WABAID == get_current_user.WABAID))
     account_creation_time = result.scalars().first()
     
     if not account_creation_time:
         raise HTTPException(status_code=404, detail="Account not found")
-
+    
+    # Default date range to account creation time and current time if not provided
     since = int(account_creation_time.created_at.timestamp())
     until = int(datetime.now().timestamp())
 
-    url = f"https://graph.facebook.com/v20.0/{account_id}?fields=conversation_analytics.start({since}).end({until}).granularity(DAILY).phone_numbers([]).dimensions([\"CONVERSATION_CATEGORY\",\"CONVERSATION_TYPE\",\"COUNTRY\",\"PHONE\"])"
+    if start_date:
+        try:
+            since = int(datetime.strptime(start_date, "%Y-%m-%d").timestamp())
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid start_date format, expected YYYY-MM-DD")
     
+    if end_date:
+        try:
+            until = int(datetime.strptime(end_date, "%Y-%m-%d").timestamp())
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid end_date format, expected YYYY-MM-DD")
+    
+    if since > until:
+        raise HTTPException(status_code=400, detail="start_date cannot be after end_date")
+
+    # Build the URL for the API request
+    url = f"https://graph.facebook.com/v20.0/{get_current_user.WABAID}?fields=conversation_analytics.start({since}).end({until}).granularity(DAILY).phone_numbers([]).dimensions([\"CONVERSATION_CATEGORY\",\"CONVERSATION_TYPE\",\"COUNTRY\",\"PHONE\"])"
+    
+    # Make the request to the external API
     response = requests.get(url, params={"access_token": ACCESS_TOKEN})
     if response.status_code != 200:
         raise HTTPException(status_code=response.status_code, detail=response.json().get("error", "Error fetching data"))
-
+    
     conversation_data = response.json().get("conversation_analytics", {}).get("data", [])
     processed_data = []
 
+    # Process the data
     for data_entry in conversation_data:
         data_points = data_entry.get("data_points", [])
         for point in data_points:

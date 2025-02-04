@@ -14,13 +14,14 @@
       </div>
     </div>
 
-    <PopUp v-if="showPopup" @close="showPopup = false, clearForm()">
+    <PopUp v-if="showPopup" @close="showPopup = false, clearForm()"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 custom-scrollbar">
 
 
       <h2 class="text-xl font-semibold mb-4">New Broadcast</h2>
       <hr class="mb-4" />
 
-
+      <div class="popup-content custom-scrollbar p-4">
       <form @submit.prevent="handleBroadcast" id="messageForm">
 
 
@@ -184,12 +185,14 @@
           </div>
         </div>
         <button type="submit" class="bg-[#23a455] text-[#f5f6fa] px-4 py-2 rounded">{{ isScheduled ?
-          'ScheduleMessage' : 'Send Message' }}</button>
+          'Schedule Message' : 'Send Message' }}</button>
       </form>
 
 
 
       <div id="response"></div>
+
+    </div>
     </PopUp>
 
 
@@ -1287,5 +1290,12 @@ export default {
   color: white;
   font-size: 16px;
   border-radius: 10px;
+}
+
+.popup-content {
+  max-height: 600px;
+  /* Limit the height of the popup */
+  overflow-y: auto;
+  /* Enable vertical scrolling if content exceeds max-height */
 }
 </style>

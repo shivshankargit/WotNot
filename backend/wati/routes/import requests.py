@@ -61,8 +61,8 @@ print("Next Execution:", next_execution)
 
 
 # Example date range
-start_date = '2024-09-13'
-end_date = '2024-12-31'
+start_date = '2024-04-13'
+end_date = '2025-01-31'
 
 # Convert the start and end dates to datetime objects
 start_date = datetime.strptime(start_date, '%Y-%m-%d')
@@ -107,8 +107,8 @@ hostname = parsed_url.hostname
 
 
 print("Hostname:", hostname)
-consumer_key = "ck_9898c473665aecf82609fc08933599b76bf36118"
-consumer_secret = "cs_4b542e8e48788b1f8f785ca84bbba53021d587f4"
+consumer_key = "ck_405740865060d13b8d8fbd27c447c8fffba626d7"
+consumer_secret = "cs_8ba912e18000aa837ffafa949d07e512a628ed87"
 
 # Fetch orders
 credentials = f"{consumer_key}:{consumer_secret}"
@@ -124,8 +124,7 @@ headers = {
 }
 
 params={
-    
-    
+    'product':''
 }
 
 # Fetch orders

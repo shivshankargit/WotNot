@@ -19,6 +19,8 @@
 
       <div class="nav-right">
 
+
+
         <!-- Wallet Button with Icon -->
         <div class="wallet-section">
           <button @click="toggleWalletModal" class="wallet-btn">
@@ -123,7 +125,7 @@
         <a href="#" @click.prevent="navigate('/integration/integration1')"
           :class="{ 'text-green-900 font-semibold': isActive('/integration/integration1') ,'hover:bg-gray-200 hover:font-semibold': !isActive('/integration/integration1') }"
           class="block p-3 text-gray-600 rounded-lg  "><i class="bi bi-link-45deg"></i>
-          Integration
+          Woocommerce
         </a>
       </div>
   <!--    <div v-if="currentSection === 'Chatbot'" class="flex-1 mt-16 p-8 bg-white overflow-y-auto h-[calc(100vh-65px)]">
@@ -146,6 +148,8 @@
 </template>
 
 <script>
+
+/* global FB */
 import { useRouter, useRoute } from 'vue-router';
 import ProfilePopup from './profile.vue';
 
@@ -171,7 +175,9 @@ export default {
       showProfilePopup: false,
       isMenuOpen: false,
       walletModalOpen: false ,
-      currentBalance: 0
+      currentBalance: 0,
+
+
     }
   },
   setup() {
@@ -203,12 +209,105 @@ export default {
     await this.fetchUserDetails() ;
     await this.created();
     document.addEventListener('click', this.handleOutsideClick);
+
+
+    const checkAndSend = () => {
+      if (this.sessionInfoResponse && this.sdkResponse) {
+        // Send data to the backend
+        fetch("http://localhost:8000/subscribe_customer", {
+          method: "POST",
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            sessionInfoResponse: this.sessionInfoResponse,
+            sdkResponse: this.sdkResponse,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Response from backend:", data);
+          })
+          .catch((error) => {
+            console.error("Error sending data to backend:", error);
+          });
+      }
+    };
+
+    // Watch for changes in both variables
+    this.$watch(
+      () => [this.sessionInfoResponse, this.sdkResponse],
+      (newValues) => {
+        const [newSessionInfoResponse, newSdkResponse] = newValues;
+        if (newSessionInfoResponse && newSdkResponse) {
+          checkAndSend();
+        }
+      },
+      { immediate: true, deep: true }
+    );
+
+
+       // Initialize the Facebook SDK
+       window.fbAsyncInit = () => {
+      FB.init({
+        appId: "2621821927998797", // Replace with your App ID
+        autoLogAppEvents: true,
+        xfbml: true,
+        version: "v21.0",
+      });
+    };
+
+    // Dynamically load the Facebook SDK
+    const script = document.createElement("script");
+    script.src = "https://connect.facebook.net/en_US/sdk.js";
+    script.async = true;
+    script.defer = true;
+    script.crossOrigin = "anonymous";
+    document.body.appendChild(script);
+
+    // Set up an event listener for messages from Facebook
+    window.addEventListener("message", (event) => {
+      if (
+        event.origin !== "https://www.facebook.com" &&
+        event.origin !== "https://web.facebook.com"
+      ) {
+        return;
+      }
+
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === "WA_EMBEDDED_SIGNUP") {
+          if (data.event === "FINISH") {
+            const { phone_number_id, waba_id } = data.data;
+            console.log(
+              "Phone number ID:",
+              phone_number_id,
+              "WhatsApp business account ID:",
+              waba_id
+            );
+          } else if (data.event === "CANCEL") {
+            const { current_step } = data.data;
+            console.warn("Cancelled at step:", current_step);
+          } else if (data.event === "ERROR") {
+            const { error_message } = data.data;
+            console.error("Error:", error_message);
+          }
+        }
+        this.sessionInfoResponse = JSON.stringify(data, null, 2);
+
+      } catch {
+        console.log("Non-JSON Response:", event.data);
+      }
+    });
   },
   beforeUnmount() {
     document.removeEventListener('click', this.handleOutsideClick);
   },
 
   methods: {
+
+
     async created() {
       try {
         const response = await fetch('http://localhost:8000/user', {

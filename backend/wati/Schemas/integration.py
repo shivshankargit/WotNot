@@ -21,3 +21,4 @@ class wooIntegration(BaseModel):
     product_id:Optional[int]= None
     status:Optional[str]= None
     base_url:Optional[str]= None
+    description:Optional[str]=None

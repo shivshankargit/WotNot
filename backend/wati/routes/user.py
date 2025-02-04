@@ -12,18 +12,133 @@ import secrets
 from ..oauth2 import get_current_user
 import httpx
 import requests
+import json
 
 router=APIRouter(tags=['User'])
+
+
+# Define the schemas for the request body
+# Endpoint to process the responses
+@router.post("/subscribe_customer")
+async def process_responses(
+    payload: dict,
+    db: AsyncSession = Depends(database.get_db),
+    get_current_user: user.newuser = Depends(get_current_user),
+):
+    sessionInfoResponse = payload.get("sessionInfoResponse")
+    sdkResponse = payload.get("sdkResponse")
+
+    if not sessionInfoResponse or not sdkResponse:
+        raise HTTPException(status_code=400, detail="Missing required fields")
+
+    try:
+        # Parse the JSON strings
+        session_info = json.loads(sessionInfoResponse)
+        sdk_info = json.loads(sdkResponse)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Invalid JSON format")
+
+    # Extract necessary data
+    waba_id = session_info.get("data", {}).get("waba_id")
+    # phone_id = session_info.get("data", {}).get("phone_id")
+    code = sdk_info.get("authResponse", {}).get("code")
+
+    if not waba_id or not code:
+        raise HTTPException(status_code=400, detail="Invalid data received")
+
+ 
+   
+
+    current_user= await db.execute(
+        select(User.User).filter(
+            User.User.id == get_current_user.id
+        )
+    )
+    current_user = current_user.scalars().first()
+
+    if not current_user:
+        raise HTTPException(
+            status_code=400, detail="user not found"
+        )
+    
+
+
+
+    # Exchange the code for a business token
+    token_url = "https://graph.facebook.com/v20.0/oauth/access_token"  # Use the correct version
+    client_id = "2621821927998797"  # Replace with your app's client ID
+    client_secret = "70f8ff2327df71cf505b853f0fdc4a20"  # Replace with your app's client secret
+    redirect_uri = "https://2f4d-2405-201-3004-d09d-700c-69d4-6511-ab75.ngrok-free.app/broadcast/broadcast2"  # Replace with your app's redirect URI
+
+    try:
+        response = requests.post(
+            token_url,
+            data={
+                "client_id": client_id,
+                "client_secret": client_secret,
+                "code": code,
+            },
+        )
+        response.raise_for_status()
+        token_data = response.json()
+    except requests.RequestException as e:
+        raise HTTPException(status_code=500, detail=f"Failed to exchange code: {e}")
+    
+
+    # Save waba_id and phone_id to the database for the current user
+
+    current_user.WABAID=int(waba_id)
+    current_user.PAccessToken=token_data.get("access_token")
+    db.add(current_user)
+    await db.commit()
+    await db.refresh(current_user)
+
+    # Permanent access token
+    Paccess_token=token_data.get("access_token")
+
+    # Setup webhooks for the customers
+    url = f"https://graph.facebook.com/v21.0/{waba_id}/subscribed_apps"
+    headers = {
+        "Authorization": f"Bearer {Paccess_token}",
+    }
+    response = requests.post(url, headers=headers)
+    response.raise_for_status()
+
+    # # Register the customer's phone_no id
+    # pin="123456"
+
+    # url = f"https://graph.facebook.com/v21.0/{phone_number_id}/register"
+    # headers = {
+    #     "Authorization": f"Bearer {Paccess_token}",
+    #     "Content-Type": "application/json",
+    # }
+    # data = {
+    #     "messaging_product": "whatsapp",
+    #     "pin": pin,
+    # }
+    # response = requests.post(url, headers=headers, json=data)
+    # response.raise_for_status()
+    # return response.json()
+
+
+    # Return the business access token to the frontend
+    return {"access_token": token_data.get("access_token"), "expires_in": token_data.get("expires_in")}
+
+# Notes:
+# - Replace placeholders like YOUR_CLIENT_ID, YOUR_CLIENT_SECRET, and YOUR_REDIRECT_URI with actual values.
+# - Ensure your database schema and models (e.g., User) have `waba_id` and `phone_id` fields.
+# - Ensure your authentication dependency `get_current_user` returns the logged-in user object.
+# - Install necessary libraries (e.g., requests) if not already installed.
+    
 
 @router.post('/register')
 async def new_user(
     request: user.register_user,
-    db: AsyncSession = Depends(database.get_db),
-    get_current_user: user.newuser = Depends(get_current_user)):
+    db: AsyncSession = Depends(database.get_db)):
     # Check for existing user
     result = await db.execute(
         select(User.User).filter(
-            (User.User.email == request.email) | (User.User.Phone_id == request.Phone_id)
+            (User.User.email == request.email) 
         )
     )
     existing_user = result.scalars().first()
@@ -40,9 +155,9 @@ async def new_user(
         username=request.username,
         email=request.email,
         password_hash=hashing.Hash.bcrypt(request.password),  # Decode the hash to store it as a string
-        WABAID=request.WABAID,
-        PAccessToken=request.PAccessToken,
-        Phone_id=request.Phone_id,
+        # WABAID=request.WABAID,
+        # PAccessToken=request.PAccessToken,
+        # Phone_id=request.Phone_id,
         api_key=api_key
     )
     

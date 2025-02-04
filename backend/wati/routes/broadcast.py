@@ -709,6 +709,8 @@ async def send_template_messages_task(
             broadcast.failed = failed_count
             await db.commit()
 
+        
+
 
 @router.get("/templates")
 async def get_templates(get_current_user: user.newuser = Depends(get_current_user)):

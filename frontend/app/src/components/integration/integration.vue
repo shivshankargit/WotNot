@@ -3,25 +3,102 @@
 
     <div class="flex flex-col md:flex-row justify-between mb-4 border-b pb-5">
       <div>
-        <h2 class="text-2xl font-bold ">Integration</h2>
-        <p>Integrate other application with WotNot</p>
+        <h2 class="text-2xl font-bold ">Woocommerce</h2>
+        <p>Integrate Wotnot with Woocommerce</p>
+      </div>
+
+      <div class="bg-[#075e54] rounded-md shadow-lg mt-2 md:mt-0">
+        <button @click="showPopup = true"
+          class="text-[#f5f6fa] px-4 py-2 md:px-4 md:py-4 text-sm md:text-base w-full md:w-auto">
+          + Create Integration
+        </button>
+      </div>
+    </div>
+
+    <div class="flex-col  md:flex-row justify-between mb-4 border-b pb-5">
+      <div class="woocommerce-card p-4 bg-[#f8f9fa] rounded-lg shadow-md max-w-sm  pb-5">
+        <div class="flex items-center mb-4">
+          <img src="@/assets/woocommerce.png" alt="WooCommerce Logo" class="rounded-full h-12 w-12" />
+          <h2 class="text-xl font-semibold ml-4">WooCommerce</h2>
+        </div>
+        <p class="text-sm font-medium text-gray-500 mb-2">
+          Status:
+          <span :class="status === 'connected' ? 'text-green-500' : 'text-red-500'">
+            {{ status }}
+          </span>
+        </p>
+        <p class="text-sm text-gray-600 mb-4">
+          Boost your cart recovery & reengage with your customers to upsell
+        </p>
+        <button @click="showWooStoreSetupPopup = true"
+          class="bg-green-600 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-green-700 flex items-center">
+          Store Setup →
+        </button>
       </div>
 
     </div>
 
 
 
-    <div class="woocommerceBox cursor-pointer p-4  hover:bg-gray-300 rounded-lg mb-4">
+    <PopUp v-if="showWooStoreSetupPopup" @close="showWooStoreSetupPopup = false"
+      class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 custom-scrollbar">
+
+      <label class="block text-gray-700 font-semibold mb-2">Store Name<span class="text-red-800">*</span></label>
+      <input type="text" class="w-full p-2 border rounded-md bg-gray-100" v-model="store_name"
+        :disabled="status == 'connected'" :class="{ 'text-gray-400': status === 'connected' }">
+
+      <label class="block text-gray-700 font-semibold mb-2">REST API Key<span class="text-red-800">*</span></label>
+      <input type="text" id="APIkey" class="w-full p-2 border rounded-md bg-gray-100" v-model="wooAPIkey"
+        placeholder="Enter your REST API key" :disabled="status == 'connected'"
+        :class="{ 'text-gray-400': status === 'connected' }">
+
+      <label class="block text-gray-700 font-semibold mb-2">REST API Secret<span class="text-red-800">*</span></label>
+      <input type="text" class="w-full p-2 border rounded-md bg-gray-100" v-model="wooAPIsecret"
+        placeholder="Enter your REST API secret" :disabled="status == 'connected'"
+        :class="{ 'text-gray-400': status === 'connected' }">
+
+      <label class="block text-gray-700 font-semibold mb-2">Woocommerce Base URL<span
+          class="text-red-800">*</span></label>
+      <input type="text" class="w-full p-2 border rounded-md bg-gray-100" v-model="Base_url"
+        :disabled="status == 'connected'" :class="{ 'text-gray-400': status === 'connected' }">
+
+      <div class="flex justify-end pt-3 items-center justify-between" v-if="status != 'connected'">
+        <p>Status: <span :class="status === 'connected' ? 'text-green-500' : 'text-red-500'">
+            {{ status }}
+          </span></p>
+        <button type="submit" class="bg-[#23a455] text-[#f5f6fa] px-4 py-2 rounded"
+          @click="testWooCommerceConnection">Connect</button>
+      </div>
+
+      <div class="flex justify-end pt-3 items-center justify-between" v-else>
+        <p> Status: <span :class="status === 'connected' ? 'text-green-500' : 'text-red-500'">
+            {{ status }}
+          </span></p>
+        <button type="submit" class="bg-[#23a455] text-[#f5f6fa] px-4 py-2 rounded"
+          @click="disconnectWooCommerce">Disconnect</button>
+
+      </div>
+
+      <div>
+
+      </div>
+
+
+
+
+    </PopUp>
+
+    <!-- <div class="woocommerceBox cursor-pointer p-4  hover:bg-gray-300 rounded-lg mb-4">
       <img src="@/assets/woocommerce.png" alt="Woocommerce" @click="showPopup = true">
-    </div>
+    </div> -->
 
     <PopUp v-if="showPopup" @close="showPopup = false"
       class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 custom-scrollbar">
-
+      <h2 class="text-xl font-bold ">Woocommerce Integration</h2>
+      <hr class="mb-4" />
       <div class="popup-content custom-scrollbar p-4">
         <form class="space-y-4" @submit.prevent="submitIntegrationForm(this.SelectedAction)">
-          <h2 class="text-xl font-bold ">Woocommerce</h2>
-          <hr class="mb-4" />
+
 
           <div>
             <label class="block text-gray-700 font-semibold mb-2" required>Select action<span
@@ -35,7 +112,11 @@
             </select>
           </div>
 
+
           <div v-if="SelectedAction === 'woo/order_confirmation'">
+
+
+
             <label class="block text-gray-700 font-semibold mb-2">Select template<span
                 class="text-red-800">*</span></label>
             <select v-model="selectedTemplate"
@@ -55,6 +136,7 @@
                   <option v-for="option in parameterOptions" :key="option" :value="option.key">{{ option.label }}
                   </option>
                 </select>
+
                 <button @click.prevent="removeParameter(index)"
                   class="relative my-2 h-8 w-24 border-2 border-solid border-red-500 text-red-500 hover:text-gray-200 hover:bg-red-700">
                   Remove
@@ -65,7 +147,10 @@
                 Add Parameter
               </button>
 
-
+                              <!-- Searchable Select using vue-select -->
+                              <vue3-select v-model="productID" :options="products" label="name" :reduce="product => product.id"
+                                placeholder="Search products..." />
+                              <p :style="{ color: 'gray', fontSize: '12px' }"> Selected Product ID: {{ productID }}</p>
 
 
               <h3 class="text-lg font-bold mb-2">Woocommerce Setup</h3>
@@ -89,6 +174,13 @@
           </div>
 
           <div v-if="SelectedAction === 'woo/pwn'">
+
+            <label for="description" class="block text-gray-700 font-semibold mb-2">Description
+              <span class="text-red-800">*</span>
+            </label>
+            <input type="text" id="description" v-model="integration_description"
+              class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+
             <label class="block text-gray-700 font-semibold mb-2">Select template<span
                 class="text-red-800">*</span></label>
             <select v-model="selectedTemplate"
@@ -114,10 +206,10 @@
               <button @click.prevent="addParameter"
                 class="relative my-2 h-auto w-auto p-1 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200">
                 Add Parameter
-            </button>
+              </button>
 
 
-              <label class="block text-gray-700 font-semibold mb-2">REST API Key<span
+              <!-- <label class="block text-gray-700 font-semibold mb-2">REST API Key<span
                   class="text-red-800">*</span></label>
               <input type="text" id="APIkey" class="w-full p-2 border rounded-md bg-gray-100" v-model="wooAPIkey"
                 placeholder="Enter your REST API key">
@@ -125,7 +217,7 @@
               <label class="block text-gray-700 font-semibold mb-2">REST API Secret<span
                   class="text-red-800">*</span></label>
               <input type="text" class="w-full p-2 border rounded-md bg-gray-100" v-model="wooAPIsecret"
-                placeholder="Enter your REST API secret">
+                placeholder="Enter your REST API secret"> -->
 
 
               <label class="block text-gray-700 font-semibold mb-2">Time and Days<span
@@ -155,35 +247,63 @@
               </div>
 
               <label class="block text-gray-700 font-semibold mb-2">Select a Date Range<span
-                class="text-red-800">*</span></label>
+                  class="text-red-800">*</span></label>
               <div class="flex">
-               
-                  <div class="mb-4">
-                    <label for="scheduleTime" class="block text-sm font-medium">Start Date</label>
-                    <input type="date" id="startDate" v-model="startDate"
-                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                  </div>
-                  <div class="mb-4">
-                    <label for="scheduleTime" class="block text-sm font-medium">End Date</label>
-                    <input type="date" id="endDate" v-model="endDate"
-                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                  </div>
-                
+
+                <div class="mb-4">
+                  <label for="scheduleTime" class="block text-sm font-medium">Start Date</label>
+                  <input type="date" id="startDate" v-model="startDate"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div class="mb-4">
+                  <label for="scheduleTime" class="block text-sm font-medium">End Date</label>
+                  <input type="date" id="endDate" v-model="endDate"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+
               </div>
-
+              <!-- 
               <label class="block text-gray-700 font-semibold mb-2">Product ID<span
-                class="text-red-800">*</span></label>
-              <input type="text" class="w-full p-2 border rounded-md bg-gray-100" v-model="productID">
+                  class="text-red-800">*</span></label>
+              <input type="text" class="w-full p-2 border rounded-md bg-gray-100" v-model="productID"> -->
 
-              
+
+
+              <!-- Searchable Select using vue-select -->
+              <vue3-select v-model="productID" :options="products" label="name" :reduce="product => product.id"
+                placeholder="Search products..." />
+              <p :style="{ color: 'gray', fontSize: '12px' }"> Selected Product ID: {{ productID }}</p>
+
+
+
+
               <label class="block text-gray-700 font-semibold mb-2">Order Status<span
-                class="text-red-800">*</span></label>
-              <input type="text" class="w-full p-2 border rounded-md bg-gray-100" v-model="OrderStatus">
+                  class="text-red-800">*</span></label>
 
-              
-              <label class="block text-gray-700 font-semibold mb-2">Woocommerce Base URL<span
-                class="text-red-800">*</span></label>
-              <input type="text" class="w-full p-2 border rounded-md bg-gray-100" v-model="Base_url">             
+              <!-- <input type="text" class="w-full p-2 border rounded-md bg-gray-100"  v-model="commaSeparatedStatuses" disabled> -->
+              <!-- <select v-model="OrderStatus"
+                class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" required
+                multiple>
+                <option value="pending">Pending Payment</option>
+                <option value="processing">Processing</option>
+                <option value="on-hold">On Hold</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="refunded">Refunded</option>
+                <option value="failed">Failed</option>
+              </select> -->
+
+              <multiselect v-model="selectedStatuses" :options="statuses" :multiple="true" :close-on-select="false"
+                :clear-on-select="false" placeholder="Select order statuses" label="label" track-by="value"
+                class="mt-2" />
+              <p v-if="commaSeparatedStatuses" class="mt-2">
+                Selected Values: {{ commaSeparatedStatuses }}
+              </p>
+
+
+              <!-- <label class="block text-gray-700 font-semibold mb-2">Woocommerce Base URL<span
+                  class="text-red-800">*</span></label>
+              <input type="text" class="w-full p-2 border rounded-md bg-gray-100" v-model="Base_url"> -->
 
               <ul class="list-disc pl-5 mt-4 space-y-2 text-sm">
                 <li>Navigate to <b>WooCommerce > Settings</b></li>
@@ -216,9 +336,9 @@
         <thead>
           <tr class=" text-center">
             <th class="p-2 md:p-4 border-b-2 sticky top-0 bg-[#ffffff]">ID</th>
-            <th class="p-2 md:p-4 border-b-2 sticky top-0 bg-[#ffffff]">Application</th>
+            <th class="p-2 md:p-4 border-b-2 sticky top-0 bg-[#ffffff]">Decription</th>
             <th class="p-2 md:p-4 border-b-2 sticky top-0 bg-[#ffffff]">Type</th>
-            <th class="p-2 md:p-4 border-b-2 sticky top-0 bg-[#ffffff]">API Key</th>
+            <th class="p-2 md:p-4 border-b-2 sticky top-0 bg-[#ffffff]">Template</th>
             <th class="p-2 md:p-4 border-b-2 sticky top-0 bg-[#ffffff] z-10">Action</th>
 
           </tr>
@@ -226,13 +346,13 @@
         <tbody class="bg-white">
           <tr v-for="integration in integrations" :key="integration.id">
             <td class="border-[#ddd] p-2 md:p-4 text-center">{{ integration.id }}</td>
-            <td class="border-[#ddd] p-2 md:p-4 text-center">{{ integration.app }}</td>
+            <td class="border-[#ddd] p-2 md:p-4 text-center">{{ integration.description }}</td>
             <td class="border-[#ddd] p-2 md:p-4 text-center">{{ integration.type }}</td>
-            <td class="border-[#ddd] p-2 md:p-4 text-center">{{ integration.api_key }}</td>
-            <button @click="deleteIntegration(integration.id)"
+            <td class="border-[#ddd] p-2 md:p-4 text-center">{{ integration.template }}</td>
+            <button @click="deleteIntegration(integration.integration_id)"
               class="hover:bg-white rounded-full p-2 center">
-              <lord-icon src="https://cdn.lordicon.com/skkahier.json" 
-                colors="primary:#ff5757,secondary:#000000" style="width:32px;height:32px">
+              <lord-icon src="https://cdn.lordicon.com/skkahier.json" colors="primary:#ff5757,secondary:#000000"
+                style="width:32px;height:32px">
               </lord-icon>
             </button>
           </tr>
@@ -248,14 +368,25 @@
 <script>
 import PopUp from "../popups/popup";
 import { useToast } from 'vue-toastification';
+import axios from "axios";
+import Multiselect from "vue-multiselect";
+import "vue-multiselect/dist/vue-multiselect.min.css";
+import Vue3Select from 'vue3-select';
+import 'vue3-select/dist/vue3-select.css';
 
 export default {
+
 
   name: 'AppIntegration',
   data() {
 
     return {
+
+      // popup
       showPopup: false,
+      showWooStoreSetupPopup: false,
+
+
       SelectedAction: null,
       templates: [],
       selectedTemplate: null,
@@ -280,24 +411,56 @@ export default {
         { id: 7, name: "Sunday", initial: "S", selected: false },
       ],
 
-      wooAPIsecret:null,
-      wooAPIkey:null,
-      startDate:null,
-      endDate:null,
-      productID:null,
-      OrderStatus:null,
-      Base_url:null
+
+      // woocommerce
+      wooAPIsecret: null,
+      wooAPIkey: null,
+      Base_url: "https://",
+      store_name: null,
+      connectionStatus: null,
+
+
+      // woocommerce pwn integration
+      startDate: null,
+      endDate: null,
+      productID: null,
+      OrderStatus: null,
+      statuses: [
+        { value: "pending", label: "Pending Payment" },
+        { value: "processing", label: "Processing" },
+        { value: "on-hold", label: "On Hold" },
+        { value: "completed", label: "Completed" },
+        { value: "cancelled", label: "Cancelled" },
+        { value: "refunded", label: "Refunded" },
+        { value: "failed", label: "Failed" },
+      ],
+      selectedStatuses: [], // Array to hold selected values
+      // String to store comma-separated values
+      products: [],
+      integration_description: null,
+
+
+
+      // Check integration status
+      statusMessage: "", // Message from the API
+      error: null, // Error message if any
+      loading: true, // Loader state
+      status: "disconnected"
 
     }
 
   },
   components: {
-    PopUp
+    PopUp,
+    Multiselect,
+    Vue3Select,
+
   },
   async mounted() {
     await this.fetchTemplates()
     await this.fetchapiKey();
     await this.fetchIntegrationList();
+    await this.checkIntegration();
     const script = document.createElement('script');
     script.src = "https://cdn.lordicon.com/lordicon.js";
     document.body.appendChild(script);
@@ -311,16 +474,138 @@ export default {
     selectedDays() {
       return this.days.filter(day => day.selected).map(day => day.name);
     },
+    commaSeparatedStatuses() {
+      return this.selectedStatuses.map(status => status.value).join(",");
+    },
+  },
+
+  created() {
+    this.fetchProducts();
   },
 
   methods: {
 
+    async disconnectWooCommerce() {
+      try {
+        const response = await axios.delete('http://localhost:8000/disconnect-woocommerce',
+          {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        if (response.data.status === 'success') {
+          this.connectionStatus = ''; // Reset connection status
+          this.store_name = '';
+          this.wooAPIkey = '';
+          this.wooAPIsecret = '';
+          this.Base_url = '';
+          this.ststus = 'disconnected';
+          alert(response.data.message);
+          // this.status="disconnected";
 
-    submitIntegrationForm(action){
-      if(action=="woo/order_confirmation"){
+        } else {
+          alert('Failed to disconnect from WooCommerce.');
+        }
+      } catch (error) {
+        console.error('Error during disconnection:', error);
+        alert('An error occurred while disconnecting.');
+      }
+    },
+
+    async fetchProducts() {
+      try {
+        // Fetch product list from FastAPI
+        const response = await axios.get('http://localhost:8000/woo_products',
+          {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        this.products = response.data;
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    },
+
+    saveStatuses() {
+      this.commaSeparatedStatuses = this.selectedStatuses.join(",");
+      // Automatically save or send the updated values to the backend
+      console.log("Comma-separated values:", this.commaSeparatedStatuses);
+    },
+
+    async checkIntegration() {
+      try {
+        this.loading = true;
+        this.error = null;
+
+        // Call the API to check the integration
+        const response = await fetch("http://localhost:8000/check-integration", {
+          method: "GET",
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.detail || "Failed to check integration.");
+        }
+
+        const data = await response.json();
+
+        // Update the status message based on the API response
+        this.statusMessage = data.message;
+        this.status = data.status;
+        this.store_name = data.store_info.store_name;
+        this.wooAPIsecret = data.store_info.consumer_key;
+        this.wooAPIkey = data.store_info.consumer_secret;
+        this.Base_url = data.store_info.base_url;
+
+
+      } catch (err) {
+        this.error = err.message || "Something went wrong.";
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async testWooCommerceConnection() {
+      try {
+        const response = await axios.post("http://localhost:8000/test-woocommerce", {
+          base_url: this.Base_url,
+          consumer_key: this.wooAPIkey,
+          consumer_secret: this.wooAPIsecret,
+          store_name: this.store_name
+        },
+          {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        // Update UI based on the response
+        this.status = "connected";
+        this.checkIntegration();
+        console.log("Store Info:", response.data.store_info);
+      } catch (error) {
+        this.connectionStatus = "Connection Failed: " + error.response.data.detail;
+      }
+    },
+
+
+
+    submitIntegrationForm(action) {
+      if (action == "woo/order_confirmation") {
         this.submitTemplate();
       }
-      else if(action=="woo/pwn"){
+      else if (action == "woo/pwn") {
         this.wooPWNform();
       }
     },
@@ -394,10 +679,11 @@ export default {
     async submitTemplate() {
       const payload = {
         template_id: this.selectedTemplate.name,
-        template_data:JSON.stringify(this.selectedTemplate),
+        template_data: JSON.stringify(this.selectedTemplate),
         parameters: this.parameters,
         type: this.SelectedAction,
-        
+        product_id: this.productID
+
 
       };
 
@@ -431,18 +717,19 @@ export default {
     async wooPWNform() {
       const payload = {
         template_id: this.selectedTemplate.name,
-        template_data:JSON.stringify(this.selectedTemplate),
+        template_data: JSON.stringify(this.selectedTemplate),
         parameters: this.parameters,
         type: this.SelectedAction,
-        contacts_start_date:this.startDate,
-        contacts_end_date:this.endDate,
-        repeat_days:[...this.selectedDays],
-        time:this.scheduleTime,
-        rest_key:this.wooAPIkey,
-        rest_secret:this.wooAPIsecret,
-        product_id:this.productID,
-        status:this.OrderStatus,
-        base_url:this.Base_url
+        contacts_start_date: this.startDate,
+        contacts_end_date: this.endDate,
+        repeat_days: [...this.selectedDays],
+        time: this.scheduleTime,
+        rest_key: this.wooAPIkey,
+        rest_secret: this.wooAPIsecret,
+        product_id: this.productID,
+        status: this.OrderStatus,
+        base_url: this.Base_url,
+        description: this.integration_description
 
       };
 
@@ -510,7 +797,7 @@ export default {
     async fetchIntegrationList() {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch("http://localhost:8000/integration/list", {
+        const response = await fetch("http://localhost:8000/woo-integration-list/", {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -525,9 +812,11 @@ export default {
         const IntegrationList = await response.json();
         this.integrations = IntegrationList.map(integration => ({
           id: integration.id,
-          app: integration.app,
+          description: integration.description,
           type: integration.type,
-          api_key: integration.api_key
+          api_key: integration.api_key,
+          template: integration.template,
+          integration_id: integration.integration_id
         }));
       } catch (error) {
         console.error('Failed to submit the template: ', error);
@@ -538,6 +827,8 @@ export default {
 </script>
 
 <style scoped>
+.multiselect {}
+
 /* Add your styles here */
 .woocommerceBox {
   padding: 10px;
@@ -551,7 +842,7 @@ export default {
 }
 
 .popup-content {
-  max-height: 700px;
+  max-height: 600px;
   /* Limit the height of the popup */
   overflow-y: auto;
   /* Enable vertical scrolling if content exceeds max-height */

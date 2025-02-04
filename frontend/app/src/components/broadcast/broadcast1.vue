@@ -135,17 +135,37 @@
           <input v-model="headerComponent.text" placeholder="Header Text (optional)"
             class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
 
-          <div class="mb-4">
+          <div class="">
             <label class="block text-sm font-medium">Body<span class="text-red-800">*</span></label>
             <textarea v-model="bodyComponent.text" class="mt-1 p-2 w-full border border-gray-300 rounded-md h-12"
               placeholder="Template Message..." rows="4" required></textarea>
           </div>
+
           <div>
-            <button @click="addVariable">add variable</button>
+            <button type="button" @click="addVariable"
+              class="relative my-2 h-8 w-24 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200">
+              Add Variable</button>
           </div>
+
+          <!-- <div>
+            <h4>Example Values for Variables:</h4>
+            <div v-for="(variable, index) in variables" :key="index" class="variable-input">
+              <input
+                type="text"
+                v-model="variables[index]"
+                :placeholder="'Enter value for {{' + (index + 1) + '}}'"
+                required
+              />
+              <button type="button" @click="removeVariable(index)">Remove</button>
+            </div>
+            
+          </div> -->
+
           <div v-if="variableCounter">
+            <h4>Variable Examples</h4>
             <div v-for="index in variableCounter" :key="index">
-              <input type="text" :placeholder="'Variable ' + index" v-model="variables[index - 1]" />
+              <input type="text" :placeholder="'Variable ' + index" v-model="variables[index - 1]"
+                class="border border-[#ddd] p-2 rounded-md w-50px mb-2" />
             </div>
           </div>
 
@@ -170,15 +190,16 @@
 
           <!-- Sub-Category Selection -->
           <label v-if="selectedCategory === 'Marketing'" for="">Sub-Category</label>
-          <select v-model="selectedSubCategory" v-if="selectedCategory === 'Marketing'" required
+          <select v-model="selectedSubCategory" v-if="selectedCategory === 'Marketing'"
             class="border border-[#ddd] p-2 rounded-md w-full mb-2">
             <option value="" disabled>Select Sub-Category</option>
             <option value="ORDER_DETAILS">Order Details</option>
+            <!-- <option value="CUSTOM">Custom</option> -->
             <!-- <option value="ORDER_STATUS">Order Status</option> -->
           </select>
           <!-- Actions -->
           <div class="flex space-x-4">
-            <button @click="submitTemplate" class="px-4 py-2 bg-green-600 text-white rounded-md">Save</button>
+            <button @click.prevent="submitTemplate" class="px-4 py-2 bg-green-600 text-white rounded-md">Save</button>
             <button @click="closePopup" class="px-4 py-2 bg-gray-400 text-white rounded-md">Cancel</button>
           </div>
         </form>
@@ -249,7 +270,7 @@ export default {
       nameError: '',
 
       variableCounter: null,
-      variables:[],
+      variables: [],
     };
   },
 
@@ -266,17 +287,88 @@ export default {
 
   methods: {
 
+    // addVariable() {
+    //   // Count existing variables in the text
+    //   const currentVariables = this.bodyComponent.text.match(/{{\d+}}/g) || [];
+
+    //   // Determine the next variable number
+    //   const nextVariableNumber = currentVariables.length + 1;
+
+    //   // Append the new variable to the text
+    //   this.bodyComponent.text += `{{${nextVariableNumber}}}`;
+    //   this.variableCounter = nextVariableNumber;
+    // },
+
     addVariable() {
-      // Count existing variables in the text
-      const currentVariables = this.bodyComponent.text.match(/{{\d+}}/g) || [];
+  // Function to count words in the text
+  const countWords = (text) => {
+    if (!text) return 0; // Handle undefined or empty text
+    return text.split(/\s+/).filter(word => word.trim().length > 0).length;
+  };
 
-      // Determine the next variable number
-      const nextVariableNumber = currentVariables.length + 1;
+  // Retrieve the text from the bodyComponent
+  const text = this.bodyComponent.text || ''; // Use a fallback for safety
 
-      // Append the new variable to the text
-      this.bodyComponent.text += `{{${nextVariableNumber}}}`;
-      this.variableCounter=nextVariableNumber;
-    },
+  // Log the text to debug issues
+  console.log("Current text:", text);
+
+  // Calculate the word count
+  const wordCount = countWords(text);
+  console.log("Word count:", wordCount);
+
+  // Extract existing variables in the text
+  const currentVariables = text.match(/{{\d+}}/g) || [];
+  console.log("Current variables:", currentVariables);
+
+  // Calculate the required number of words (3 words per variable)
+  const requiredWords = 3 * (currentVariables.length + 1); // +1 accounts for the new variable being added
+
+  // Check if the word count meets the requirement
+  if (wordCount < requiredWords) {
+    alert(`The text must have at least ${requiredWords} words to add ${currentVariables.length + 1} variables.`);
+    return;
+  }
+
+  // Determine the next variable number
+  const nextVariableNumber = currentVariables.length + 1;
+
+  // Append the new variable to the text
+  this.bodyComponent.text += ` {{${nextVariableNumber}}}`;
+  console.log(`Added variable {{${nextVariableNumber}}}`);
+
+  // Update the variable counter
+  this.variableCounter = nextVariableNumber;
+  console.log("Updated variable counter:", this.variableCounter);
+},
+
+
+//     addVariable() {
+//   // Function to count words in the text
+//   const countWords = (text) => {
+//     return text.split(/\s+/).filter(word => word.trim().length > 0).length;
+//   };
+
+//   // Check the word count before adding the variable
+//   const wordCount = countWords(this.bodyComponent.text);
+//   console.log(wordCount)
+//   const currentVariables = this.bodyComponent.text.match(/{{\d+}}/g) || [];
+  
+//   if(wordCount<3*currentVariables.length+1){
+//     alert("The text must have at least 3 words before adding a variable.");
+//     return;
+//   }
+
+
+//   // Count existing variables in the text
+
+
+//   // Determine the next variable number
+//   const nextVariableNumber = currentVariables.length + 1;
+
+//   // Append the new variable to the text
+//   this.bodyComponent.text += ` {{${nextVariableNumber}}}`;
+//   this.variableCounter = nextVariableNumber;
+// },
 
     showpreview(preview) {
       this.showPreview = true;
@@ -418,25 +510,32 @@ export default {
 
       this.template.components = [this.bodyComponent];
 
-      if (this.selectedSubCategory !== 'ORDER_STATUS') {
-        if (this.headerComponent.text) {
-          this.template.components.push(this.headerComponent);
-        }
+      if (this.variables.length>0) {
 
-        if (this.footerComponent.text) {
-          this.template.components.push(this.footerComponent);
-        }
+        this.bodyComponent.example = {
+          body_text:[this.variables] , // Example values for the placeholders
+        };
 
-        if (this.button.text && this.button.url) {
-          this.template.components.push({
-            type: 'BUTTONS',
-            buttons: [this.button]
-          });
-        }
-      } else {
-        if (this.footerComponent.text) {
-          this.template.components.push(this.footerComponent);
-        }
+      }
+
+      //  Add examples only if variables are provided
+
+
+
+
+      if (this.headerComponent.text) {
+        this.template.components.push(this.headerComponent);
+      }
+
+      if (this.footerComponent.text) {
+        this.template.components.push(this.footerComponent);
+      }
+
+      if (this.button.text && this.button.url) {
+        this.template.components.push({
+          type: 'BUTTONS',
+          buttons: [this.button]
+        });
       }
 
       const payload = {
@@ -461,6 +560,8 @@ export default {
             'Content-Type': 'application/json'
           }
         });
+
+       
 
         console.log('Template created successfully:', response.data);
 

@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 import BroadCast1 from './components/broadcast/broadcast1.vue';
 import BroadCast2 from './components/broadcast/broadcast2.vue';
 import BroadCast3 from './components/broadcast/broadcast3.vue';
@@ -7,6 +7,7 @@ import ContActs2 from './components/contacts/contacts2.vue';
 import AppIntegration from './components/integration/integration.vue';
 import LoginPage from './components/login/login.vue';
 import SignupPage from './components/signup/signup.vue';
+import BasicSignupPage from './components/signup/basic_signup.vue';
 import DashboardView from './views/dashboardview.vue';
 import Profile from './views/profile.vue';
 import Settings from './views/profileSettings.vue';
@@ -17,6 +18,7 @@ const routes = [
   // Public routes
   { path: '/', component: LoginPage },
   { path: '/signup', component: SignupPage },
+  { path: '/signup2', component: BasicSignupPage },
   { path: '/purchase-history', component: PurchaseHistory },
   // { path: '/', component: PublicView },
 
@@ -42,7 +44,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes,
 });
 

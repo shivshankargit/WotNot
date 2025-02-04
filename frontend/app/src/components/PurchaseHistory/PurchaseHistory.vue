@@ -1,5 +1,11 @@
 <template>
   <div class="content-section p-4">
+
+    <div class="mb-4 flex items-center space-x-2">
+      <label for="month" class="font-bold">Select Month:</label>
+      <input type="month" id="month" class="p-2 border rounded" v-model="selectedMonth" @change="onMonthChange" />
+    </div>
+
     <!-- Section Header -->
     <div class="flex flex-col md:flex-row justify-between mb-4">
       <div>
@@ -44,26 +50,56 @@
 export default {
   data() {
     return {
+
+      selectedMonth: '',
+      currentMonthStartDate: '',
       localUser: {
         whatsapp_business_id: '',
       },
       analyticsData: [], // Holds the conversation data
       loading: true, // Loading indicator
       error: null, // Error message if any
-    };
+    }
   },
   async mounted() {
     await this.fetchUserDetails();
-    await this.fetchConversationHistory(this.localUser.whatsapp_business_id);
+
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+    // Format dates as YYYY-MM-DD
+    this.currentMonthStartDate = startOfMonth.toISOString().split("T")[0];
+    this.currentMonthEndDate = endOfMonth.toISOString().split("T")[0];
+
+    // Fetch data for the current month
+    await this.fetchConversationHistory(
+      this.currentMonthStartDate,
+      this.currentMonthEndDate
+    );
+  
   },
   computed: {
-  // Computed property to return a sorted copy of analyticsData in descending order of start_time
-  sortedAnalyticsData() {
-    return [...this.analyticsData].sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
+    // Computed property to return a sorted copy of analyticsData in descending order of start_time
+    sortedAnalyticsData() {
+      return [...this.analyticsData].sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
+    },
   },
-},
 
   methods: {
+
+
+    async onMonthChange() {
+      if (!this.selectedMonth) return;
+
+      // Get the start and end dates for the selected month
+      const [year, month] = this.selectedMonth.split('-');
+      const startDate = new Date(year, month - 1, 1).toISOString().split('T')[0];
+      const endDate = new Date(year, month, 0).toISOString().split('T')[0];
+
+      // Fetch data for the selected month
+      await this.fetchConversationHistory(startDate, endDate);
+    },
     async fetchUserDetails() {
       try {
         const response = await fetch('http://localhost:8000/user', {
@@ -84,25 +120,25 @@ export default {
         console.error('Error fetching user details:', error);
       }
     },
-    async fetchConversationHistory(accountId) {
-      try {
-        const response = await fetch(
-          `http://localhost:8000/conversation-cost-history/${accountId}`,
-          {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-          }
-        );
-        const data = await response.json();
-        this.analyticsData = data.conversation_analytics;
-        this.loading = false;
-      } catch (err) {
-        this.error = err.message || 'Failed to fetch data';
-        this.loading = false;
+    async fetchConversationHistory(startDate, endDate) {
+  try {
+    const response = await fetch(
+      `http://localhost:8000/conversation-cost-history/?start_date=${startDate}&end_date=${endDate}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
       }
-    },
+    );
+    const data = await response.json();
+    this.analyticsData = data.conversation_analytics;
+    this.loading = false;
+  } catch (err) {
+    this.error = err.message || 'Failed to fetch data';
+    this.loading = false;
+  }
+},
     goToDashboard() {
       this.$router.push('/dashboard');
     },

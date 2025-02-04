@@ -19,9 +19,9 @@ class register_user(BaseModel):
     username:str
     email:str
     password:str
-    WABAID:int
-    PAccessToken:str
-    Phone_id:int
+    WABAID:Optional[int]=None
+    PAccessToken:Optional[str]=None
+    Phone_id:Optional[int]=None
 
 # login user model
 
