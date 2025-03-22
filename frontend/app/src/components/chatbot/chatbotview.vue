@@ -219,6 +219,8 @@ export default {
 
   data() {
     return {
+      apiUrl: process.env.VUE_APP_API_URL,
+      
       contextMenuVisible: false,
       contextMenuPosition: { x: 0, y: 0 },
       selectedMessage: null,
@@ -496,7 +498,7 @@ export default {
         const token = localStorage.getItem('token');
 
         // Create a new EventSource for receiving SSE
-        this.eventSourceB = new EventSource(`http://localhost:8000/active-conversations?token=${token}`, {
+        this.eventSourceB = new EventSource(`${this.apiUrl}/active-conversations?token=${token}`, {
           headers: {
             'Authorization': `Bearer ${token}`  // Unfortunately, EventSource does not support custom headers directly
           }
@@ -559,7 +561,7 @@ export default {
       const token = localStorage.getItem('token');
 
       // Create a new EventSource instance with the new wa_id
-      this.eventSourceA = new EventSource(`http://localhost:8000/sse/conversations/${wa_id}?token=${token}`, {
+      this.eventSourceA = new EventSource(`${this.apiUrl}/sse/conversations/${wa_id}?token=${token}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -631,7 +633,7 @@ export default {
 
       try {
 
-        const response = await fetch(`http://localhost:8000/contacts/${wa_id}`, {
+        const response = await fetch(`${this.apiUrl}/contacts/${wa_id}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -668,7 +670,7 @@ export default {
           body: message
         }
 
-        const response = await fetch("http://localhost:8000/send-text-message/", {
+        const response = await fetch(`${this.apiUrl}/send-text-message/`, {
           method: "POST",
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -702,7 +704,7 @@ export default {
 
         }
 
-        const response = await fetch("http://localhost:8000/send-text-message-reply/", {
+        const response = await fetch(`${this.apiUrl}/send-text-message-reply/`, {
           method: "POST",
           headers: {
             'Authorization': `Bearer ${token}`,

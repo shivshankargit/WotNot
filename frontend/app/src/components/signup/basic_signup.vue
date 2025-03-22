@@ -56,6 +56,11 @@
 
 
 export default {
+  data() {
+    return {
+      apiUrl: process.env.VUE_APP_API_URL,
+    };
+  },
   name: 'BasicSignUpForm',
   methods: {
 
@@ -74,7 +79,7 @@ export default {
       }
 
       // Send a request to your FastAPI endpoint
-      fetch('http://localhost:8000/register', {
+      fetch(`${this.apiUrl}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

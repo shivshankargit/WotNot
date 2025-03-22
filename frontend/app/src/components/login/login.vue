@@ -50,6 +50,7 @@ export default {
   name: "LoginPage",
   data() {
     return {
+      apiUrl: process.env.VUE_APP_API_URL,
       username: '',
       password: '',
       errorMessage: '',
@@ -57,7 +58,7 @@ export default {
   },
   methods: {
     async handleLogin() {
-      fetch('http://localhost:8000/login', {
+      fetch('http://localhost:8000/login/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',

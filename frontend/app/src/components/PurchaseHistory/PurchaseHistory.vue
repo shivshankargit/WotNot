@@ -1,34 +1,15 @@
 <template>
-  <div class="content-section p-4">
-
-    <div class="mb-4 flex items-center space-x-2">
-      <label for="month" class="font-bold">Select Month:</label>
-      <input type="month" id="month" class="p-2 border rounded" v-model="selectedMonth" @change="onMonthChange" />
-    </div>
-
-    <!-- Section Header -->
-    <div class="flex flex-col md:flex-row justify-between mb-4">
-      <div>
-        <h2 class="text-xl md:text-2xl font-bold">Conversation Analytics</h2>
-        <p class="text-sm md:text-base">Your data for conversation analytics goes here.</p>
-      </div>
-      <button @click="goToDashboard"
-        class="bg-[#075e54] text-[#f5f6fa] px-4 py-2 md:px-4 md:py-4 text-sm md:text-base rounded-md shadow-lg">
-        Go to Dashboard
-      </button>
-    </div>
-
-    <!-- Analytics List Table -->
-    <div class="bg-[#f5f6fa] rounded-md p-4 mb-4 shadow-lg">
-      <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
-        <table class="w-full border-collapse">
+  <div class="cost-summary">
+    <h2 class="title">Transactions <span class="info">Info</span></h2>
+    <div class="overflow-x-auto max-h-[33vh] custom-scrollbar">
+      <table class="w-full rounded-lg border-collapse">
           <thead>
-            <tr class="bg-[#dddddd] text-center">
-              <th class="p-2 text-left md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Start Time</th>
-              <th class="p-2 text-left md:p-4 border-b-2 bg-[#dddddd] sticky top-0">End Time</th>
-              <th class="p-2 text-left md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Conversation Type</th>
-              <th class="p-2 text-left md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Conversation Category</th>
-              <th class="p-2 text-left md:p-4 border-b-2 bg-[#dddddd] sticky top-0">Cost</th>
+            <tr class="bg-[#fff] text-center">
+              <th class="p-2 text-left md:p-4 border-b-2 bg-[#fff] sticky top-0">Start Time</th>
+              <th class="p-2 text-left md:p-4 border-b-2 bg-[#fff] sticky top-0">End Time</th>
+              <th class="p-2 text-left md:p-4 border-b-2 bg-[#fff] sticky top-0">Conversation Type</th>
+              <th class="p-2 text-left md:p-4 border-b-2 bg-[#fff] sticky top-0">Conversation Category</th>
+              <th class="p-2 text-left md:p-4 border-b-2 bg-[#fff] sticky top-0">Cost</th>
             </tr>
           </thead>
           <tbody class="bg-white">
@@ -42,7 +23,7 @@
           </tbody>
         </table>
       </div>
-    </div>
+   
   </div>
 </template>
 
@@ -50,6 +31,8 @@
 export default {
   data() {
     return {
+
+      apiUrl: process.env.VUE_APP_API_URL,
 
       selectedMonth: '',
       currentMonthStartDate: '',
@@ -102,7 +85,7 @@ export default {
     },
     async fetchUserDetails() {
       try {
-        const response = await fetch('http://localhost:8000/user', {
+        const response = await fetch(`${this.apiUrl}/user`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -123,7 +106,7 @@ export default {
     async fetchConversationHistory(startDate, endDate) {
   try {
     const response = await fetch(
-      `http://localhost:8000/conversation-cost-history/?start_date=${startDate}&end_date=${endDate}`,
+      `${this.apiUrl}/conversation-cost-history/?start_date=${startDate}&end_date=${endDate}`,
       {
         method: 'GET',
         headers: {
@@ -147,6 +130,23 @@ export default {
 </script>
 
 <style scoped>
+.cost-summary {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: black;
+}
+
+.info {
+  font-size: 0.9rem;
+  color: #1486ff;
+  cursor: pointer;
+}
 /* Custom scrollbar for table overflow */
 .custom-scrollbar::-webkit-scrollbar {
   width: 10px;

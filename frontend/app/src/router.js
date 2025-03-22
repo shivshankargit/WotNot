@@ -11,15 +11,14 @@ import BasicSignupPage from './components/signup/basic_signup.vue';
 import DashboardView from './views/dashboardview.vue';
 import Profile from './views/profile.vue';
 import Settings from './views/profileSettings.vue';
-import PurchaseHistory from './components/PurchaseHistory/PurchaseHistory.vue';
 import ChatbotView from './components/chatbot/chatbotview.vue'; // Ensure this path is correct
-
+import CostAnalytics from './components/PurchaseHistory/CostDashboard.vue';
+import Analytics from './components/analytics/Analytics.vue';
 const routes = [
   // Public routes
   { path: '/', component: LoginPage },
   { path: '/signup', component: SignupPage },
   { path: '/signup2', component: BasicSignupPage },
-  { path: '/purchase-history', component: PurchaseHistory },
   // { path: '/', component: PublicView },
 
   // Protected routes within the dashboard
@@ -28,6 +27,8 @@ const routes = [
     component: DashboardView,
     meta: { requiresAuth: true },
     children: [
+      { path: '/analytics/cost', component: CostAnalytics, name: 'Costanalytics' },
+      { path: '/analytics/conversations', component: Analytics, name: 'DataAnalytics' },
       { path: '/broadcast/broadcast1', component: BroadCast1, name: 'Broadcast1' },
       { path: '/broadcast/broadcast2', component: BroadCast2, name: 'Broadcast2' },
       { path: '/broadcast/broadcast3', component: BroadCast3, name: 'Broadcast3' },

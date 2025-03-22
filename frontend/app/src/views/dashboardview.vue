@@ -22,11 +22,11 @@
 
 
         <!-- Wallet Button with Icon -->
-        <div class="wallet-section">
+        <!-- <div class="wallet-section">
           <button @click="toggleWalletModal" class="wallet-btn">
             <i class="bi bi-wallet2"></i>
           </button>
-        </div>
+        </div> -->
 
         <div class="flex" v-if="user">
 
@@ -48,7 +48,7 @@
           <div v-if="dropdownOpen" class="dropdown-menu" ref="dropdownMenu">
             <ul>
               <li @click="goToProfile"><i class="bi bi-person-circle"></i> View Profile</li>
-              <li @click="goToPurchaseHistory"><i class="bi bi-currency-rupee"></i> Purchase History </li>
+              <li @click="goToCostAnalytics"><i class="bi bi-currency-rupee"></i> Purchase History </li>
               <li @click="goToSettings"><i class="bi bi-gear-fill"></i> Settings</li>
               <li @click="logout"><i class="bi bi-box-arrow-right"></i> Logout</li>
             </ul>
@@ -128,6 +128,22 @@
           Woocommerce
         </a>
       </div>
+
+      <div
+      class="fixed top-12 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4  overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out"
+      :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }" v-if="currentSection === 'Analytics'">
+      <a href="#" @click.prevent="navigate('/analytics/cost')"
+        :class="{ 'text-green-900 font-semibold': isActive('/analytics/cost') ,'hover:bg-gray-200 hover:font-semibold': !isActive('/analytics/cost') }"
+        class="block p-3 text-gray-600 rounded-lg  "><i class="bi bi-currency-dollar"></i>
+        Cost
+      </a>
+
+      <a href="#" @click.prevent="navigate('/analytics/conversations')"
+      :class="{ 'text-green-900 font-semibold': isActive('/analytics/conversations') ,'hover:bg-gray-200 hover:font-semibold': !isActive('/analytics/conversations') }"
+      class="block p-3 text-gray-600 rounded-lg  "><i class="bi bi-link-45deg"></i>
+      Conversations
+    </a>
+    </div>
   <!--    <div v-if="currentSection === 'Chatbot'" class="flex-1 mt-16 p-8 bg-white overflow-y-auto h-[calc(100vh-65px)]">
   <router-view></router-view>
 </div>-->
@@ -160,6 +176,9 @@ export default {
   },
   data() {
     return {
+
+      apiUrl: process.env.VUE_APP_API_URL,
+
       localUser: {
         whatsapp_business_id: '', 
         // currentBalance: 0 ,
@@ -168,7 +187,8 @@ export default {
         { name: 'broadcast', label: 'Broadcast', icon: 'bi bi-broadcast', path: '/broadcast/broadcast2' },
         { name: 'Contacts', label: 'Contacts', icon: 'bi bi-person-video2', path: '/contacts/contacts1' },
         { name: 'Integration', label: 'Integration', icon: 'bi bi-plugin', path: '/integration/integration1' },
-        { name: 'chatbot', label: 'Chatbot', path: '/chatbot/chatbotview', icon: 'bi bi-robot' }
+        { name: 'chatbot', label: 'Chatbot', path: '/chatbot/chatbotview', icon: 'bi bi-robot' },
+        { name: 'Analytics', label: 'Analytics', path: '/analytics/cost', icon: 'bi bi-graph-up' }
       ],
       user: null,
       dropdownOpen: false,
@@ -183,6 +203,7 @@ export default {
   setup() {
     const router = useRouter();
     const route = useRoute();
+    
     const isActive = (path) => route.path === path;
     const navigate = (path) => {
       router.push(path);
@@ -214,7 +235,7 @@ export default {
     const checkAndSend = () => {
       if (this.sessionInfoResponse && this.sdkResponse) {
         // Send data to the backend
-        fetch("http://localhost:8000/subscribe_customer", {
+        fetch(`${this.apiUrl}/subscribe_customer`, {
           method: "POST",
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -310,7 +331,7 @@ export default {
 
     async created() {
       try {
-        const response = await fetch('http://localhost:8000/user', {
+        const response = await fetch(`${this.apiUrl}/user`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -329,7 +350,7 @@ export default {
 
     async fetchUserDetails() {
       try {
-        const response = await fetch('http://localhost:8000/user', {
+        const response = await fetch(`${this.apiUrl}/user`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -351,7 +372,7 @@ export default {
     async fetchWalletDetails(accountId) {
     try {
         
-        const response = await fetch(`http://localhost:8000/conversations-cost/${accountId}`, {
+        const response = await fetch(`${this.apiUrl}/conversations-cost/${accountId}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -400,8 +421,8 @@ export default {
     goToSettings() {
       this.$router.push('/settings');
     },
-    goToPurchaseHistory() {
-      this.$router.push('/purchase-history');
+    goToCostAnalytics() {
+      this.$router.push('/analytics/cost');
     },
     logout() {
       localStorage.removeItem('token');
@@ -425,7 +446,8 @@ function getSectionFromRoute(path) {
   if (path.startsWith('/broadcast')) return 'broadcast';
   if (path.startsWith('/contacts')) return 'Contacts';
   if (path.startsWith('/integration')) return 'Integration';
-  if (path.startsWith('/chatbot')) return 'Chatbot'; // Add this line
+  if (path.startsWith('/chatbot')) return 'Chatbot';
+  if (path.startsWith('/analytics')) return 'Analytics'; // Add this line
   return 'broadcast';
 }
 </script>

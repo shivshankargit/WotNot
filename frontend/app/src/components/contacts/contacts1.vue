@@ -21,7 +21,7 @@
 
 
 
-      <PopUp v-if="showPopupimport" @close="closePopupimport()">
+      <PopUp1 v-if="showPopupimport" @close="closePopupimport()">
         <div class="popup-content">
           <h2 class="text-xl font-semibold mb-4">Bulk Import Contacts</h2>
 
@@ -110,10 +110,10 @@
 
 
         </div>
-      </PopUp>
+      </PopUp1>
 
     </div>
-    <PopUp1 v-if="showPopup" @close="closePopup">
+    <PopUpSmall v-if="showPopup" @close="closePopup">
       <form @submit.prevent="submitForm" id="contactForm" class="p-6 w-[400px]">
         <h2 class="text-xl font-semibold mb-4">{{ isEditing ? 'Edit Contact' : 'Add Contact' }}</h2>
         <hr class="mb-4" />
@@ -175,7 +175,7 @@
           </button>
         </div>
       </form>
-    </PopUp1>
+    </PopUpSmall>
 
 
 
@@ -270,13 +270,14 @@
 <script>
 import { useToast } from 'vue-toastification';
 import PopUp1 from "../popups/popup1";
-import PopUp from "../popups/popup";
+import PopUpSmall from "../popups/popup_small";
+
 import axios from "axios";
 
 export default {
   components: {
     PopUp1,
-    PopUp
+    PopUpSmall
   },
   async mounted() {
     await this.fetchContactList();
@@ -289,6 +290,7 @@ export default {
   name: "ContActs1",
   data() {
     return {
+      apiUrl: process.env.VUE_APP_API_URL,
       currentPage: 1,
       showPopup: false,
       showPopupimport: false,
@@ -373,7 +375,7 @@ export default {
 
       const tagArray = tags.map(tag => `${tag.key}:${tag.value}`);
 
-      const url = id ? `http://localhost:8000/contacts/${id}` : "http://localhost:8000/contacts/";
+      const url = id ? `${this.apiUrl}/contacts/${id}` : `${this.apiUrl}/contacts/`;
       const method = id ? "PUT" : "POST";
       const token = localStorage.getItem("token");
 
@@ -424,7 +426,7 @@ export default {
     async fetchContactList(page = 1) {
   const token = localStorage.getItem("token");
   const itemsPerPage = 10; // Number of contacts per page
-  const url = `http://localhost:8000/contacts/?sort_by=${this.sortBy}&order=${this.order}&limit=${itemsPerPage}&offset=${(page - 1) * itemsPerPage}`;
+  const url = `${this.apiUrl}/contacts?sort_by=${this.sortBy}&order=${this.order}&limit=${itemsPerPage}&offset=${(page - 1) * itemsPerPage}`;
 
   try {
     const response = await fetch(url, {
@@ -465,7 +467,7 @@ export default {
       const tagKey = this.tag_key
       try {
 
-        const response = await fetch(`http://localhost:8000/contacts-filter/filter?tag_key=${tagKey}&tag_value=${tagValue}`, {
+        const response = await fetch(`${this.apiUrl}/contacts-filter/filter?tag_key=${tagKey}&tag_value=${tagValue}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -513,7 +515,7 @@ export default {
 
       const token = localStorage.getItem("token");
       try {
-        const response = await fetch(`http://localhost:8000/contacts/${phone}`, {
+        const response = await fetch(`${this.apiUrl}/contacts/${phone}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -560,7 +562,7 @@ export default {
       formData.append("file", this.file);
 
       try {
-        const response = await axios.post("http://localhost:8000/contacts/csv/", formData, {
+        const response = await axios.post(`${this.apiUrl}/contacts/csv/`, formData, {
           headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` },
         });
 
@@ -582,7 +584,7 @@ export default {
       formData.append("file", this.file);
 
       try {
-        const response = await axios.post("http://localhost:8000/contacts/bulk_import/", formData, {
+        const response = await axios.post(`${this.apiUrl}/contacts/bulk_import/`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,

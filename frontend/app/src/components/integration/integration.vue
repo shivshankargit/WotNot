@@ -40,7 +40,7 @@
 
 
 
-    <PopUp v-if="showWooStoreSetupPopup" @close="showWooStoreSetupPopup = false"
+    <PopUp1 v-if="showWooStoreSetupPopup" @close="showWooStoreSetupPopup = false"
       class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 custom-scrollbar">
 
       <label class="block text-gray-700 font-semibold mb-2">Store Name<span class="text-red-800">*</span></label>
@@ -86,18 +86,19 @@
 
 
 
-    </PopUp>
+    </PopUp1>
 
     <!-- <div class="woocommerceBox cursor-pointer p-4  hover:bg-gray-300 rounded-lg mb-4">
       <img src="@/assets/woocommerce.png" alt="Woocommerce" @click="showPopup = true">
     </div> -->
 
-    <PopUp v-if="showPopup" @close="showPopup = false"
+    <PopUp1 v-if="showPopup" @close="closePopup"
       class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 custom-scrollbar">
       <h2 class="text-xl font-bold ">Woocommerce Integration</h2>
       <hr class="mb-4" />
       <div class="popup-content custom-scrollbar p-4">
-        <form class="space-y-4" @submit.prevent="submitIntegrationForm(this.SelectedAction)">
+        <form class="space-y-4" @submit.prevent="submitIntegrationForm(this.SelectedAction)" :class="{ 'opacity-50 pointer-events-none': isSubmitted }">
+
 
 
           <div>
@@ -116,6 +117,12 @@
           <div v-if="SelectedAction === 'woo/order_confirmation'">
 
 
+            <label for="description" class="block text-gray-700 font-semibold mb-2">Description
+              <span class="text-red-800">*</span>
+            </label>
+            <input type="text" id="description" v-model="integration_description"
+              class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+
 
             <label class="block text-gray-700 font-semibold mb-2">Select template<span
                 class="text-red-800">*</span></label>
@@ -127,8 +134,8 @@
             </select>
 
             <div v-if="selectedTemplate !== null">
-              <label for="" class="block text-gray-700 font-semibold mb-2">Add Parameters<span
-                  class="text-red-800">*</span></label>
+              <label for="" class="block text-gray-400 font-semibold mb-2">Add Parameter (if any)<span
+                  class="text-red-800"></span></label>
               <div v-for="(parameter, index) in parameters" :key="index" class="flex items-center space-x-2 mb-2">
 
                 <select v-model="parameter.key" class="w-full p-2 border rounded-md bg-gray-100">
@@ -147,11 +154,12 @@
                 Add Parameter
               </button>
 
-                              <!-- Searchable Select using vue-select -->
-                              <vue3-select v-model="productID" :options="products" label="name" :reduce="product => product.id"
-                                placeholder="Search products..." />
-                              <p :style="{ color: 'gray', fontSize: '12px' }"> Selected Product ID: {{ productID }}</p>
-
+              <!-- Searchable Select using vue-select -->
+              <label class="block text-gray-700 font-semibold mb-2">Select product<span
+                  class="text-red-800">*</span></label>
+              <vue3-select v-model="productID" :options="products" label="name" :reduce="product => product.id"
+                placeholder="Search products..." required />
+              <p :style="{ color: 'gray', fontSize: '12px' }"> Selected Product ID: {{ productID }}</p>
 
               <h3 class="text-lg font-bold mb-2">Woocommerce Setup</h3>
               <input type="text" v-model="webhookLink" class="w-full p-2 border rounded-md bg-gray-100" disabled>
@@ -170,6 +178,9 @@
                 <li><b>API Version:</b> Leave the default version</li>
                 <li>Click Save Webhook to activate the integration</li>
               </ul>
+
+
+
             </div>
           </div>
 
@@ -203,6 +214,9 @@
                   Remove
                 </button>
               </div>
+
+              <label class="block text-gray-500 font-semibold mb-2">Add parameter (if any)<span
+                  class="text-red-800">*</span></label>
               <button @click.prevent="addParameter"
                 class="relative my-2 h-auto w-auto p-1 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200">
                 Add Parameter
@@ -220,102 +234,80 @@
                 placeholder="Enter your REST API secret"> -->
 
 
-              <label class="block text-gray-700 font-semibold mb-2">Time and Days<span
+                <label class="block text-gray-700 font-semibold mb-2">Execution Time and Days<span
                   class="text-red-800">*</span></label>
-              <div class="flex items-center ">
+              <div class="bg-[#f5f6fa] items-center space-x-2 p-2 justify-between">
 
-                <div class="mr-2">
-                  <label for="scheduleTime" class="block text-sm font-medium">Time<span
-                      class="text-red-800">*</span>(GMT
-                    +5:30)</label>
-                  <input type="time" v-model="scheduleTime" id="scheduleTime" required
-                    class="border border-gray-300 rounded px-3 py-2 w-full">
-                </div>
+                <div class="flex items-center ">
 
-
-                <div class="flex justify-between items-center mt-4">
-                  <div v-for="day in days" :key="day.id" @click="toggleDaySelection(day.id)" :class="[
-                    'w-10 h-10 flex items-center justify-center cursor-pointer rounded-full font-bold transition-all duration-200',
-                    day.selected ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700',
-                  ]">
-                    {{ day.initial }}
+                  <div class="mr-2">
+                    <label for="scheduleTime" class="block text-sm font-medium">Time<span
+                        class="text-red-800">*</span> (in IST)</label>
+                    <input type="time" v-model="scheduleTime" id="scheduleTime" required
+                      class="border border-gray-300 rounded px-3 py-2 w-full">
                   </div>
-                </div>
-                <!-- <p class="mt-4 text-gray-700 font-medium">
+
+
+                  <div class="flex justify-between items-center mt-4">
+                    <div v-for="day in days" :key="day.id" @click="toggleDaySelection(day.id)" :class="[
+                      'w-10 h-10 flex items-center justify-center cursor-pointer rounded-full font-bold transition-all duration-200',
+                      day.selected ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700',
+                    ]">
+                      {{ day.initial }}
+                    </div>
+                  </div>
+
+                  <!-- <p class="mt-4 text-gray-700 font-medium">
                     Selected days: {{ selectedDays.join(", ") }}
                   </p> -->
+                </div>
               </div>
 
-              <label class="block text-gray-700 font-semibold mb-2">Select a Date Range<span
-                  class="text-red-800">*</span></label>
-              <div class="flex">
+              <label class="block text-gray-700 font-semibold mb-2">Filter Contacts by</label>
 
-                <div class="mb-4">
-                  <label for="scheduleTime" class="block text-sm font-medium">Start Date</label>
-                  <input type="date" id="startDate" v-model="startDate"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <div class="bg-[#f5f6fa] items-center space-x-2 p-2 justify-between">
+
+                <label class="block text-sm font-medium">Date Range<span class="text-red-800">*</span></label>
+
+                <div class="flex items-center space-x-2">
+                  <div class="mb-4">
+                    <input type="date" id="startDate" v-model="startDate"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required />
+                  </div>
+
+                  <p>to</p>
+
+                  <div class="mb-4">
+                    <input type="date" id="endDate" v-model="endDate"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required />
+                  </div>
                 </div>
-                <div class="mb-4">
-                  <label for="scheduleTime" class="block text-sm font-medium">End Date</label>
-                  <input type="date" id="endDate" v-model="endDate"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                </div>
+              </div>
+
+
+              <div class="bg-[#f5f6fa] items-center space-x-2 p-2 justify-between">
+
+                <label for="Product" class="block text-sm font-medium">Product<span class="text-red-800">*</span></label>
+
+                <vue3-select id="Product" v-model="productID" :options="products" label="name" :reduce="product => product.id"
+                  placeholder="Search products..." />
+                <p :style="{ color: 'gray', fontSize: '12px' }"> Selected Product ID: {{ productID }}</p>
 
               </div>
-              <!-- 
-              <label class="block text-gray-700 font-semibold mb-2">Product ID<span
-                  class="text-red-800">*</span></label>
-              <input type="text" class="w-full p-2 border rounded-md bg-gray-100" v-model="productID"> -->
-
-
 
               <!-- Searchable Select using vue-select -->
-              <vue3-select v-model="productID" :options="products" label="name" :reduce="product => product.id"
-                placeholder="Search products..." />
-              <p :style="{ color: 'gray', fontSize: '12px' }"> Selected Product ID: {{ productID }}</p>
 
+              <div class="bg-[#f5f6fa] items-center space-x-2 p-2 justify-between">
 
+                <label for="orderStatus" class="block text-sm font-medium">Order Status<span class="text-red-800">*</span></label>
 
+                <multiselect id="orderStatus" v-model="selectedStatuses" :options="statuses" :multiple="true" :close-on-select="false"
+                  :clear-on-select="false" placeholder="Select order statuses" label="label" track-by="value"
+                  class="mt-2" required />
 
-              <label class="block text-gray-700 font-semibold mb-2">Order Status<span
-                  class="text-red-800">*</span></label>
-
-              <!-- <input type="text" class="w-full p-2 border rounded-md bg-gray-100"  v-model="commaSeparatedStatuses" disabled> -->
-              <!-- <select v-model="OrderStatus"
-                class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" required
-                multiple>
-                <option value="pending">Pending Payment</option>
-                <option value="processing">Processing</option>
-                <option value="on-hold">On Hold</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
-                <option value="refunded">Refunded</option>
-                <option value="failed">Failed</option>
-              </select> -->
-
-              <multiselect v-model="selectedStatuses" :options="statuses" :multiple="true" :close-on-select="false"
-                :clear-on-select="false" placeholder="Select order statuses" label="label" track-by="value"
-                class="mt-2" />
-              <p v-if="commaSeparatedStatuses" class="mt-2">
-                Selected Values: {{ commaSeparatedStatuses }}
-              </p>
-
-
-              <!-- <label class="block text-gray-700 font-semibold mb-2">Woocommerce Base URL<span
-                  class="text-red-800">*</span></label>
-              <input type="text" class="w-full p-2 border rounded-md bg-gray-100" v-model="Base_url"> -->
-
-              <ul class="list-disc pl-5 mt-4 space-y-2 text-sm">
-                <li>Navigate to <b>WooCommerce > Settings</b></li>
-                <li>Click on the <b>Advanced tab</b></li>
-                <li>In the <b>Advanced settings</b>, click on <b>REST API</b></li>
-                <li>Click the <b>Add Key</b> button.</li>
-                <li><b>Configure REST API Settings</b></li>
-                <li><b>Description</b>: Give your REST API a description to identify it.</li>
-                <li><b>User:</b>Select the user</li>
-                <li>Permission: Select the permission</li>
-                <li>Click on <b>generate API Key</b></li>
-              </ul>
+              </div>
 
             </div>
           </div>
@@ -323,16 +315,24 @@
 
 
 
-          <button type="submit" class="bg-[#23a455] text-[#f5f6fa] px-4 py-2 rounded">Save Integration</button>
+          
+          <button
+          type="submit"
+          class="px-4 py-2 bg-green-600 text-white rounded-md flex items-center justify-center"
+          :disabled="PopupLoading || isSubmitted">
+          <span v-if="PopupLoading"
+            class="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4 mr-2"></span>
+          {{ isSubmitted ? "Submitted" : PopupLoading ? "Submitting..." : "Submit" }}
+        </button>
 
         </form>
       </div>
 
 
-    </PopUp>
+    </PopUp1>
     <h3 class="text-xl md:text-2xs mb-4 text-gray-600"><b>Integration List</b></h3>
-    <div class="overflow-x-auto max-h-[45vh] custom-scrollbar">
-      <table class="w-full rounded-lg border-collapse">
+    <div class="overflow-x-auto max-h-[32vh] custom-scrollbar">
+      <table class="w-full rounded-lg border-collapse" :class="{ 'opacity-50 pointer-events-none':deleteLoading }">
         <thead>
           <tr class=" text-center">
             <th class="p-2 md:p-4 border-b-2 sticky top-0 bg-[#ffffff]">ID</th>
@@ -366,13 +366,15 @@
 
 
 <script>
-import PopUp from "../popups/popup";
+import PopUp1 from "../popups/popup1";
+
 import { useToast } from 'vue-toastification';
 import axios from "axios";
 import Multiselect from "vue-multiselect";
 import "vue-multiselect/dist/vue-multiselect.min.css";
 import Vue3Select from 'vue3-select';
 import 'vue3-select/dist/vue3-select.css';
+
 
 export default {
 
@@ -382,9 +384,11 @@ export default {
 
     return {
 
+      apiUrl: process.env.VUE_APP_API_URL,
       // popup
       showPopup: false,
       showWooStoreSetupPopup: false,
+
 
 
       SelectedAction: null,
@@ -421,6 +425,7 @@ export default {
 
 
       // woocommerce pwn integration
+      scheduleTime:null,
       startDate: null,
       endDate: null,
       productID: null,
@@ -444,14 +449,20 @@ export default {
       // Check integration status
       statusMessage: "", // Message from the API
       error: null, // Error message if any
-      loading: true, // Loader state
-      status: "disconnected"
+
+      isSubmitted: false,// Loader state
+      status: "connecting", // Status of the integration
+
+      //oading
+      loading: true,
+      PopupLoading: false, 
+      deleteLoading:false
 
     }
 
   },
   components: {
-    PopUp,
+    PopUp1,
     Multiselect,
     Vue3Select,
 
@@ -474,8 +485,11 @@ export default {
     selectedDays() {
       return this.days.filter(day => day.selected).map(day => day.name);
     },
+    isValid() {
+      return this.selectedDays.length > 0; // Valid if at least one day is selected
+    },
     commaSeparatedStatuses() {
-      return this.selectedStatuses.map(status => status.value).join(",");
+      return this.selectedStatuses.map(OrderStatus => OrderStatus.value).join(",");
     },
   },
 
@@ -487,7 +501,7 @@ export default {
 
     async disconnectWooCommerce() {
       try {
-        const response = await axios.delete('http://localhost:8000/disconnect-woocommerce',
+        const response = await axios.delete(`${this.apiUrl}/disconnect-woocommerce/`,
           {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -517,7 +531,7 @@ export default {
     async fetchProducts() {
       try {
         // Fetch product list from FastAPI
-        const response = await axios.get('http://localhost:8000/woo_products',
+        const response = await axios.get(`${this.apiUrl}/woo_products/`,
           {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -543,7 +557,7 @@ export default {
         this.error = null;
 
         // Call the API to check the integration
-        const response = await fetch("http://localhost:8000/check-integration", {
+        const response = await fetch(`${this.apiUrl}/check-integration/`, {
           method: "GET",
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -562,8 +576,8 @@ export default {
         this.statusMessage = data.message;
         this.status = data.status;
         this.store_name = data.store_info.store_name;
-        this.wooAPIsecret = data.store_info.consumer_key;
-        this.wooAPIkey = data.store_info.consumer_secret;
+        this.wooAPIkey = data.store_info.consumer_key;
+        this.wooAPIsecret = data.store_info.consumer_secret;
         this.Base_url = data.store_info.base_url;
 
 
@@ -576,7 +590,7 @@ export default {
 
     async testWooCommerceConnection() {
       try {
-        const response = await axios.post("http://localhost:8000/test-woocommerce", {
+        const response = await axios.post(`${this.apiUrl}/test-woocommerce/`, {
           base_url: this.Base_url,
           consumer_key: this.wooAPIkey,
           consumer_secret: this.wooAPIsecret,
@@ -633,7 +647,7 @@ export default {
     async fetchTemplates() {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:8000/template', {
+        const response = await fetch(`${this.apiUrl}/template/`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -655,7 +669,7 @@ export default {
     async fetchapiKey() {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch("http://localhost:8000/webhooklink",
+        const response = await fetch(`${this.apiUrl}/webhooklink/`,
           {
             method: 'GET',
             headers: {
@@ -682,16 +696,18 @@ export default {
         template_data: JSON.stringify(this.selectedTemplate),
         parameters: this.parameters,
         type: this.SelectedAction,
-        product_id: this.productID
+        product_id: this.productID,
+        description:this.integration_description
 
 
       };
 
       // Replace with your API endpoint
       try {
+        this.PopupLoading = true;
         const toast = useToast();
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:8000/integrate/woo_order_cnf', {
+        const response = await fetch(`${this.apiUrl}/integrate/woo_order_cnf`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -702,6 +718,8 @@ export default {
 
         if (response.ok) {
           toast.success("Integration saved successfully");
+          this.PopupLoading = false;
+          this.isSubmitted=true;
           this.fetchIntegrationList();
 
         } else {
@@ -713,15 +731,23 @@ export default {
         console.error('Failed to submit the template: ', error);
       }
     },
+    convertISTtoUTC(timeString) {
+      return new Date(new Date().toLocaleDateString("en-US", { timeZone: "Asia/Kolkata" }) + " " + timeString)
+        .toISOString()
+        .slice(11, 16);
+    },
 
     async wooPWNform() {
+
+      this.PopupLoading=true;
+      this.OrderStatus = this.selectedStatuses.map(OrderStatus => OrderStatus.value).join(",");
       const payload = {
         template_id: this.selectedTemplate.name,
         template_data: JSON.stringify(this.selectedTemplate),
         parameters: this.parameters,
         type: this.SelectedAction,
         contacts_start_date: this.startDate,
-        contacts_end_date: this.endDate,
+        contacts_end_date: this.endDate.split("T")[0] + "T23:59:59",
         repeat_days: [...this.selectedDays],
         time: this.scheduleTime,
         rest_key: this.wooAPIkey,
@@ -730,14 +756,53 @@ export default {
         status: this.OrderStatus,
         base_url: this.Base_url,
         description: this.integration_description
-
       };
+      const toast = useToast();
+
+
+      if (this.isValid == false) {
+        this.showError = true;
+        toast.error(`Select at least one day`);
+        return;
+      }
+
+      else if (this.productID == null) {
+        this.showError = true;
+        toast.error(`Select a product`);
+        return;
+      }
+      else if (this.OrderStatus == null) {
+        this.showError = true;
+        toast.error(`Select order status`);
+        return;
+      }
+      else if (this.startDate == null) {
+        this.showError = true;
+        toast.error(`Select start date`);
+        return;
+      }
+      else if (this.endDate == null) {
+        this.showError = true;
+        toast.error(`Select end date`);
+        return;
+      }
+      else if (this.scheduleTime == null) {
+        this.showError = true;
+        toast.error(`Select time`);
+        return;
+      }
+      else if (this.integration_description == null) {
+        this.showError = true;
+        toast.error(`Enter description`);
+        return;
+      }
+
 
       // Replace with your API endpoint
       try {
-        const toast = useToast();
+
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:8000/integrate/woo_pwn', {
+        const response = await fetch(`${this.apiUrl}/integrate/woo_pwn`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -748,6 +813,8 @@ export default {
 
         if (response.ok) {
           toast.success("Integration saved successfully");
+          this.PopupLoading = false;
+          this.isSubmitted=true;
           this.fetchIntegrationList();
 
         } else {
@@ -763,11 +830,12 @@ export default {
     async deleteIntegration(integration_id) {
       try {
 
+        this.deleteLoading=true;
         const toast = useToast();
         const token = localStorage.getItem('token');
         const confirmDelete = confirm("Are you sure you want to delete this contact?                           Note:Make sure to also delete the webhook from woocommece.")
         if (!confirmDelete) return;
-        const response = await fetch(`http://localhost:8000/integration/${integration_id}`,
+        const response = await fetch(`${this.apiUrl}/integration/${integration_id}`,
           {
             method: 'DELETE',
             headers: {
@@ -791,13 +859,33 @@ export default {
       } catch (error) {
         console.error('Failed to delete the integration: ', error)
 
+      }finally{
+        this.deleteLoading=false;
       }
+    },
+
+    closePopup(){
+      this.showPopup = false;
+      this.clearForm();
+    },
+
+    clearForm() {
+      this.isSubmitted=false;
+      this.SelectedAction = null;
+      this.selectedTemplate = null;
+      this.parameters = [];
+      this.productID = null;
+      this.integration_description = null;
+      this.scheduleTime = null;
+      this.startDate = null;
+      this.endDate = null;
+      this.selectedStatuses = [];
     },
 
     async fetchIntegrationList() {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch("http://localhost:8000/woo-integration-list/", {
+        const response = await fetch(`${this.apiUrl}/woo-integration-list/`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

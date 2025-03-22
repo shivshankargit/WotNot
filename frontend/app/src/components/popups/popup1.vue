@@ -1,7 +1,10 @@
 <template>
   <div class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-[10000]">
-    <div class="bg-[#f5f6fa] p-5 rounded-lg w-28% shadow-lg relative">
-      <span class="absolute top-2.5 right-8 text-4xl cursor-pointer text-black" @click="$emit('close')">&times;</span>
+    <div class="bg-[#ffffff] p-6 rounded-md w-[750px]  relative max-h-[750px]">
+      <div class="flex ">
+        <span class="close" @click="$emit('close')" hover>&times;</span> 
+      </div>
+        
       <slot/>
     </div>
   </div>
@@ -13,7 +16,14 @@ export default {
 }
 </script>
 
+<style scoped>
+.close{
 
+  margin-left: auto;
+  font-size: 25px;
+  cursor: pointer;
+}
+</style>
 
 
 
