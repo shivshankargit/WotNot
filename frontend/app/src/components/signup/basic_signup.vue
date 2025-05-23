@@ -1,34 +1,34 @@
 <template>
   <div class="bg-container">
-    <div class="max-w-md w-full bg-white p-6 rounded-lg shadow-lg">
-      <h2 class="text-2xl sm:text-3xl font-semibold text-center text-gray-800 mb-4">Get started with Wotnot</h2>
+    <div class="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
+      <h2 class="text-2xl sm:text-2xl font-semibold text-center text-gray-800 mb-4">Get started with <span class="logo">WotNot</span></h2>
 
       <hr class="my-3 border-gray-300" />
 
       <div class="space-y-4">
         <div class="w-full">
           <label for="username" class="block text-sm font-medium text-gray-700">Business Name</label>
-          <input type="text" id="username" placeholder="Your Business Name"
+          <input type="text" id="username" placeholder=""
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             required />
         </div>
 
         <div class="w-full">
           <label for="email" class="block text-sm font-medium text-gray-700">Business Email Address</label>
-          <input type="email" id="email" placeholder="Your Business Email Address"
+          <input type="email" id="email" placeholder=""
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             required />
         </div>
 
         <div class="w-full">
           <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-          <input type="password" id="password" placeholder="Set Password"
+          <input type="password" id="password" placeholder=""
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             required />
         </div>
-      </div>
 
-      <div class="mt-4 text-sm text-center">
+
+              <div class="mt-4 text-sm text-center">
         <p class="mb-2 text-sm">
           By signing up you agree to the
           <a href="#" class="text-[#075e54] font-semibold">Terms</a> and
@@ -36,16 +36,21 @@
         </p>
       </div>
 
-      <button
-        class="w-full bg-[#075e54] text-white py-2 rounded-md hover:bg-[#2d988c] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-        @click.prevent="handleSubmit">
-        Get Account
-      </button>
+      </div>
 
-      <p class="mt-4 text-center text-sm">
-        Already have an account?
-        <a href="" class="text-[#075e54] font-semibold mb-4" @click="redirectLogin">Login</a>
-      </p>
+
+      <div class="flex flex-col items-center">
+        <button class=" w-full bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
+        @click.prevent="handleSubmit">Get Account</button>
+  
+        <p class="mt-4 text-center text-sm">
+          Already have an account?
+          <a href="" class="text-[#075e54] font-semibold mb-4" @click="redirectLogin">Login</a>
+        </p>
+      </div>
+
+
+
     </div>
   </div>
 </template>
@@ -114,6 +119,14 @@ export default {
 
 
 <style scoped>
+
+.logo {
+  font-weight: 800;
+  margin: 8px 0;
+  padding-right: 30px;
+  font-size: 30px;
+  color: #075e54;
+}
 .bg-container {
   display: flex;
   align-items: center;

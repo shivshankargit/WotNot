@@ -319,6 +319,9 @@ async def event_stream(
     token: str = Query(...),
     db: AsyncSession = Depends(database.get_db), # Use AsyncSession for async DB operations
 ) -> StreamingResponse:
+    """
+    Stream whatsapp conversations for a specific contact number.
+    """
 
     current_user = await get_current_user(token, db)
     if current_user is None:
@@ -383,6 +386,9 @@ async def get_active_conversations(
     token: str = Query(...),
     db: AsyncSession = Depends(database.get_db),  # Use AsyncSession for async DB operations
 ) -> StreamingResponse:
+    '''
+    Stream active conversations for the current user.
+    '''
     # Authenticate the user using the token
     current_user = await get_current_user(token, db)
     if current_user is None:
@@ -424,6 +430,9 @@ async def send_message(
     db: AsyncSession = Depends(database.get_db),  # Use async db dependency
     get_current_user: user.newuser = Depends(get_current_user)
 ):
+    '''
+    Send a text message reply to a specific WhatsApp message for a specific number when the chat is active.
+    '''
     # Construct the URL for sending the message
     whatsapp_url = f"https://graph.facebook.com/v20.0/{get_current_user.Phone_id}/messages"
 
@@ -492,6 +501,9 @@ async def send_message(
     db: AsyncSession = Depends(database.get_db),  # Use async db dependency
     get_current_user: user.newuser = Depends(get_current_user)
 ):
+    '''
+    Send a text message to a specific WhatsApp number when the chat is active.
+    '''
     # Construct the URL for sending the message
     whatsapp_url = f"https://graph.facebook.com/v20.0/{get_current_user.Phone_id}/messages"
 
@@ -560,6 +572,9 @@ async def send_template_message(
     get_current_user: user.newuser = Depends(get_current_user),
     db: AsyncSession = Depends(database.get_db)
 ):
+    '''
+    Send a template message to multiple recipients using the WhatsApp Business API.
+    '''
     # Save broadcast details
     print(request.template)
     broadcast_list = Broadcast.BroadcastList(
@@ -726,6 +741,9 @@ async def get_templates(get_current_user: user.newuser = Depends(get_current_use
     headers = {
         'Authorization': f'Bearer {get_current_user.PAccessToken}'
     }
+    '''
+    Fetches the list of templates from the WhatsApp Business API.
+    '''
 
     async with httpx.AsyncClient() as client:
         response = await client.get(API_URL, headers=headers)
@@ -781,6 +799,10 @@ async def broadcastList(
     db: Session = Depends(database.get_db),
     get_current_user: user.newuser = Depends(get_current_user)
 ):
+    '''
+    Endpoint to create a new broadcast.
+    This endpoint accepts a request with the broadcast details and saves it to the database.
+    '''
     # Initialize success and failed counts
     success_count = 0
     failed_count = 0
@@ -858,6 +880,9 @@ async def update_broadcast(
     db: AsyncSession = Depends(database.get_db),
     get_current_user: user.newuser = Depends(get_current_user)
 ):
+    '''
+    Endpoint to update a broadcast entry in the database.
+    '''
     # Retrieve the broadcast entry from the database
     result = await db.execute(
         select(Broadcast.BroadcastList).where(Broadcast.BroadcastList.id == broadcast_id)
@@ -893,6 +918,10 @@ async def fetch_scheduled_broadcast_list(
     db: AsyncSession = Depends(database.get_db),
     get_current_user: user.newuser = Depends(get_current_user)
 ):
+    '''
+    Fetches the list of scheduled broadcasts for the current user.
+    This endpoint allows for pagination using skip and limit parameters.
+    '''
     query = select(Broadcast.BroadcastList).where(
         Broadcast.BroadcastList.status == "Scheduled"
     ).order_by(Broadcast.BroadcastList.id.desc()).offset(skip).limit(limit)
@@ -933,6 +962,10 @@ async def get_templates(get_current_user: user.newuser = Depends(get_current_use
         'Authorization': f'Bearer {get_current_user.PAccessToken}'
     }
 
+    '''
+    Fetches the list of templates from the WhatsApp Business API.
+    '''
+
     # Make an asynchronous HTTP GET request
     async with httpx.AsyncClient() as client:
         response = await client.get(API_URL, headers=headers)
@@ -953,6 +986,9 @@ async def delete_scheduled_broadcast(
     db: AsyncSession = Depends(database.get_db),
     get_current_user: user.newuser = Depends(get_current_user)
 ):
+    '''
+    Endpoint to delete a scheduled broadcast.
+    '''
     # Fetch the broadcast asynchronously
     result = await db.execute(
         select(Broadcast.BroadcastList).filter(Broadcast.BroadcastList.id == broadcast_id)
@@ -1022,6 +1058,10 @@ async def create_template(
     
     get_current_user: user.newuser = Depends(get_current_user)
 ):
+    '''
+    Endpoint to create a new WhatsApp template.
+    This endpoint validates the template data and sends it to the WhatsApp API.
+    '''
     try:
         template_data = request.model_dump()  # Convert Pydantic model to dictionary
         broadcast.TemplateCreate.validate_template(template_data)  # Validate template
@@ -1058,6 +1098,11 @@ async def DeleteTemplate(
     template_name:str,
     request: Request,
     get_current_user: user.newuser = Depends(get_current_user)):
+        
+        '''
+        Endpoint to delete a WhatsApp template.
+        This endpoint sends a DELETE request to the WhatsApp API to remove the specified template.
+        '''
 
         url = f"https://graph.facebook.com/v14.0/{get_current_user.WABAID}/message_templates?name={template_name}"
         headers = {
@@ -1101,6 +1146,10 @@ async def upload_file(
     get_current_user: user.newuser = Depends(get_current_user),
     db: AsyncSession = Depends(database.get_db)
 ):
+    '''
+    Uploads a media file to WhatsApp using the WhatsApp Business API.
+    This endpoint handles the file upload, prepares the request, and sends it to the API.
+    '''
     # Read the contents of the uploaded file
     try:
         contents = await file.read()

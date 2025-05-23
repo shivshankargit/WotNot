@@ -9,10 +9,18 @@
 
       <div class="flex justify-between">
         <div>
-          <button @click="showPopup = true"
+          <!-- <button @click="showPopup = true"
             class="bg-[#075e54] text-[#f5f6fa] px-4 py-2 md:px-4 md:py-4 text-sm md:text-base rounded-md shadow-lg">
             + Add Contact
-          </button>
+          </button> -->
+
+          <button class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
+          @click="showPopup = true">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+            </svg>
+            New Contact
+        </button>
         </div>
 
 
@@ -426,7 +434,7 @@ export default {
     async fetchContactList(page = 1) {
   const token = localStorage.getItem("token");
   const itemsPerPage = 10; // Number of contacts per page
-  const url = `${this.apiUrl}/contacts?sort_by=${this.sortBy}&order=${this.order}&limit=${itemsPerPage}&offset=${(page - 1) * itemsPerPage}`;
+  const url = `${this.apiUrl}/contacts/?sort_by=${this.sortBy}&order=${this.order}&limit=${itemsPerPage}&offset=${(page - 1) * itemsPerPage}`;
 
   try {
     const response = await fetch(url, {

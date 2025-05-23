@@ -7,10 +7,17 @@
       </div>
 
       <div>
-        <button @click="showPopup = true, fetchContacts()"
-          class="bg-[#075e54] text-[#f5f6fa] px-4 py-2 md:px-4 md:py-4 text-sm md:text-base rounded-md shadow-lg ">
+        <button class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
+        @click="showPopup = true, fetchContacts()">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+          </svg>
           New Broadcast
-        </button>
+      </button>
+        <!-- <button @click="showPopup = true, fetchContacts()"
+          class="bg-[#075e54] text-[#f5f6fa] px-4 py-2 md:px-4 md:py-4 text-sm md:text-base rounded-md shadow-lg ">
+          
+        </button> -->
       </div>
     </div>
 
@@ -55,7 +62,7 @@
 
                 <!-- New select field-->
                 <select id="template-select" v-model="selectedTemplateId" @change="onTemplateSelect"
-                  class="border border-gray-300 rounded px-3 py-2 w-full " required>
+                  class="border border-gray-300 rounded px-3 py-2 w-full max-h-[50px]" required>
                   <option v-for="template in templates" :key="template.id" :value="template.id">
                     {{ template.name }}
                   </option>
@@ -192,11 +199,11 @@
 
               <button
               type="submit"
-              class="px-4 py-2 bg-green-600 text-white rounded-md flex items-center justify-center"
-              :disabled="PopupLoading || isSubmitted">
-              <span v-if="PopupLoading"
+              class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
+              :disabled="popupLoading || isSubmitted">
+              <span v-if="popupLoading"
                 class="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4 mr-2"></span>
-              {{ isSubmitted ? "Submitted" : PopupLoading ? "Submitting..." : isScheduled ?
+              {{ isSubmitted ? "Submitted" : popupLoading ? "Submitting..." : isScheduled ?
               'Schedule Message' : 'Send Message' }}
             </button>
           </form>
@@ -287,11 +294,11 @@
             <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.contacts.length }}</td>
             <td class="p-2 md:p-4 text-center">
               <div :class="{
-                'bg-[#e9f6ee] text-green-600 ': broadcast.status === 'Successful',
-                'bg-blue-200 text-blue-600 ': broadcast.status === 'Scheduled',
-                'bg-red-200 text-red-600 ': broadcast.status === 'Cancelled',
-                'bg-yellow-100 text-yellow-500 ': broadcast.status === 'Partially Successful',
-                'bg-yellow-200 text-yellow-600 ': broadcast.status === 'processing...',
+                'text-green-500 ': broadcast.status === 'Successful',
+                'text-blue-500 ': broadcast.status === 'Scheduled',
+                'text-red-500 ': broadcast.status === 'Cancelled',
+                'text-yellow-500 ': broadcast.status === 'Partially Successful',
+                'text-yellow-600 ': broadcast.status === 'processing...',
                 'border-[#ddd]': true
               }" class="text-[80%] lg:text-[100%] rounded-lg">
                 {{ broadcast.status }}
@@ -431,7 +438,7 @@
       </div>
 
 
-      <div class="overflow-x-auto max-h-[60vh] overflow-y-auto custom-scrollbar">
+      <div class="overflow-x-auto max-h-[45vh] overflow-y-auto custom-scrollbar">
         <table class="w-full rounded-lg border-collapse">
           <thead>
             <tr class="text-center">
@@ -699,7 +706,7 @@ export default {
     async fetchtemplateList() {
       const token = localStorage.getItem('token');
       try {
-        const response = await fetch(`${this.apiUrl}/template/`, {
+        const response = await fetch(`${this.apiUrl}/template`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -770,7 +777,7 @@ export default {
 
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`${this.apiUrl}/contacts/`, {
+        const response = await fetch(`${this.apiUrl}/contacts/?limit=1000&offset=0`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -884,7 +891,7 @@ export default {
 
       try {
 
-        const response = await fetch(`${this.apiUrl}/upload-media/`, {
+        const response = await fetch(`${this.apiUrl}/upload-media`, {
           method: "POST",
           headers: {
 
