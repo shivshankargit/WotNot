@@ -1,5 +1,5 @@
 <template>
-  <div class="content-section md:ml-64">
+  <div class="content-section m-8 md:ml-72">
     
     <h2>Coming Soon...</h2>
     <p>Your content for scheduled broadcasts goes here.</p>

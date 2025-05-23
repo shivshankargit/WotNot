@@ -1,5 +1,5 @@
 <template>
-  <div class="content-section md:ml-64">
+  <div class="content-section m-8 md:ml-72">
     <div class="flex flex-col md:flex-row justify-between mb-4 border-b pb-5">
       <div>
         <h2 class="text-xl md:text-2xl font-bold ">Manage Contacts</h2>
@@ -21,7 +21,7 @@
 
 
 
-      <PopUp v-if="showPopupimport" @close="closePopupimport()">
+      <PopUp1 v-if="showPopupimport" @close="closePopupimport()">
         <div class="popup-content">
           <h2 class="text-xl font-semibold mb-4">Bulk Import Contacts</h2>
 
@@ -62,17 +62,18 @@
                   </tr>
                 </tbody>
               </table>
+              
             </div>
 
 
           </div>
 
 
-          <div  v-if="importcontacts.length">
+          <div v-if="importcontacts.length">
             <h3>New Contacts</h3>
 
-            <div class="overflow-y-auto max-h-[20vh] custom-scrollbar" >
-              <table >
+            <div class="overflow-y-auto max-h-[20vh] custom-scrollbar">
+              <table>
                 <thead>
                   <tr>
                     <th>Name</th>
@@ -93,10 +94,9 @@
                     </td>
                   </tr>
                 </tbody>
-              </table>
-  
-            </div>
 
+              </table>
+            </div>
           </div>
 
           <div v-if="importcontacts.length" class="flex">
@@ -110,10 +110,10 @@
 
 
         </div>
-      </PopUp>
+      </PopUp1>
 
     </div>
-    <PopUp1 v-if="showPopup" @close="closePopup">
+    <PopUpSmall v-if="showPopup" @close="closePopup">
       <form @submit.prevent="submitForm" id="contactForm" class="p-6 w-[400px]">
         <h2 class="text-xl font-semibold mb-4">{{ isEditing ? 'Edit Contact' : 'Add Contact' }}</h2>
         <hr class="mb-4" />
@@ -128,9 +128,9 @@
           <label for="phone" class="block text-sm font-medium">Phone Number<span class="text-red-800">*</span></label>
           <div class="flex">
             <select v-model="contact.countryCode" class="border border-gray-300 rounded-l px-3 py-2 w-20 mr-2">
-              <option value="+1">+1</option>
-              <option value="+44">+44</option>
-              <option value="+91">+91</option>
+              <option value="1">+1</option>
+              <option value="44">+44</option>
+              <option value="91">+91</option>
             </select>
             <input type="text" v-model="contact.phone" id="phone" placeholder="Phone Number" required
               class="border border-gray-300 rounded-r px-3 py-2 w-full">
@@ -175,33 +175,14 @@
           </button>
         </div>
       </form>
-    </PopUp1>
+    </PopUpSmall>
 
 
 
     <div class="bg-[#f5f6fa] p-5  filter-container space-x-2">
 
       <h3 class="text-xl md:text-2xs mb-0 text-gray-600"><b>Contact List</b></h3>
-      <!-- <div class="dropdown-container">
-        <b><label for="sort-by">Sort by:</label></b>
-        <select v-model="sortBy" @change="fetchContactList">
-          <option value="created_at">Created At</option>
-          <option value="updated_at">Updated_at</option>
-        </select>
-      </div>
 
-      <div class="dropdown-container">
-        <b><label for="order">Order:</label></b>
-        <select v-model="order" @change="fetchContactList">
-          <option value="desc">Descending</option>
-          <option value="asc">Ascending</option>
-        </select>
-      </div>
-
-      <div class="search-container">
-      <b><label for="search">Search by phone number:</label></b>
-      <input type="text" v-model="searchQuery" placeholder="Search by phone number" @input="fetchContactList">
-      </div> -->
 
 
 
@@ -231,7 +212,7 @@
 
 
 
-    <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
+    <div class="overflow-x-auto max-h-[54vh] custom-scrollbar">
       <table class="w-full rounded-lg border-collapse block">
         <thead>
           <tr class="bg-[#ffffff] border-b-2 border-gray-300">
@@ -260,12 +241,11 @@
             <td class="border-gray-300 py-5 px-3">
               <div class="flex justify-left">
                 <button @click="modifyContact(contact)" class="hover:bg-white rounded-full p-2 transition">
-                  <lord-icon src="https://cdn.lordicon.com/wuvorxbv.json" trigger="hover"
-                    style="width:32px;height:32px">
+                  <lord-icon src="https://cdn.lordicon.com/wuvorxbv.json" trigger="none" style="width:32px;height:32px">
                   </lord-icon>
                 </button>
                 <button @click="deleteContact(contact.phone)" class="hover:bg-white rounded-full p-2 transition">
-                  <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="hover"
+                  <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="none"
                     colors="primary:#ff5757,secondary:#000000" style="width:32px;height:32px">
                   </lord-icon>
                 </button>
@@ -275,19 +255,29 @@
         </tbody>
       </table>
     </div>
+    <div class="flex justify-end">
+      <div class="flex justify-between items-center">
+        <button class="p-2 text-blue-500 underline hover:text-blue-700 hover:bg-transparent" 
+        @click="loadPreviousPage" :disabled="currentPage === 1">Previous</button>
+        <div class="border-2">{{ currentPage }}</div>
+        <button class="p-2 text-blue-500 underline hover:text-blue-700 hover:bg-transparent" 
+        @click="loadNextPage">Next</button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { useToast } from 'vue-toastification';
 import PopUp1 from "../popups/popup1";
-import PopUp from "../popups/popup";
+import PopUpSmall from "../popups/popup_small";
+
 import axios from "axios";
 
 export default {
   components: {
     PopUp1,
-    PopUp
+    PopUpSmall
   },
   async mounted() {
     await this.fetchContactList();
@@ -300,6 +290,8 @@ export default {
   name: "ContActs1",
   data() {
     return {
+      apiUrl: process.env.VUE_APP_API_URL,
+      currentPage: 1,
       showPopup: false,
       showPopupimport: false,
       showActionPopup: false,
@@ -311,7 +303,7 @@ export default {
         name: "",
         email: "",
         phone: "",
-        countryCode: "+91",
+        countryCode: "",
         tags: [],
 
         // Search Bar
@@ -355,13 +347,25 @@ export default {
     }
   },
   methods: {
+
+    async loadNextPage() {
+      this.currentPage += 1;
+      await this.fetchContactList(this.currentPage);
+    },
+    async loadPreviousPage() {
+      if (this.currentPage > 1) {
+        this.currentPage -= 1;
+        await this.fetchContactList(this.currentPage);
+      }
+    },
+
     async submitForm() {
       const toast = useToast();
       const { id, name, email, phone, countryCode, tags } = this.contact;
 
       let fullPhoneNumber = phone;
       if (countryCode && countryCode.trim() !== '') {
-        fullPhoneNumber = `${countryCode} ${phone}`;
+        fullPhoneNumber = `${countryCode}${phone}`;
       }
 
       if (tags.some(tag => tag.key === '' || tag.value === '')) {
@@ -371,7 +375,7 @@ export default {
 
       const tagArray = tags.map(tag => `${tag.key}:${tag.value}`);
 
-      const url = id ? `http://localhost:8000/contacts/${id}` : "http://localhost:8000/contacts/";
+      const url = id ? `${this.apiUrl}/contacts/${id}` : `${this.apiUrl}/contacts/`;
       const method = id ? "PUT" : "POST";
       const token = localStorage.getItem("token");
 
@@ -417,41 +421,44 @@ export default {
       const date = new Date(dateString);
       return date.toLocaleDateString('en-US', options).replace(/,/g, '');
     },
-    async fetchContactList() {
-      const token = localStorage.getItem("token");
-      const url = `http://localhost:8000/contacts/?sort_by=${this.sortBy}&order=${this.order}`;
 
-      try {
-        const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
 
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
+    async fetchContactList(page = 1) {
+  const token = localStorage.getItem("token");
+  const itemsPerPage = 10; // Number of contacts per page
+  const url = `${this.apiUrl}/contacts?sort_by=${this.sortBy}&order=${this.order}&limit=${itemsPerPage}&offset=${(page - 1) * itemsPerPage}`;
 
-        const contactsList = await response.json();
-        console.log(contactsList);
-        this.contacts = contactsList.map((contact) => ({
-          id: contact.id,
-          name: contact.name,
-          phone: contact.phone,
-          email: contact.email,
-          tags: contact.tags.map(tag => {
-            const [key, value] = tag.split(":");
-            return { key, value };
-          }),
-          created_at: contact.created_at, // Store raw dates for sorting
-          updated_at: contact.updated_at // Store updated_at too
-        }));
-      } catch (error) {
-        console.error("Error fetching contacts:", error);
-      }
-    },
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const contactsList = await response.json();
+    console.log(contactsList);
+    this.contacts = contactsList.map((contact) => ({
+      id: contact.id,
+      name: contact.name,
+      phone: contact.phone,
+      email: contact.email,
+      tags: contact.tags.map(tag => {
+        const [key, value] = tag.split(":");
+        return { key, value };
+      }),
+      created_at: contact.created_at, // Store raw dates for sorting
+      updated_at: contact.updated_at // Store updated_at too
+    }));
+  } catch (error) {
+    console.error("Error fetching contacts:", error);
+  }
+},
 
     // Contacts Tags Filter
     async fiterBytTags() {
@@ -460,7 +467,7 @@ export default {
       const tagKey = this.tag_key
       try {
 
-        const response = await fetch(`http://localhost:8000/contacts-filter/filter?tag_key=${tagKey}&tag_value=${tagValue}`, {
+        const response = await fetch(`${this.apiUrl}/contacts-filter/filter?tag_key=${tagKey}&tag_value=${tagValue}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -508,7 +515,7 @@ export default {
 
       const token = localStorage.getItem("token");
       try {
-        const response = await fetch(`http://localhost:8000/contacts/${phone}`, {
+        const response = await fetch(`${this.apiUrl}/contacts/${phone}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -555,7 +562,7 @@ export default {
       formData.append("file", this.file);
 
       try {
-        const response = await axios.post("http://localhost:8000/contacts/csv/", formData, {
+        const response = await axios.post(`${this.apiUrl}/contacts/csv/`, formData, {
           headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` },
         });
 
@@ -577,7 +584,7 @@ export default {
       formData.append("file", this.file);
 
       try {
-        const response = await axios.post("http://localhost:8000/contacts/bulk_import/", formData, {
+        const response = await axios.post(`${this.apiUrl}/contacts/bulk_import/`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,

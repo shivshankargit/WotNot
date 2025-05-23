@@ -14,6 +14,7 @@ class Conversation(database.Base):
     message_id = Column(String)  # Unique message ID
     phone_number_id = Column(BIGINT)  # Phone number ID
     message_content = Column(Text)  # Message body
+    media_id=Column(String,nullable=True)
     timestamp = Column(DateTime, default=datetime.utcnow)  # Message timestamp
     context_message_id = Column(String, nullable=True,default= None)  # ID of the message that this is replying to
     message_type = Column(String)  # Type of message (e.g., text, image)

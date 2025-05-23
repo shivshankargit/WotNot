@@ -22,4 +22,5 @@ class WebhookData(BaseModel):
 class MessagePayload(BaseModel):
     wa_id: str
     body: str
+    context_message_id: Optional[str] = Field(None)
     

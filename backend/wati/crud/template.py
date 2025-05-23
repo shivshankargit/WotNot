@@ -8,7 +8,7 @@ def get_template_by_id(db: Session, template_id: str):
     return db.query(Broadcast.Template).filter(Broadcast.Template.id == template_id).first()
 
 async def send_template_to_whatsapp(template: dict , access_token: str, business_account_id: str) -> Dict[str, Any]:
-    url = f"https://graph.facebook.com/v14.0/{business_account_id}/message_templates"
+    url = f"https://graph.facebook.com/v21.0/{business_account_id}/message_templates"
     headers = {
         "Authorization": f"Bearer {access_token}",
         "Content-Type": "application/json"
@@ -29,3 +29,6 @@ async def send_template_to_whatsapp(template: dict , access_token: str, business
         raise HTTPException(status_code=response.status_code, detail=response.json())
 
     return response.json()
+
+
+

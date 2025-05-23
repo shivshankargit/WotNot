@@ -76,30 +76,36 @@ from ..crud.template import send_template_to_whatsapp
 
 
 
-router=APIRouter( tags=['Broadcast'])
+# Initialize the FastAPI router for broadcast-related routes
+router = APIRouter(tags=['Broadcast'])
+
+# Initialize the FastAPI application
 app = FastAPI()
 
+# Define a constant for the webhook verification token
 WEBHOOK_VERIFY_TOKEN = "12345"  # Replace with your verification token
 
 # Meta Webhook verification endpoint
 @router.get("/meta-webhook")
 async def verify_webhook(request: Request):
+    """
+    Endpoint to verify the webhook from WhatsApp.
+    """
     verify_token = request.query_params.get("hub.verify_token")
     challenge = request.query_params.get("hub.challenge")
     hubmode = request.query_params.get("hub.mode")
     print(f"Received verify_token: {challenge}, Expected: {WEBHOOK_VERIFY_TOKEN}")
-    if verify_token == WEBHOOK_VERIFY_TOKEN and hubmode == "subscribe" :
-        return PlainTextResponse(content=request.query_params.get("hub.challenge"),status_code=200)
-    
+    if verify_token == WEBHOOK_VERIFY_TOKEN and hubmode == "subscribe":
+        return PlainTextResponse(content=request.query_params.get("hub.challenge"), status_code=200)
     else:
         raise HTTPException(status_code=403, detail="Verification token mismatch")
 
-# ######### WORKING ENDPOINT WITH BROADCAST REPORT ##########
-
 # POST endpoint to handle webhook data from WhatsApp
-
 @router.post("/meta-webhook")
 async def receive_meta_webhook(request: Request, db: AsyncSession = Depends(database.get_db)):
+    """
+    Endpoint to receive and process webhook data from WhatsApp.
+    """
     try:
         # Parse the incoming webhook request
         body = await request.json()
@@ -134,6 +140,8 @@ async def receive_meta_webhook(request: Request, db: AsyncSession = Depends(data
                         message_read=False
                         message_delivered=False
                         message_sent=False
+                        error_reason = None
+                        
 
                         
                         if(message_status=="read"):
@@ -142,18 +150,30 @@ async def receive_meta_webhook(request: Request, db: AsyncSession = Depends(data
                             message_sent=True
                             
                         
-                        if(message_status=="delivered"):
+                        elif(message_status=="delivered"):
                             message_read=False
                             message_delivered=True
                             message_sent=True
                             
 
 
-                        if(message_status=="sent"):
+                        elif(message_status=="sent"):
                             message_read=False
                             message_delivered=False
                             message_sent=True
+
+
+                        
+                        elif (message_status == "failed"):
+                            # Log the error reason from the status
+                            if "errors" in status and status["errors"]:
+                                error_details = status["errors"][0]
+                                error_data_details = status["errors"][0].get("error_data", {}).get("details", "No details available") # Assuming only one error is present
+                                error_reason = f"Error Code: {error_details.get('code', 'N/A')}, " \
+                                            f"Title: {error_details.get('title', 'N/A')}, " \
+                                            f"Details: {error_data_details}"
                             
+                                
 
 
 
@@ -171,6 +191,8 @@ async def receive_meta_webhook(request: Request, db: AsyncSession = Depends(data
                                 broadcast_report.delivered=message_delivered
                                 broadcast_report.sent=message_sent
                                 broadcast_report.status=message_status
+                                if error_reason is not None:
+                                    broadcast_report.error_reason = error_reason 
 
                         db.add(broadcast_report)
                         await db.commit()
@@ -190,16 +212,17 @@ async def receive_meta_webhook(request: Request, db: AsyncSession = Depends(data
                                 
                             broadcast_report=result2.scalars().first()
                             
-                            if not broadcast_report:
-                                    raise HTTPException(status_code=404,detail="Broadcast not found")
+                            # if not broadcast_report:                                    
+                            #         raise HTTPException(status_code=404,detail="Broadcast not found")
 
-                            if wamid:
-                                    broadcast_report.replied=message_sent=message_reply
-                                    broadcast_report.status=message_status
 
-                            db.add(broadcast_report)
-                            await db.commit()
-                            await db.refresh(broadcast_report)
+                           
+                            if broadcast_report:
+                                broadcast_report.replied=message_sent=message_reply
+                                broadcast_report.status=message_status
+                                db.add(broadcast_report)
+                                await db.commit()
+                                await db.refresh(broadcast_report)
                 # Handle incoming messages and replies
                 if "messages" in value:
                     await handle_incoming_messages(value, db)
@@ -392,6 +415,77 @@ async def get_active_conversations(
 
 
 
+
+
+
+@router.post("/send-text-message-reply/")
+async def send_message(
+    payload: chatbox.MessagePayload,
+    db: AsyncSession = Depends(database.get_db),  # Use async db dependency
+    get_current_user: user.newuser = Depends(get_current_user)
+):
+    # Construct the URL for sending the message
+    whatsapp_url = f"https://graph.facebook.com/v20.0/{get_current_user.Phone_id}/messages"
+
+    # Set up headers with the access token provided by the frontend
+    headers = {
+        "Authorization": f"Bearer {get_current_user.PAccessToken}",
+        "Content-Type": "application/json"
+    }
+
+    # Construct the message payload to be sent to the WhatsApp Business API
+
+
+    data={
+    "messaging_product": "whatsapp",
+    "recipient_type": "individual",
+    "to": payload.wa_id,
+    "context": {
+        "message_id": payload.context_message_id
+    },
+    "type": "text",
+    "text": {
+        "preview_url": False,
+        "body": payload.body
+    }
+}
+
+    async with httpx.AsyncClient() as client:
+        # Send POST request to WhatsApp API
+        response = await client.post(whatsapp_url, headers=headers, json=data)
+
+    # Check for errors in the response
+    if response.status_code != 200:
+        print(response.json())
+        raise HTTPException(status_code=response.status_code, detail=response.json())
+
+    # Parse the response JSON to get message details
+    response_data = response.json()
+
+    try:
+        # Save the sent message data in conversations table
+        conversation = Conversation(
+            wa_id=payload.wa_id,
+            message_id=response_data.get("messages")[0].get("id"),
+            phone_number_id=get_current_user.Phone_id,
+            message_content=payload.body,
+            timestamp=datetime.utcnow(),
+            context_message_id=payload.context_message_id,  # Set based on your needs
+            message_type="text",
+            direction="sent"  # Set direction to "sent"
+        )
+
+        db.add(conversation)
+        await db.commit()  # Commit changes asynchronously
+        await db.refresh(conversation)  # Refresh asynchronously
+
+        return {"status": "Message sent", "response": response_data}
+
+    except Exception as e:
+        await db.rollback()  # Rollback in case of any error asynchronously
+        print(f"Error storing message in conversation table: {e}")
+        raise HTTPException(status_code=500, detail="Error storing message in database")
+
 @router.post("/send-text-message/")
 async def send_message(
     payload: chatbox.MessagePayload,
@@ -467,6 +561,7 @@ async def send_template_message(
     db: AsyncSession = Depends(database.get_db)
 ):
     # Save broadcast details
+    print(request.template)
     broadcast_list = Broadcast.BroadcastList(
         user_id=get_current_user.id,
         name=request.name,
@@ -488,6 +583,7 @@ async def send_template_message(
         broadcast_id=broadcast_list.id,
         recipients=contacts,
         template=request.template,
+        template_data=request.template_data,
         image_id=request.image_id,
         body_parameters=request.body_parameters,
         phone_id=get_current_user.Phone_id,
@@ -503,12 +599,15 @@ async def send_template_messages_task(
     broadcast_id: int,
     recipients: list,
     template: str,
+    template_data:str,
     image_id: str,
     body_parameters: str,
     phone_id: str,
     access_token: str,
     user_id: int,
 ):
+
+
     async with database.get_db() as db:
         success_count = 0
         failed_count = 0
@@ -520,10 +619,14 @@ async def send_template_messages_task(
             "Content-Type": "application/json"
         }
 
+
         async with httpx.AsyncClient() as client:
             for contact in recipients:
                 recipient_name = contact.name
                 recipient_phone = contact.phone
+
+                template_data = json.loads(template_data)
+                Templatelanguage = template_data.get("language")
 
                 data = {
                     "messaging_product": "whatsapp",
@@ -531,9 +634,10 @@ async def send_template_messages_task(
                     "type": "template",
                     "template": {
                         "name": template,
-                        "language": {"code": "en_US"},
+                        "language": {"code": Templatelanguage},
                     }
                 }
+
 
                 if image_id:
                     data["template"]["components"] = [
@@ -578,7 +682,7 @@ async def send_template_messages_task(
                         wa_id=recipient_phone,
                         message_id=wamid,
                         phone_number_id=phone_id,
-                        message_content=f"#template_message# {template}",
+                        message_content=f"#template_message# {template_data}",
                         timestamp=datetime.utcnow(),
                         context_message_id=None,
                         message_type="text",
@@ -612,6 +716,8 @@ async def send_template_messages_task(
             broadcast.status = "Successful" if failed_count == 0 else "Partially Successful"
             broadcast.failed = failed_count
             await db.commit()
+
+        
 
 
 @router.get("/templates")
@@ -709,9 +815,10 @@ async def broadcastList(
 # Route to fetch the broadcastlist
 @router.get('/broadcast')  # Use your response model here
 async def fetchbroadcastList(
-    skip: int = 0,
-    limit: int = 10,
-    tag: str = None,
+    limit: int = Query(10),
+    offset: int = Query(0),
+    statusfilter: str | None = Query(None),
+    tag: str | None = Query(None),
     db: AsyncSession = Depends(database.get_db),  # Ensure this is your async db session dependency
     get_current_user: user.newuser = Depends(get_current_user)
 ):
@@ -723,7 +830,12 @@ async def fetchbroadcastList(
 
     # Apply tag filtering if provided
     if tag:
-        query = query.filter(Broadcast.BroadcastList.template.ilike(f"%{tag}%"))  # Adjust field as needed
+        query = query.filter(Broadcast.BroadcastList.template.ilike(f"%{tag}%")) # Adjust field as needed
+
+    if statusfilter!="null" :
+        query=query.filter(Broadcast.BroadcastList.status==statusfilter)
+    # Apply pagination
+    query = query.offset(offset).limit(limit)
 
     # Execute the query
     result = await db.execute(query)
@@ -857,30 +969,88 @@ async def delete_scheduled_broadcast(
     return {"detail": "Scheduled broadcast has been canceled."}
 
 
+# @router.post("/create-template", response_model=broadcast.TemplateResponse)
+# async def create_template(
+#     template: broadcast.TemplateCreate,
+#     request: Request,
+#     get_current_user: user.newuser = Depends(get_current_user)
+# ):
+#     try:
+#         template_data = await request.json()  # Await JSON data from the request
+#         broadcast.TemplateCreate.validate_template(template_data)  # Ensure the template is validated synchronously
+        
+#         # Send the template to WhatsApp API
+
+#         url = f"https://graph.facebook.com/v21.0/{get_current_user.WABAID}/message_templates"
+#         headers = {
+#             "Authorization": f"Bearer {get_current_user.PAccessToken}",
+#             "Content-Type": "application/json"
+#         }
+#         payload = {
+#             "allow_category_change": True,
+#             "category": template.get('category'),
+#             "components": [comp for comp in template.get('components', [])],
+#             "language": template.get('language'),
+#             "name": template.get('name'),
+#             "sub_category": template.get('sub_category')
+#         }
+
+#         async with httpx.AsyncClient() as client:
+#             response = await client.post(url, headers=headers, json=payload)
+
+#         if response.status_code != 200:
+#             raise HTTPException(status_code=response.status_code, detail=response.json())
+
+#         return response
+    
+#     except HTTPException as e:
+#         logging.critical(f"HTTP Exception: {e.detail}")
+#         raise HTTPException(status_code=e.status_code, detail=e.detail)
+#     except Exception as e:
+#         logging.critical(f"Unexpected Exception: {str(e)}")
+#         raise HTTPException(status_code=500, detail="An unexpected error occurred.")
+
+import logging
+from fastapi import APIRouter, HTTPException, Request, Depends
+import httpx
+  # Adjust import path as per your project
+
+
 @router.post("/create-template", response_model=broadcast.TemplateResponse)
 async def create_template(
-    template: broadcast.TemplateCreate,
-    request: Request,
+    request: broadcast.TemplateCreate,
+    
     get_current_user: user.newuser = Depends(get_current_user)
 ):
     try:
-        template_data = await request.json()  # Await JSON data from the request
-        broadcast.TemplateCreate.validate_template(template_data)  # Ensure the template is validated synchronously
-        
-        # Send the template asynchronously to WhatsApp
-        response = await send_template_to_whatsapp(
-            template_data,
-            get_current_user.PAccessToken,
-            get_current_user.WABAID
-        )
-        
-        return response
+        template_data = request.model_dump()  # Convert Pydantic model to dictionary
+        broadcast.TemplateCreate.validate_template(template_data)  # Validate template
+
+        # WhatsApp API URL and headers
+        url = f"https://graph.facebook.com/v21.0/{get_current_user.WABAID}/message_templates"
+        headers = {
+            "Authorization": f"Bearer {get_current_user.PAccessToken}",
+            "Content-Type": "application/json"
+        }
+
+        # Payload construction
+        payload = template_data
+        print(payload)
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url, headers=headers, json=payload)
+            response_data = response.json()  # Ensure JSON parsing
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=response_data)
+
+        return response_data  # Return parsed JSON instead of raw response
+
     except HTTPException as e:
         logging.critical(f"HTTP Exception: {e.detail}")
-        raise HTTPException(status_code=e.status_code, detail=e.detail)
-    except Exception as e:
-        logging.critical(f"Unexpected Exception: {str(e)}")
-        raise HTTPException(status_code=500, detail="An unexpected error occurred.")
+        raise e  # No need to wrap again
+
+
 
 
 @router.delete("/delete-template/{template_name}")
@@ -1001,3 +1171,69 @@ async def upload_file(
     except Exception as e:
         logging.error(f"Unexpected error: {e}")
         raise HTTPException(status_code=500, detail="An unexpected error occurred while uploading the media.")
+
+
+
+from fastapi import APIRouter, Depends, HTTPException, Response
+from sqlalchemy.ext.asyncio import AsyncSession
+import requests
+import mimetypes
+
+
+
+# Configuration for the API
+
+
+@router.get("/download-media/{media_id}")
+async def load_media(
+    media_id: str,  # Media ID from the client
+    get_current_user: user.newuser = Depends(get_current_user),  # User validation
+    db: AsyncSession = Depends(database.get_db)  # Database session
+):
+    """
+    Downloads media from WhatsApp using its media ID and serves it to the client.
+    """
+    try:
+        # Step 1: Get the media URL
+        response = requests.get(
+            f"https://graph.facebook.com/v20.0/{media_id}",
+            headers={"Authorization": f"Bearer {get_current_user.PAccessToken}"}
+        )
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=404, detail="Media not found")
+
+        media_url = response.json().get("url")
+        if not media_url:
+            raise HTTPException(status_code=404, detail="Unable to retrieve media URL")
+
+        # Step 2: Download the media
+        media_response = requests.get(
+            media_url,
+            headers={"Authorization": f"Bearer {get_current_user.PAccessToken}"}
+        )
+
+        if media_response.status_code != 200:
+            raise HTTPException(status_code=500, detail="Failed to download media")
+
+        # Determine the MIME type from the response headers
+        content_type = media_response.headers.get("Content-Type", "application/octet-stream")
+        extension = mimetypes.guess_extension(content_type) or ".bin"  # Default to binary if unknown
+
+        # Serve the media file as a response
+        return Response(
+            content=media_response.content,
+            media_type=content_type,
+            headers={
+                "Content-Disposition": f"attachment; filename=downloaded_media{extension}"
+            }
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    
+
+
+
+

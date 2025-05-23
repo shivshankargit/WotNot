@@ -37,4 +37,5 @@ class BroadcastAnalysis(database.Base):
     delivered=Column(Boolean,nullable=True)
     sent=Column(Boolean,nullable=True)
     replied=Column(Boolean,nullable=True)
+    error_reason=Column(String,nullable=True)
 

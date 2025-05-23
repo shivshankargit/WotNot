@@ -45,36 +45,44 @@ async def integrationlist(
 
     return integrationList
 
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+
+
+
+
+
 @router.delete("/integration/{id}")
-async def deleteIntegration(
-    id: str,
+async def delete_integration(
+    id: int,
     db: AsyncSession = Depends(database.get_db),
-    get_current_user: user.newuser = Depends(get_current_user)
+    get_current_user: user.newuser = Depends(get_current_user),
 ):
     # Find the WooIntegration object asynchronously
-    result = await db.execute(
+    woo_integration_result = await db.execute(
         select(Integration.WooIntegration).filter(
             (Integration.WooIntegration.integration_id == id) &
             (Integration.WooIntegration.user_id == get_current_user.id)
         )
     )
-    woo_integration = result.scalars().first()
+    woo_integration = woo_integration_result.scalars().first()
 
-    if not woo_integration:
-        raise HTTPException(status_code=404, detail="Woocommerce Integration not found")
-
-    # Delete WooIntegration object
-    await db.delete(woo_integration)
-    await db.commit()
+    if woo_integration:
+        # Delete WooIntegration object
+        await db.delete(woo_integration)
+        await db.commit()
+    else:
+        raise HTTPException(status_code=404, detail="WooCommerce Integration not found")
 
     # Find the Integration object asynchronously
-    result = await db.execute(
+    integration_result = await db.execute(
         select(Integration.Integration).filter(
             (Integration.Integration.id == id) &
             (Integration.Integration.user_id == get_current_user.id)
         )
     )
-    integration = result.scalars().first()
+    integration = integration_result.scalars().first()
 
     if not integration:
         raise HTTPException(status_code=404, detail="Integration not found")
@@ -84,4 +92,5 @@ async def deleteIntegration(
     await db.commit()
 
     return {"detail": f"Successfully deleted Integration with id: {id}"}
+
 

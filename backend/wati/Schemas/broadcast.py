@@ -11,6 +11,7 @@ class input(BaseModel):
     name:str
     recipients: List[Contact]
     template:str
+    template_data:str
     status:str
     scheduled_time:str
     type:str
@@ -21,6 +22,7 @@ class input(BaseModel):
 class input_broadcast(BaseModel):
     recipients: List[Contact]
     template:str
+    template_data:str
     status:str
     name:str
     type:str
@@ -52,7 +54,8 @@ class BroadcastListUpdate(BaseModel):
 #     sent:bool
 
     
-
+class ExampleModel(BaseModel):
+    header_handle: List[str]
 
 class Button(BaseModel):
     type: str = Field(..., description="The type of the button, e.g., 'URL' or 'QUICK_REPLY'")
@@ -62,6 +65,7 @@ class Component(BaseModel):
     type: str
     format: Optional[str] = None  # Allowed only for certain component types
     text: Optional[str] = None
+    example: ExampleModel = None
     buttons: Optional[List[Button]] = None  # Optional list of Button objects
     @classmethod
     def validate_component(cls, component: dict):

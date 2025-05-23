@@ -48,11 +48,6 @@
           />
         </div>
 
-        <div class="mt-4">
-          <button type="submit" class="w-full px-4 py-2 text-white bg-teal-600 hover:bg-teal-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
-            Save
-          </button>
-        </div>
       </form>
     </div>
   </div>
@@ -74,6 +69,8 @@ export default {
   },
   data() {
     return {
+      apiUrl: process.env.VUE_APP_API_URL,
+      
       localUser: { ...this.user },
       isEmailReadonly: true,
       isNameReadonly: true
@@ -107,7 +104,7 @@ export default {
     },
     async fetchUserDetails() {
       try {
-        const response = await fetch('http://localhost:8000/user', {
+        const response = await fetch(`${this.apiUrl}/user`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -130,7 +127,7 @@ export default {
     },
     async saveProfile() {
       try {
-        const response = await fetch('http://localhost:8000/user', {
+        const response = await fetch(`${this.apiUrl}/user`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',

@@ -1,5 +1,5 @@
 <template>
-  <div class="content-section md:ml-64">
+  <div class="content-section m-8 md:ml-72">
     <!-- Section Header -->
     <div class="flex flex-col md:flex-row justify-between mb-4 border-b pb-5">
       <div>
@@ -67,7 +67,10 @@ export default {
   name: 'BroadCast3',
   data() {
     return {
+
+      apiUrl: process.env.VUE_APP_API_URL,
       broadcasts: [],
+
 
     }
 
@@ -85,7 +88,7 @@ export default {
     async fetchScheduledBroadcastList() {
       const token = localStorage.getItem('token');
       try {
-        const response = await fetch('http://localhost:8000/scheduled-broadcast/', {
+        const response = await fetch(`${this.apiUrl}/scheduled-broadcast/`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -118,7 +121,7 @@ export default {
       if (!confirmDelete) return;
       try {
 
-        const response = await fetch(`http://localhost:8000/broadcasts-delete/${broadcast_id}`, {
+        const response = await fetch(`${this.apiUrl}/broadcasts-delete/${broadcast_id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`,
