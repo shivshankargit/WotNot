@@ -141,7 +141,8 @@
 
           <input type="file" id="file-upload" @change="FileUpload" class="file-input" />
 
-          <button id="send-button" @click="sendChatMessage()" v-if="!replyMessage">Send</button>
+          <button id="send-button" class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
+          @click="sendChatMessage()" v-if="!replyMessage">Send</button>
           <button id="send-button" @click="sendChatMessageReply()" v-if="replyMessage">Reply</button>
 
 
@@ -269,6 +270,8 @@ export default {
     },
 
     processMessageContent(content) {
+
+    console.log(content)
       const templatePrefix = "#template_message# ";
 
       // Check if it's a template message

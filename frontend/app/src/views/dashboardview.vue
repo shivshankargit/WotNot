@@ -12,8 +12,8 @@
 
         <div class="logo"> WotNot</div>
         <div class="nav-item" v-for="section in navItems" :key="section.name" @click="navigate(section.path)"
-          :class="{ active: isActive(section.path)}">
-          <i :class="section.icon"></i>{{ section.label }}        
+          :class="{ active: isActive(section.path) }">
+          <i :class="section.icon"></i>{{ section.label }}
         </div>
       </div>
 
@@ -30,20 +30,36 @@
 
         <div class="flex" v-if="user">
 
-          <p class="text-green-700"> {{ user.email }}</p>
+          <p class="text-green-700 mr-2"> {{ user.email }}</p>
         </div>
         <div v-else>
-          <p class="text-gray-600">Session Expired</p>
+          <p class="text-gray-600 mr-2">Session Expired</p>
         </div>
 
 
         <div class="profile-dropdown" @click="toggleDropdown" ref="profileDropdown">
           <!-- <img src="../assets/—Pngtree—avatar icon profile icon member_5247852.png" alt="Profile"
             class="profile-icon" /> -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
-              <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
-              <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
-            </svg>
+
+          <div class="profile-icon">
+
+
+            <div v-if="profile.profile_picture_url">
+              <img :src="profile.profile_picture_url" alt="">
+            </div>
+
+            <div v-else>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-person-circle" viewBox="0 0 16 16">
+                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+                <path fill-rule="evenodd"
+                  d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
+              </svg>
+            </div>
+
+          </div>
+
+
 
           <div v-if="dropdownOpen" class="dropdown-menu" ref="dropdownMenu">
             <ul>
@@ -55,14 +71,14 @@
           </div>
         </div>
 
-        
+
       </div>
 
 
     </div>
 
     <!-- Wallet Modal Pop-up -->
-    <div v-if="walletModalOpen" class="modal-overlay" >
+    <div v-if="walletModalOpen" class="modal-overlay">
       <div class="modal-content" @click.stop>
         <div class="modal-header">
           <h2>Wallet</h2>
@@ -86,17 +102,17 @@
         :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }"
         v-if="currentSection === 'broadcast'">
         <a href="#" @click.prevent="navigate('/broadcast/broadcast2')"
-          :class="{ 'text-green-900 font-semibold': isActive('/broadcast/broadcast2'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/broadcast/broadcast2')}"
+          :class="{ 'text-green-900 font-semibold': isActive('/broadcast/broadcast2'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/broadcast/broadcast2') }"
           class="block p-3 text-gray-600 rounded-lg ">
           <i class="bi bi-broadcast mr-2"></i>Broadcast Messages
         </a>
         <a href="#" @click.prevent="navigate('/broadcast/broadcast1')"
-          :class="{ 'text-green-900 font-semibold': isActive('/broadcast/broadcast1') ,'hover:bg-gray-200 hover:font-semibold': !isActive('/broadcast/broadcast1') }"
+          :class="{ 'text-green-900 font-semibold': isActive('/broadcast/broadcast1'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/broadcast/broadcast1') }"
           class="block p-3 text-gray-600 rounded-lg ">
           <i class="bi bi-chat-right-text-fill mr-2"></i>Manage Templates
         </a>
         <a href="#" @click.prevent="navigate('/broadcast/broadcast3')"
-          :class="{ 'text-green-900 font-semibold': isActive('/broadcast/broadcast3'),'hover:bg-gray-200 hover:font-semibold': !isActive('/broadcast/broadcast3') }"
+          :class="{ 'text-green-900 font-semibold': isActive('/broadcast/broadcast3'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/broadcast/broadcast3') }"
           class="block p-3 text-gray-600 rounded-lg ">
           <i class="bi bi-calendar2-range-fill mr-2"></i>Scheduled Broadcasts
         </a>
@@ -107,12 +123,12 @@
         class="fixed top-12 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4  overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out"
         :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }" v-if="currentSection === 'Contacts'">
         <a href="#" @click.prevent="navigate('/contacts/contacts1')"
-          :class="{ 'text-green-900 font-semibold': isActive('/contacts/contacts1'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/contacts/contacts1')  }"
+          :class="{ 'text-green-900 font-semibold': isActive('/contacts/contacts1'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/contacts/contacts1') }"
           class="block p-3 text-gray-600 rounded-lg ">
           <i class="bi bi-journal-bookmark-fill mr-2 "></i>Manage Contacts
         </a>
         <a href="#" @click.prevent="navigate('/contacts/contacts2')"
-          :class="{ 'text-green-900 font-semibold': isActive('/contacts/contacts2'),'hover:bg-gray-200 hover:font-semibold': !isActive('/contacts/contacts2')  }"
+          :class="{ 'text-green-900 font-semibold': isActive('/contacts/contacts2'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/contacts/contacts2') }"
           class="block p-3 text-gray-600 rounded-lg ">
           <i class="bi bi-tags-fill mr-2"></i>Manage Tags
         </a>
@@ -121,33 +137,56 @@
       <!-- Integration Section Sidebar -->
       <div
         class="fixed top-12 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4  overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out"
-        :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }" v-if="currentSection === 'Integration'">
+        :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }"
+        v-if="currentSection === 'Integration'">
         <a href="#" @click.prevent="navigate('/integration/integration1')"
-          :class="{ 'text-green-900 font-semibold': isActive('/integration/integration1') ,'hover:bg-gray-200 hover:font-semibold': !isActive('/integration/integration1') }"
+          :class="{ 'text-green-900 font-semibold': isActive('/integration/integration1'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/integration/integration1') }"
           class="block p-3 text-gray-600 rounded-lg  "><i class="bi bi-link-45deg"></i>
           Woocommerce
         </a>
       </div>
 
+      <!-- Analytics Section Sidebar -->
+      <div
+        class="fixed top-12 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4  overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out"
+        :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }"
+        v-if="currentSection === 'Analytics'">
+        <a href="#" @click.prevent="navigate('/analytics/cost')"
+          :class="{ 'text-green-900 font-semibold': isActive('/analytics/cost'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/analytics/cost') }"
+          class="block p-3 text-gray-600 rounded-lg  "><i class="bi bi-currency-dollar"></i>
+          Cost
+        </a>
+
+        <a href="#" @click.prevent="navigate('/analytics/conversations')"
+          :class="{ 'text-green-900 font-semibold': isActive('/analytics/conversations'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/analytics/conversations') }"
+          class="block p-3 text-gray-600 rounded-lg  "><i class="bi bi-link-45deg"></i>
+          Conversations
+        </a>
+      </div>
+
+      <!-- AI agent Sidebar -->
       <div
       class="fixed top-12 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4  overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out"
-      :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }" v-if="currentSection === 'Analytics'">
-      <a href="#" @click.prevent="navigate('/analytics/cost')"
-        :class="{ 'text-green-900 font-semibold': isActive('/analytics/cost') ,'hover:bg-gray-200 hover:font-semibold': !isActive('/analytics/cost') }"
+      :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }"
+      v-if="currentSection === 'AIagent'">
+      <a href="#" @click.prevent="navigate('/agent')"
+        :class="{ 'text-green-900 font-semibold': isActive('/agent'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/agent') }"
         class="block p-3 text-gray-600 rounded-lg  "><i class="bi bi-currency-dollar"></i>
-        Cost
+        AI Agent
       </a>
 
-      <a href="#" @click.prevent="navigate('/analytics/conversations')"
-      :class="{ 'text-green-900 font-semibold': isActive('/analytics/conversations') ,'hover:bg-gray-200 hover:font-semibold': !isActive('/analytics/conversations') }"
-      class="block p-3 text-gray-600 rounded-lg  "><i class="bi bi-link-45deg"></i>
-      Conversations
-    </a>
+      <!-- <a href="#" @click.prevent="navigate('/analytics/conversations')"
+        :class="{ 'text-green-900 font-semibold': isActive('/analytics/conversations'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/analytics/conversations') }"
+        class="block p-3 text-gray-600 rounded-lg  "><i class="bi bi-link-45deg"></i>
+        Conversations
+      </a> -->
     </div>
-  <!--    <div v-if="currentSection === 'Chatbot'" class="flex-1 mt-16 p-8 bg-white overflow-y-auto h-[calc(100vh-65px)]">
+
+
+      <!--    <div v-if="currentSection === 'Chatbot'" class="flex-1 mt-16 p-8 bg-white overflow-y-auto h-[calc(100vh-65px)]">
   <router-view></router-view>
 </div>-->
-<!--<ActiveChatsSidebar v-if="currentSection === 'Chatbot'" class="fixed top-12 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4 overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out" :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }" />-->
+      <!--<ActiveChatsSidebar v-if="currentSection === 'Chatbot'" class="fixed top-12 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4 overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out" :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }" />-->
 
 
 
@@ -168,6 +207,7 @@
 /* global FB */
 import { useRouter, useRoute } from 'vue-router';
 import ProfilePopup from './profile.vue';
+import axios from "axios";
 
 export default {
   name: 'DashboardView',
@@ -180,7 +220,7 @@ export default {
       apiUrl: process.env.VUE_APP_API_URL,
 
       localUser: {
-        whatsapp_business_id: '', 
+        whatsapp_business_id: '',
         // currentBalance: 0 ,
       },
       navItems: [
@@ -188,22 +228,35 @@ export default {
         { name: 'Contacts', label: 'Contacts', icon: 'bi bi-person-video2', path: '/contacts/contacts1' },
         { name: 'Integration', label: 'Integration', icon: 'bi bi-plugin', path: '/integration/integration1' },
         { name: 'chatbot', label: 'Chatbot', path: '/chatbot/chatbotview', icon: 'bi bi-robot' },
-        { name: 'Analytics', label: 'Analytics', path: '/analytics/cost', icon: 'bi bi-graph-up' }
+        { name: 'Analytics', label: 'Analytics', path: '/analytics/cost', icon: 'bi bi-graph-up' },
+        { name: 'AI Agent', label: 'AIagent', path: '/agent', icon: 'bi bi-robot' }
       ],
       user: null,
       dropdownOpen: false,
       showProfilePopup: false,
       isMenuOpen: false,
-      walletModalOpen: false ,
+      walletModalOpen: false,
       currentBalance: 0,
 
+
+      profile: {
+        about: "",
+        address: "",
+        email: "",
+        description: "",
+        websites: "",
+        vertical: "OTHER",
+        messaging_product: "whatsapp",
+        profile_picture_url: "" // Default value
+      },
+      originalProfile: {},
 
     }
   },
   setup() {
     const router = useRouter();
     const route = useRoute();
-    
+
     const isActive = (path) => route.path === path;
     const navigate = (path) => {
       router.push(path);
@@ -227,7 +280,8 @@ export default {
 
 
   async mounted() {
-    await this.fetchUserDetails() ;
+    await this.fetchProfile();
+    await this.fetchUserDetails();
     await this.created();
     document.addEventListener('click', this.handleOutsideClick);
 
@@ -269,8 +323,8 @@ export default {
     );
 
 
-       // Initialize the Facebook SDK
-       window.fbAsyncInit = () => {
+    // Initialize the Facebook SDK
+    window.fbAsyncInit = () => {
       FB.init({
         appId: "2621821927998797", // Replace with your App ID
         autoLogAppEvents: true,
@@ -363,53 +417,83 @@ export default {
 
         const data = await response.json();
         this.localUser.whatsapp_business_id = data['Whatsapp_Business_Id'];
-        
+
       } catch (error) {
         console.error('Error fetching user details:', error);
       }
     },
 
     async fetchWalletDetails(accountId) {
-    try {
-        
+      try {
+
         const response = await fetch(`${this.apiUrl}/conversations-cost/${accountId}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
         });
-        
+
         // Check if the response is ok (status code 200-299)
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        
+
         // Parse the JSON data from the response
         const costData = await response.json();
-        
+
         // Set the current balance using the response data
         this.currentBalance = costData;
-        this.currentBalance = this.currentBalance.toFixed(3) ; // Assuming the response directly gives the balance
-        
-        
-    } catch (error) {
+        this.currentBalance = this.currentBalance.toFixed(3); // Assuming the response directly gives the balance
+
+
+      } catch (error) {
         console.error('Error fetching wallet details:', error);
         // Handle errors accordingly, e.g., show an error message to the user
         return null; // Or any default value or error handling logic
-    }
-},
+      }
+    },
+
+    async fetchProfile() {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`${this.apiUrl}/get-business-profile/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.status >= 200 && response.status < 300 && response.data.data.length) {
+          const data = response.data.data[0]; // Access the first object in the "data" array
+          this.profile = {
+            about: data.about || "",
+            address: data.address || "",
+            email: data.email || "",
+            websites: (data.websites && data.websites.join(", ")) || "",
+            vertical: data.vertical || "OTHER",
+            messaging_product: data.messaging_product || "whatsapp",
+            description: data.description || "",
+            profile_picture_url: data.profile_picture_url || "",
+          };
+          this.originalProfile = { ...this.profile }; // Save original profile for reset
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error.response?.data?.detail || error.message);
+      } finally {
+        this.loading = false;
+      }
+    },
 
     toggleDropdown() {
       this.dropdownOpen = !this.dropdownOpen;
     },
     async toggleWalletModal() {
       this.walletModalOpen = !this.walletModalOpen;
-      const walletOpen= this.walletModalOpen
+      const walletOpen = this.walletModalOpen
 
-      if(walletOpen){
+      if (walletOpen) {
         await this.fetchWalletDetails(this.localUser.whatsapp_business_id)
       }
-      
+
 
     },
     topUpBalance() {
@@ -430,15 +514,15 @@ export default {
     },
 
     handleOutsideClick(event) {
-    // Check if the click is outside the dropdown element
-    const dropdownMenu = this.$refs.dropdownMenu; // Use $refs to access the dropdown menu element
-    const profileDropdown = this.$refs.profileDropdown; // Use $refs to access the profile dropdown element
+      // Check if the click is outside the dropdown element
+      const dropdownMenu = this.$refs.dropdownMenu; // Use $refs to access the dropdown menu element
+      const profileDropdown = this.$refs.profileDropdown; // Use $refs to access the profile dropdown element
 
-    if (dropdownMenu && !dropdownMenu.contains(event.target) && profileDropdown && !profileDropdown.contains(event.target)) {
-      this.dropdownOpen = false; // Close dropdown
-    }
-  },
- 
+      if (dropdownMenu && !dropdownMenu.contains(event.target) && profileDropdown && !profileDropdown.contains(event.target)) {
+        this.dropdownOpen = false; // Close dropdown
+      }
+    },
+
   }
 }
 
@@ -447,7 +531,9 @@ function getSectionFromRoute(path) {
   if (path.startsWith('/contacts')) return 'Contacts';
   if (path.startsWith('/integration')) return 'Integration';
   if (path.startsWith('/chatbot')) return 'Chatbot';
-  if (path.startsWith('/analytics')) return 'Analytics'; // Add this line
+  if (path.startsWith('/analytics')) return 'Analytics';
+  if (path.startsWith('/agent')) return 'AIagent'; 
+  // Add this line
   return 'broadcast';
 }
 </script>
@@ -460,7 +546,6 @@ function getSectionFromRoute(path) {
 
 
 <style>
-
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -489,6 +574,7 @@ body {
 
 .nav-right {
   align-items: center;
+  margin-right: 15px;
 }
 
 .logo {
@@ -507,7 +593,7 @@ body {
 }
 
 .nav-right svg {
-  
+
   width: 36px;
   height: 36px;
   padding: 0;
@@ -515,7 +601,8 @@ body {
   color: #525252;
   transition: all 0.3s ease;
 }
-.nav-right svg:hover{
+
+.nav-right svg:hover {
   border-radius: 100%;
   padding: 0;
   width: 36px;
@@ -527,7 +614,7 @@ body {
 .nav-item {
   padding: 15px;
   cursor: pointer;
-  color:#525252;
+  color: #525252;
   text-align: center;
   margin: 8px 0;
   border-right: 1px solid #e9ecef;
@@ -544,12 +631,23 @@ body {
 }
 
 .profile-icon {
-  width: 60px;
-  height: 60px;
-  cursor: pointer;
-  margin-right: 5px;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%; /* Makes it circular */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* Ensures the image does not overflow */
+  background-color: #ddd; /* Optional: background for SVG */
+  border: 1px solid grey; /* Adds a black border */
 }
 
+.profile-icon img {
+  width: 100%; /* Ensures the image fills the container */
+  height: 100%;
+  border-radius: 50%; /* Ensures the image remains circular */
+  object-fit: cover; /* Ensures the image fills the circle without distortion */
+}
 .profile-dropdown {
   position: relative;
 }
@@ -644,9 +742,11 @@ button {
 button:hover {
   background-color: #1ebd5b;
 }
-.wallet-section{
-  margin-right:9px;
+
+.wallet-section {
+  margin-right: 9px;
 }
+
 .wallet-btn {
   background: linear-gradient(45deg, #34eb83, #2ebf91);
   color: white;
@@ -746,6 +846,7 @@ button:hover {
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -755,22 +856,22 @@ button:hover {
 
 .emoji-picker-container {
   max-width: 300px;
-  margin:0 auto;
+  margin: 0 auto;
   text-align: center;
   font-family: Arial, sans-serif;
 }
 
 .emoji-button {
-  background-color:transparent;
+  background-color: transparent;
   border: none;
   font-size: 20px;
   cursor: pointer;
-  margin:3px;
+  margin: 3px;
 }
 
 .emoji-button:hover {
-background-color: transparent;
-color: #25d366;
+  background-color: transparent;
+  color: #25d366;
 }
 
 /* Emoji Picker Styles */
@@ -782,15 +883,18 @@ color: #25d366;
   border-radius: 8px;
   background-color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 270px; /* Customize width */
-  max-height: 240px; /* Customize height */
+  width: 270px;
+  /* Customize width */
+  max-height: 240px;
+  /* Customize height */
   overflow: auto;
-  padding: 10px; /* Add padding for better layout */
+  padding: 10px;
+  /* Add padding for better layout */
 }
 
 /* Adjust emoji size */
-.v3-emojis button img{
-  height:35px;
-  margin:1px;
+.v3-emojis button img {
+  height: 35px;
+  margin: 1px;
 }
 </style>

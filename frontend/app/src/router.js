@@ -6,7 +6,7 @@ import ContActs1 from './components/contacts/contacts1.vue';
 import ContActs2 from './components/contacts/contacts2.vue';                
 import AppIntegration from './components/integration/integration.vue';
 import LoginPage from './components/login/login.vue';
-import SignupPage from './components/signup/signup.vue';
+import AIagent from './components/AIagent/AIagent.vue';
 import BasicSignupPage from './components/signup/basic_signup.vue';
 import DashboardView from './views/dashboardview.vue';
 import Profile from './views/profile.vue';
@@ -17,8 +17,8 @@ import Analytics from './components/analytics/Analytics.vue';
 const routes = [
   // Public routes
   { path: '/', component: LoginPage },
-  { path: '/signup', component: SignupPage },
-  { path: '/signup2', component: BasicSignupPage },
+  { path: '/signup', component: BasicSignupPage },
+  
   // { path: '/', component: PublicView },
 
   // Protected routes within the dashboard
@@ -27,6 +27,7 @@ const routes = [
     component: DashboardView,
     meta: { requiresAuth: true },
     children: [
+      { path: '/agent', component: AIagent, name: 'AIagent' },
       { path: '/analytics/cost', component: CostAnalytics, name: 'Costanalytics' },
       { path: '/analytics/conversations', component: Analytics, name: 'DataAnalytics' },
       { path: '/broadcast/broadcast1', component: BroadCast1, name: 'Broadcast1' },

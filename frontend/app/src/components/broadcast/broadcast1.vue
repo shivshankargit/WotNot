@@ -6,11 +6,18 @@
         <p class="text-sm md:text-base">Your content for scheduled broadcasts goes here.</p>
       </div>
 
-      <div class="bg-[#075e54] rounded-md shadow-lg mt-2 md:mt-0">
-        <button @click="showPopup = true"
+      <div >
+        <!-- <button @click="showPopup = true"
           class="text-[#f5f6fa] px-4 py-2 md:px-4 md:py-4 text-sm md:text-base w-full md:w-auto">
           Create New Template
-        </button>
+        </button> -->
+        <button class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
+        @click="showPopup = true">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+          </svg>
+          New Template
+      </button>
 
       </div>
     </div>
@@ -298,7 +305,7 @@
               <!-- Actions -->
               <div class="flex space-x-4">
                 <button @click.prevent="submitTemplate"
-                  class="px-4 py-2 bg-green-600 text-white rounded-md flex items-center justify-center"
+                  class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
                   :disabled="loading || isSubmitted">
                   <span v-if="loading"
                     class="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4 mr-2"></span>
@@ -534,7 +541,7 @@ export default {
     async fetchtemplateList() {
       const token = localStorage.getItem('token');
       try {
-        const response = await fetch(`${this.apiUrl}/template/`, {
+        const response = await fetch(`${this.apiUrl}/template`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -719,7 +726,7 @@ export default {
       }
 
       try {
-        const response = await axios.post(`${this.apiUrl}/create-template/`, payload, {
+        const response = await axios.post(`${this.apiUrl}/create-template`, payload, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -728,7 +735,8 @@ export default {
 
         if (response.status >= 200 && response.status < 300) {
           console.log('Template created successfully:', response.data);
-          
+          toast.success('Template created successfully');
+          this.isSubmitted=true;
           await this.fetchtemplateList();
           
         } else {
@@ -743,8 +751,7 @@ export default {
         console.error('Request failed:', error);
       }
       finally {
-        toast.success('Template created successfully');
-        this.isSubmitted=true;
+
         this.loading = false; // Hide loading indicator
       }
     },

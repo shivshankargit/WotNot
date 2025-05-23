@@ -176,7 +176,7 @@ export default {
     const checkAndSend = () => {
       if (this.sessionInfoResponse && this.sdkResponse) {
         // Send data to the backend
-        fetch(`${this.apiUrl}/subscribe_customer/`, {
+        fetch(`${this.apiUrl}/subscribe_customer`, {
           method: "POST",
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -285,7 +285,7 @@ export default {
           override_default_response_type: true,
           extras: {
             setup: {},
-            featureType: "only_waba_sharing",
+            featureType: "",
             sessionInfoVersion: "2",
           },
         }

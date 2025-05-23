@@ -7,11 +7,18 @@
         <p>Integrate Wotnot with Woocommerce</p>
       </div>
 
-      <div class="bg-[#075e54] rounded-md shadow-lg mt-2 md:mt-0">
-        <button @click="showPopup = true"
+      <div >
+        <!-- <button @click="showPopup = true"
           class="text-[#f5f6fa] px-4 py-2 md:px-4 md:py-4 text-sm md:text-base w-full md:w-auto">
           + Create Integration
-        </button>
+        </button> -->
+        <button class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
+        @click="showPopup = true">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Create Integration
+      </button>
       </div>
     </div>
 
@@ -126,7 +133,7 @@
 
             <label class="block text-gray-700 font-semibold mb-2">Select template<span
                 class="text-red-800">*</span></label>
-            <select v-model="selectedTemplate"
+            <select v-model="selectedTemplate" @change="onTemplateSelect"
               class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" required>
               <option v-for="template in templates" :key="template.id" :value="template">
                 {{ template.name }}
@@ -134,6 +141,13 @@
             </select>
 
             <div v-if="selectedTemplate !== null">
+
+              <div v-if="selectedTemplateHasImage">
+                <label for="" class="block text-sm font-semibold">Upload Media</label>
+                <input type="file" @change="onFileChange" class="mb-2 w-[60%] mr-1" required>
+              </div>
+              <div v-if="uploadedMedia">{{ this.mediaId }}</div>
+
               <label for="" class="block text-gray-400 font-semibold mb-2">Add Parameter (if any)<span
                   class="text-red-800"></span></label>
               <div v-for="(parameter, index) in parameters" :key="index" class="flex items-center space-x-2 mb-2">
@@ -194,13 +208,22 @@
 
             <label class="block text-gray-700 font-semibold mb-2">Select template<span
                 class="text-red-800">*</span></label>
-            <select v-model="selectedTemplate"
+            <select v-model="selectedTemplate" @change="onTemplateSelect"
               class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" required>
               <option value="" disabled>Select your template</option>
               <option v-for="template in templates" :key="template.id" :value="template">{{ template.name }}</option>
             </select>
 
+
+
             <div v-if="selectedTemplate !== null">
+
+              <div v-if="selectedTemplateHasImage">
+                <label for="" class="block text-sm font-semibold">Upload Media</label>
+                <input type="file" @change="onFileChange" class="mb-2 w-[60%] mr-1" required>
+              </div>
+              <div v-if="uploadedMedia">{{ this.mediaId }}</div>
+            
 
               <div v-for="(parameter, index) in parameters" :key="index" class="flex items-center space-x-2 mb-2">
 
@@ -318,7 +341,7 @@
           
           <button
           type="submit"
-          class="px-4 py-2 bg-green-600 text-white rounded-md flex items-center justify-center"
+          class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
           :disabled="PopupLoading || isSubmitted">
           <span v-if="PopupLoading"
             class="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4 mr-2"></span>
@@ -399,10 +422,11 @@ export default {
       templateParams: [],
       parameters: [],  // List of parameters for the template
       parameterOptions: [{ label: "Customer Name", key: "billing.first_name" },
-      { label: "Order ID", key: "id" },
-      { label: "Order Total", key: "total" },
-      { label: "Customer Phone", key: "billing.phone" },
-      { label: "Payment Method", key: "payment_method" },],
+      // { label: "Order ID", key: "id" },
+      // { label: "Order Total", key: "total" },
+      // { label: "Customer Phone", key: "billing.phone" },
+      // { label: "Payment Method", key: "payment_method" },
+    ],
 
       parameterFields: [{ selected: '' }],
       days: [
@@ -443,6 +467,9 @@ export default {
       // String to store comma-separated values
       products: [],
       integration_description: null,
+      selectedTemplateHasImage:false,
+      imageUrl:'',
+      media_id:'',
 
 
 
@@ -451,7 +478,7 @@ export default {
       error: null, // Error message if any
 
       isSubmitted: false,// Loader state
-      status: "connecting", // Status of the integration
+      status: "", // Status of the integration
 
       //oading
       loading: true,
@@ -499,9 +526,33 @@ export default {
 
   methods: {
 
+    onTemplateSelect() {
+      // Find the selected template
+      const selectedTemplate = this.templates.find(template => template.id === this.selectedTemplate.id);
+      console.log(this.previewData);
+
+      // Check if the selected template has a HEADER with IMAGE format
+      const headerComponent = selectedTemplate.components.find(
+        component => component.type === 'HEADER' && component.format === 'IMAGE'
+
+      );
+
+      if (headerComponent) {
+        // Show the image input field and pre-fill with the example image URL if available
+        this.selectedTemplateHasImage = true;
+        this.imageUrl = headerComponent.example?.header_handle?.[0] || ''; // Use the first example image if available
+      } else {
+        // Hide the image input field if no image is found in the template
+        this.selectedTemplateHasImage = false;
+        this.imageUrl = '';
+      }
+
+    },
+
+
     async disconnectWooCommerce() {
       try {
-        const response = await axios.delete(`${this.apiUrl}/disconnect-woocommerce/`,
+        const response = await axios.delete(`${this.apiUrl}/disconnect-woocommerce`,
           {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -515,7 +566,7 @@ export default {
           this.wooAPIkey = '';
           this.wooAPIsecret = '';
           this.Base_url = '';
-          this.ststus = 'disconnected';
+          this.status = 'disconnected';
           alert(response.data.message);
           // this.status="disconnected";
 
@@ -531,7 +582,7 @@ export default {
     async fetchProducts() {
       try {
         // Fetch product list from FastAPI
-        const response = await axios.get(`${this.apiUrl}/woo_products/`,
+        const response = await axios.get(`${this.apiUrl}/woo_products`,
           {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -557,7 +608,7 @@ export default {
         this.error = null;
 
         // Call the API to check the integration
-        const response = await fetch(`${this.apiUrl}/check-integration/`, {
+        const response = await fetch(`${this.apiUrl}/check-integration`, {
           method: "GET",
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -567,6 +618,7 @@ export default {
 
         if (!response.ok) {
           const errorData = await response.json();
+          this.status="disconnected"
           throw new Error(errorData.detail || "Failed to check integration.");
         }
 
@@ -590,7 +642,7 @@ export default {
 
     async testWooCommerceConnection() {
       try {
-        const response = await axios.post(`${this.apiUrl}/test-woocommerce/`, {
+        const response = await axios.post(`${this.apiUrl}/test-woocommerce`, {
           base_url: this.Base_url,
           consumer_key: this.wooAPIkey,
           consumer_secret: this.wooAPIsecret,
@@ -647,7 +699,7 @@ export default {
     async fetchTemplates() {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`${this.apiUrl}/template/`, {
+        const response = await fetch(`${this.apiUrl}/template`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -669,7 +721,7 @@ export default {
     async fetchapiKey() {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`${this.apiUrl}/webhooklink/`,
+        const response = await fetch(`${this.apiUrl}/webhooklink`,
           {
             method: 'GET',
             headers: {
@@ -697,9 +749,8 @@ export default {
         parameters: this.parameters,
         type: this.SelectedAction,
         product_id: this.productID,
-        description:this.integration_description
-
-
+        description:this.integration_description,
+        image_id:this.media_id
       };
 
       // Replace with your API endpoint
@@ -723,6 +774,7 @@ export default {
           this.fetchIntegrationList();
 
         } else {
+          this.PopupLoading = false;
           const errorData = await response.json();
           toast.error(`Error: ${errorData.detail}`);
         }
@@ -755,7 +807,8 @@ export default {
         product_id: this.productID,
         status: this.OrderStatus,
         base_url: this.Base_url,
-        description: this.integration_description
+        description: this.integration_description,
+        image_id:this.media_id
       };
       const toast = useToast();
 
@@ -827,13 +880,55 @@ export default {
       }
     },
 
+    onFileChange(event) {
+      this.file = event.target.files[0];
+      this.uploadMedia();
+    },
+
+
+    async uploadMedia() {
+      const token = localStorage.getItem('token');
+      this.mediafile = event.target.files[0];
+      const formData = new FormData();
+      formData.append('file', this.mediafile);
+
+      try {
+
+        const response = await fetch(`${this.apiUrl}/upload-media`, {
+          method: "POST",
+          headers: {
+
+            'Authorization': `Bearer ${token}`,
+            // 'Content-Type': 'multipart/form-data',
+
+          },
+          body: formData,
+        });
+
+        const media = await response.json()
+        this.media_id = media.whatsapp_media_id
+        console.log(this.media_id)
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        else {
+          this.uploadedMedia = true
+          alert("Media Uploaded Successfully")
+        }
+      } catch (error) {
+        console.error('Error uploading media:', error);
+      }
+    },
+
+
     async deleteIntegration(integration_id) {
       try {
 
         this.deleteLoading=true;
         const toast = useToast();
         const token = localStorage.getItem('token');
-        const confirmDelete = confirm("Are you sure you want to delete this contact?                           Note:Make sure to also delete the webhook from woocommece.")
+        const confirmDelete = confirm("Are you sure you want to delete this integration?                           Note:Make sure to also delete the webhook from woocommece.")
         if (!confirmDelete) return;
         const response = await fetch(`${this.apiUrl}/integration/${integration_id}`,
           {
@@ -885,7 +980,7 @@ export default {
     async fetchIntegrationList() {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`${this.apiUrl}/woo-integration-list/`, {
+        const response = await fetch(`${this.apiUrl}/woo-integration-list`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

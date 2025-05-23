@@ -88,7 +88,7 @@ export default {
     async fetchScheduledBroadcastList() {
       const token = localStorage.getItem('token');
       try {
-        const response = await fetch(`${this.apiUrl}/scheduled-broadcast/`, {
+        const response = await fetch(`${this.apiUrl}/scheduled-broadcast`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
