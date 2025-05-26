@@ -79,7 +79,7 @@
             <div :class="{ 'message': true, 'sent-message': message.direction == 'sent' }"
               @contextmenu.prevent="showContextMenu($event, message)">
 
-              <div>
+              <div style="width: 100%;max-width: 300px;">
                 <div v-if="message.context_message_id" class="replied-message-context mb-2 text-sm text-gray-600">
 
                   <div class="replied-message">
@@ -91,7 +91,7 @@
 
                 </div>
                 <!-- Message Content -->
-                <div style="white-space: pre-line;" v-html="processMessageContent(message.message_content)"></div>
+                <div style="white-space: pre-line; word-wrap: break-word; overflow-wrap: break-word; max-width: 100%" v-html="processMessageContent(message.message_content)"></div>
 
                 <div class="messageTime">
                   <p>{{ message.timestamp.split('T')[1].substring(0, 5) }}</p>
