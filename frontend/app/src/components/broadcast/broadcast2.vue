@@ -250,6 +250,7 @@
             @click="fetchBroadcastList(this.filterStatus, 1)">
             <i class="bi bi-arrow-clockwise"></i> Refresh
           </button>
+          <p v-if="loading" class="ml-2 w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin inline-block"></p>
         </div>
 
       </div>
@@ -269,7 +270,7 @@
 
       </div>
     </div>
-
+    
     <div class="overflow-x-auto max-h-[51vh] custom-scrollbar">
       <table class="w-full rounded-lg border-collapse">
         <thead>
@@ -514,6 +515,7 @@ export default {
       // Tmeplate preview
       previewData: null,
 
+      loading:false,
       currentPage: 1,
       tooltipVisible: null, // Index of the row with a visible tooltip
       tooltipStyles: {},
@@ -705,6 +707,7 @@ export default {
 
     async fetchtemplateList() {
       const token = localStorage.getItem('token');
+      
       try {
         const response = await fetch(`${this.apiUrl}/template`, {
           method: 'GET',
@@ -784,11 +787,11 @@ export default {
             'Content-Type': 'application/json',
           },
         });
-
+      
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-
+        
         const contactList = await response.json();
         this.contacts = contactList.map(contact => ({
           id: contact.id,
@@ -813,6 +816,8 @@ export default {
 
       try {
         // Fetch data from the backend
+        this.loading=true;
+        // await new Promise(resolve => setTimeout(resolve, 2000));
         const response = await fetch(url, {
           method: 'GET',
           headers: {
@@ -820,7 +825,7 @@ export default {
             'Content-Type': 'application/json',
           },
         });
-
+        
         // Check if the response is OK
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -828,7 +833,7 @@ export default {
 
         // Parse JSON response
         const broadcastList = await response.json();
-
+        this.loading=false;
         // Process and optionally filter broadcasts
         this.broadcasts = broadcastList
           .map((broadcast) => ({
