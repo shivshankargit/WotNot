@@ -3,57 +3,58 @@
     <!-- Section Header -->
     <div class="flex flex-col md:flex-row justify-between mb-4 border-b pb-5">
       <div>
-        <h2 class="text-xl md:text-2xl font-bold">Scheduled Broadcasts</h2>
+        <h2 class="text-xl md:text-2xl font-bold text-green-800">Scheduled Broadcasts</h2>
         <p class="text-sm md:text-base">Your content for scheduled broadcasts goes here.</p>
       </div>
     </div>
 
     <!-- Broadcast List Table -->
-    <h3 class="text-xl md:text-2xs mb-4 text-gray-600"><b>Scheduled Broadcast List</b></h3>
-      <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
-        <table class="w-full border-collapse">
-          <thead>
-            <tr class="bg-[#ffffff] text-center">
-              <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">ID</th>
-              <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0">Scheduled Time</th>
-              <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0">Broadcast Name</th>
-              <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0">Template</th>
-              <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0">Contacts</th>
-              <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0">Status</th>
-              <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 z-10">Action</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white">
-            <tr v-for="broadcast in broadcasts" :key="broadcast.id">
-              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.id }}</td>
-              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.name }}</td>
-              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.scheduled_time }}</td>
-              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.template }}</td>
-              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.contacts.length }}</td>
-              <td class="p-2 md:p-4 text-center">
-                <div :class="{
-                  'bg-green-100 text-green-500 ': broadcast.status === 'Successful',
-                  'bg-blue-100 text-blue-500 ': broadcast.status === 'Scheduled',
-                  'bg-red-100 text-red-500 ': broadcast.status === 'Cancelled',
-                  'bg-yellow-100 text-yellow-500 ': broadcast.status === 'Partially Successful',
-                  'bg-yellow-100 text-yellow-600 ': broadcast.status === 'pending...',
-                  'border-[#ddd]': true
-                }" class="text-[80%] lg:text-[100%] rounded-lg">
-                  {{ broadcast.status }}
-                </div>
-              </td>
-              <td class="border-[#ddd] p-2 md:p-4 text-center">
-                <button @click="DeleteScheduledBroadcast(broadcast.id)"
-                  class="hover:bg-white rounded-full p-2 transition">
-                  <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="hover"
-                  colors="primary:#ff5757,secondary:#000000"  style="width:32px;height:32px">
-                  </lord-icon>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <h3 class="text-xl md:text-2xs mb-4 text-green-800"><b>Scheduled Broadcast List</b></h3>
+      
+    <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
+      <table class="w-full border border-gray-300 rounded-lg text-sm md:text-base bg-white">
+        <thead>
+          <tr class="bg-gray-100 text-center text-gray-700 font-semibold">
+            <th class="p-3 md:p-4 text-center border border-gray-300 sticky top-0 z-10 bg-gray-100">ID</th>
+            <th class="p-3 md:p-4 text-center border border-gray-300 sticky top-0 z-10 bg-gray-100">Scheduled Time</th>
+            <th class="p-3 md:p-4 text-center border border-gray-300 sticky top-0 z-10 bg-gray-100">Broadcast Name</th>
+            <th class="p-3 md:p-4 text-center border border-gray-300 sticky top-0 z-10 bg-gray-100">Template</th>
+            <th class="p-3 md:p-4 text-center border border-gray-300 sticky top-0 z-10 bg-gray-100">Contacts</th>
+            <th class="p-3 md:p-4 text-center border border-gray-300 sticky top-0 z-10 bg-gray-100">Status</th>
+            <th class="p-3 md:p-4 text-center border border-gray-300 sticky top-0 z-10 bg-gray-100">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="broadcast in broadcasts" :key="broadcast.id" class="hover:bg-gray-50">
+            <td class="p-3 md:p-4 text-center border border-gray-200">{{ broadcast.id }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">{{ broadcast.scheduled_time }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">{{ broadcast.name }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">{{ broadcast.template }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">{{ broadcast.contacts.length }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">
+              <div :class="{
+                'bg-green-100 text-green-600 font-semibold px-2 py-1 rounded': broadcast.status === 'Successful',
+                'bg-blue-100 text-blue-600 font-semibold px-2 py-1 rounded': broadcast.status === 'Scheduled',
+                'bg-red-100 text-red-500 font-semibold px-2 py-1 rounded': broadcast.status === 'Cancelled',
+                'bg-yellow-100 text-yellow-500 font-semibold px-2 py-1 rounded': broadcast.status === 'Partially Successful',
+                'bg-yellow-100 text-yellow-600 font-semibold px-2 py-1 rounded': broadcast.status === 'pending...'
+              }">
+                {{ broadcast.status }}
+              </div>
+            </td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">
+              <button @click="DeleteScheduledBroadcast(broadcast.id)" class="hover:bg-white rounded-full p-2 transition">
+                <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="hover"
+                  colors="primary:#ff5757,secondary:#000000" style="width:32px;height:32px">
+                </lord-icon>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
   </div>
 </template>
 
