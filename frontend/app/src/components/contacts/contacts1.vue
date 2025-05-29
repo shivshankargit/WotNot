@@ -14,7 +14,7 @@
             + Add Contact
           </button> -->
 
-          <button class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
+          <button class="bg-green-700 hover:bg-green-800 text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center "
           @click="showPopup = true">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
@@ -121,52 +121,53 @@
       </PopUp1>
 
     </div>
-    <PopUpSmall v-if="showPopup" @close="closePopup">
-      <form @submit.prevent="submitForm" id="contactForm" class="p-6 w-[400px]">
+    <PopUpSmall class="bg-white" v-if="showPopup" @close="closePopup">
+      <form @submit.prevent="submitForm" id="contactForm" class="p-6 w-[400px] bg-white">
         <h2 class="text-xl font-semibold mb-4">{{ isEditing ? 'Edit Contact' : 'Add Contact' }}</h2>
-        <hr class="mb-4" />
 
-        <div class="mb-4">
-          <label for="name" class="block text-sm font-medium">Name<span class="text-red-800">*</span></label>
-          <input type="text" v-model="contact.name" id="name" placeholder="Name" required
-            class="border border-gray-300 rounded px-3 py-2 w-full">
-        </div>
-
-        <div class="mb-4">
-          <label for="phone" class="block text-sm font-medium">Phone Number<span class="text-red-800">*</span></label>
-          <div class="flex">
-            <select v-model="contact.countryCode" class="border border-gray-300 rounded-l px-3 py-2 w-20 mr-2">
-              <option value="1">+1</option>
-              <option value="44">+44</option>
-              <option value="91">+91</option>
-            </select>
-            <input type="text" v-model="contact.phone" id="phone" placeholder="Phone Number" required
-              class="border border-gray-300 rounded-r px-3 py-2 w-full">
-          </div>
-        </div>
-        <label for="email" class="block text-sm font-medium">Email<span class="text-red-800">*</span></label>
-        <input type="email" v-model="contact.email" id="email" placeholder="Email" required
-          class="border border-gray-300 rounded px-3 py-2 mb-2 w-full">
-
-        <div class="mb-4">
-          <label class="block text-sm font-medium">Tags</label>
-          <div class="custom-scrollbar tags-container-container">
-
-            <div class="tags-container">
-              <div class="tag-input" v-for="(tag, index) in contact.tags" :key="index"
-                style="display: flex; align-items: center;">
-                <input type="text" v-model="tag.key" placeholder="Key" required
-                  class="border border-gray-300 rounded px-3 py-2 mb-2 w-full" style="width: 60%;">
-                <input type="text" v-model="tag.value" placeholder="Value" required
-                  class="border border-gray-300 rounded px-3 py-2 mb-2 w-full" style="width: 60%; margin-left: 10px;">
-                <button type="button" @click="removeTag(index)" class="hover:bg-gray-100 rounded-full p-2 transition">
-                  <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="hover"
-                    colors="primary:#ff5757,secondary:#000000" style="width:32px;height:32px"></lord-icon>
-                </button>
+            <div class="p-4 bg-[#f5f6fa]">
+                <div class="mb-4">
+                <label for="name" class="block text-sm font-medium">Name<span class="text-red-800">*</span></label>
+                <input type="text" v-model="contact.name" id="name" placeholder="Name" required
+                  class="border border-gray-300 rounded px-3 py-2 w-full">
               </div>
+
+              <div class="mb-4">
+                <label for="phone" class="block text-sm font-medium">Phone Number<span class="text-red-800">*</span></label>
+                <div class="flex">
+                  <select v-model="contact.countryCode" class="border border-gray-300 rounded-l px-3 py-2 w-20 mr-2">
+                    <option value="1">+1</option>
+                    <option value="44">+44</option>
+                    <option value="91">+91</option>
+                  </select>
+                  <input type="text" v-model="contact.phone" id="phone" placeholder="Phone Number" required
+                    class="border border-gray-300 rounded-r px-3 py-2 w-full">
+                </div>
+              </div>
+              <label for="email" class="block text-sm font-medium">Email<span class="text-red-800">*</span></label>
+              <input type="email" v-model="contact.email" id="email" placeholder="Email" required
+                class="border border-gray-300 rounded px-3 py-2 mb-2 w-full">
+
+              <div class="mb-4">
+                <label class="block text-sm font-medium">Tags</label>
+                <div class="custom-scrollbar tags-container-container">
+
+                  <div class="tags-container">
+                    <div class="tag-input" v-for="(tag, index) in contact.tags" :key="index"
+                      style="display: flex; align-items: center;">
+                      <input type="text" v-model="tag.key" placeholder="Key" required
+                        class="border border-gray-300 rounded px-3 py-2 mb-2 w-full" style="width: 60%;">
+                      <input type="text" v-model="tag.value" placeholder="Value" required
+                        class="border border-gray-300 rounded px-3 py-2 mb-2 w-full" style="width: 60%; margin-left: 10px;">
+                      <button type="button" @click="removeTag(index)" class="hover:bg-gray-100 rounded-full p-2 transition">
+                        <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="hover"
+                          colors="primary:#ff5757,secondary:#000000" style="width:32px;height:32px"></lord-icon>
+                      </button>
+                    </div>
+                  </div>
             </div>
             <button type="button" @click="addTag"
-              class="my-2 h-auto w-auto p-1 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200">Add
+              class="my-2 h-auto w-auto p-2 bg-green-700 text-white hover:bg-green-800">Add
               Tag</button>
 
           </div>
@@ -174,11 +175,7 @@
 
 
         <div class="flex justify-between mt-2">
-          <button @click="closePopup" type="button"
-            class="border-[2px] border-gray-300 hover:bg-gray-200 text-black rounded-lg px-4 py-2">
-            Cancel
-          </button>
-          <button type="submit" class="bg-[#23a455] text-white px-4 py-2 rounded">
+          <button type="submit" class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded">
             {{ isEditing ? 'Update Contact' : 'Add Contact' }}
           </button>
         </div>
@@ -187,7 +184,7 @@
 
 
 
-    <div class="bg-[#f5f6fa] p-5  filter-container space-x-2">
+    <div class=" p-5  filter-container space-x-2">
 
       <h3 class="text-xl md:text-2xs mb-0 text-gray-600"><b>Contact List</b></h3>
 
@@ -205,13 +202,13 @@
             class="border border-gray-300 rounded px-3 py-2 w-40px">
 
           <button @click="fiterBytTags"
-            class="relative my-2 h-auto w-auto p-1 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200">Apply
+            class="relative my-2 h-auto w-auto p-2 bg-green-700 hover:bg-green-800 text-white">Apply
             filter</button>
         </div>
 
         <div>
           <button @click="showPopupimport = true"
-            class="bg-[#ffffff] text-[#000000] px-4 py-2 md:px-4 md:py-4 text-xs md:text-base rounded-full shadow-lg ml-auto hover:text-gray-200">
+            class="bg-green-600 hover:bg-green-800 text-white px-4 py-2 ">
             <i class="bi bi-download"></i> Import CSV
           </button>
         </div>
@@ -220,58 +217,73 @@
 
 
 
-    <div class="overflow-x-auto max-h-[54vh] custom-scrollbar">
-      <table class="w-full rounded-lg border-collapse block">
-        <thead>
-          <tr class="bg-[#ffffff] border-b-2 border-gray-300">
-            <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Id</th>
-            <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Name</th>
-            <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Phone Number</th>
-            <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Email</th>
-            <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Tags</th>
-            <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0">Created at</th>
-            <th class="py-5 px-3 border-white m-2 text-left bg-[#ffffff] sticky top-0 z-10">Action</th>
-          </tr>
-        </thead>
+      <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
+        <table class="w-full border border-gray-300 rounded-lg text-sm md:text-base ">
+          <thead>
+            <tr class="bg-gray-100 text-center text-gray-700 font-semibold">
+              <th class="p-3 md:p-4 text-center border border-gray-300 sticky top-0 z-10 bg-gray-100">ID</th>
+              <th class="p-3 md:p-4 text-center border border-gray-300 sticky top-0 z-10 bg-gray-100">Name</th>
+              <th class="p-3 md:p-4 text-center border border-gray-300 sticky top-0 z-10 bg-gray-100">Phone Number</th>
+              <th class="p-3 md:p-4 text-center border border-gray-300 sticky top-0 z-10 bg-gray-100">Email</th>
+              <th class="p-3 md:p-4 text-center border border-gray-300 sticky top-0 z-10 bg-gray-100">Tags</th>
+              <th class="p-3 md:p-4 text-center border border-gray-300 sticky top-0 z-10 bg-gray-100">Created At</th>
+              <th class="p-3 md:p-4 text-center border border-gray-300 sticky top-0 z-10 bg-gray-100">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="contact in contacts" :key="contact.id" class="hover:bg-gray-50">
+              <td class="p-3 md:p-4 text-center border border-gray-200">{{ contact.id }}</td>
+              <td class="p-3 md:p-4 text-center border border-gray-200">{{ contact.name }}</td>
+              <td class="p-3 md:p-4 text-center border border-gray-200">{{ contact.phone }}</td>
+              <td class="p-3 md:p-4 text-center border border-gray-200">{{ contact.email }}</td>
+              <td class="p-3 md:p-4 text-center border border-gray-200">
+                <div v-for="(tag, index) in contact.tags" :key="index">
+                  <span class="font-semibold">{{ tag.key }}:</span> {{ tag.value }}
+                </div>
+              </td>
+              <td class="p-3 md:p-4 text-center border border-gray-200">{{ formatDate(contact.created_at) }}</td>
+              <td class="p-3 md:p-4 text-center border border-gray-200">
+                <div class="flex justify-center space-x-2">
+                  <button @click="modifyContact(contact)" class="hover:bg-white rounded-full p-2 transition">
+                    <lord-icon src="https://cdn.lordicon.com/wuvorxbv.json" trigger="hover"
+                      style="width:32px;height:32px">
+                    </lord-icon>
+                  </button>
+                  <button @click="deleteContact(contact.phone)" class="hover:bg-white rounded-full p-2 transition">
+                    <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="hover"
+                      colors="primary:#ff5757,secondary:#000000" style="width:32px;height:32px">
+                    </lord-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-        <tbody class="bg-white">
-          <tr v-for="contact in contacts" :key="contact.id">
-            <td class="border-gray-300 py-5 px-3 contact-id-column">{{ contact.id }}</td>
-            <td class="border-gray-300 py-5 px-3 name-column">{{ contact.name }}</td>
-            <td class="border-gray-300 py-5 px-3">{{ contact.phone }}</td>
-            <td class="border-gray-300 py-5 px-3 contact-email-column">{{ contact.email }}</td>
-            <td class="border-gray-300 py-5 px-4 contact-tag-column">
-              <div v-for="(tag, index) in contact.tags" :key="index">
-                <span class="font-bold">{{ tag.key }}:</span> {{ tag.value }}
-              </div>
-            </td>
-            <td class="border-gray-300 py-5 px-3">{{ formatDate(contact.created_at) }}</td>
-            <td class="border-gray-300 py-5 px-3">
-              <div class="flex justify-left">
-                <button @click="modifyContact(contact)" class="hover:bg-white rounded-full p-2 transition">
-                  <lord-icon src="https://cdn.lordicon.com/wuvorxbv.json" trigger="none" style="width:32px;height:32px">
-                  </lord-icon>
-                </button>
-                <button @click="deleteContact(contact.phone)" class="hover:bg-white rounded-full p-2 transition">
-                  <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="none"
-                    colors="primary:#ff5757,secondary:#000000" style="width:32px;height:32px">
-                  </lord-icon>
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="flex justify-end">
-      <div class="flex justify-between items-center">
-        <button class="p-2 text-blue-500 underline hover:text-blue-700 hover:bg-transparent" 
-        @click="loadPreviousPage" :disabled="currentPage === 1">Previous</button>
-        <div class="border-2">{{ currentPage }}</div>
-        <button class="p-2 text-blue-500 underline hover:text-blue-700 hover:bg-transparent" 
-        @click="loadNextPage">Next</button>
+
+
+    <div class="flex justify-center mt-4">
+      <div class="flex items-center space-x-4 bg-white shadow-md rounded-lg px-4 py-2">
+        <button
+          class="px-3 py-1 bg-green-600 text-white font-medium rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          @click="loadPreviousPage"
+          :disabled="currentPage === 1"
+        >
+          Previous
+        </button>
+        <div class="px-4 py-1 border border-gray-300 rounded text-gray-700 font-semibold">
+          {{ currentPage }}
+        </div>
+        <button
+          class="px-3 py-1 bg-green-600 text-white font-medium rounded hover:bg-green-700"
+          @click="loadNextPage"
+        >
+          Next
+        </button>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -357,8 +369,15 @@ export default {
   methods: {
 
     async loadNextPage() {
-      this.currentPage += 1;
+      const prev=this.contacts[0]?.id
+      
       await this.fetchContactList(this.currentPage);
+      const newFirst = this.contacts[0]?.id;
+      if (prev !== newFirst && this.contacts.length > 0) 
+      {
+        this.currentPage += 1;
+      }
+      
     },
     async loadPreviousPage() {
       if (this.currentPage > 1) {

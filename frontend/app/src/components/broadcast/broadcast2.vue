@@ -26,7 +26,7 @@
 
 
       <h2 class="text-xl font-semibold mb-4 text-green-800">New Broadcast</h2>
-      <hr class="mb-4" />
+      
 
       <div class="flex">
 

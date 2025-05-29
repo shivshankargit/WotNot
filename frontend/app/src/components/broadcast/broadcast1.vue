@@ -24,9 +24,9 @@
     </div>
 
     <h3 class="text-xl md:text-2xs mb-4 text-gray-600"><b>Template List</b></h3>
-    <span v-if="cursor" class="ml-5 w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin inline-block"></span>
+    <span v-if="cursor" class="ml-5 w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin inline-block"></span>
 
-    <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
+    <div class="overflow-x-auto max-h-[60vh] custom-scrollbar mb-2">
         <table class="w-full border border-gray-300 rounded-lg text-sm md:text-base bg-white"
               :class="{ 'opacity-50 pointer-events-none': tableLoading }">
           <thead>
@@ -94,7 +94,7 @@
 
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-semibold text-green-800">Create Message Template</h2>
-        <hr class="mb-4" />
+  
       </div>
       <div>
         <h4 class="text-green-800"><b>Enter a name for your template.</b></h4>
