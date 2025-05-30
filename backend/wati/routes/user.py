@@ -131,41 +131,70 @@ async def process_responses(
 # - Install necessary libraries (e.g., requests) if not already installed.
     
 
+
+import httpx
+import os
+
+  # Replace with your actual Turnstile secret key
+
+async def verify_turnstile_token(token: str, remoteip: str = None) -> dict:
+    data = {
+        "secret": os.getenv("TURNSTILE_SECRET_KEY"),
+        "response": token,
+    }
+    if remoteip:
+        data["remoteip"] = remoteip
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+            data=data
+        )
+        result = response.json()
+        return result
+
 @router.post('/register')
 async def new_user(
     request: user.register_user,
     db: AsyncSession = Depends(database.get_db)):
-    # Check for existing user
-    result = await db.execute(
-        select(User.User).filter(
-            (User.User.email == request.email) 
-        )
-    )
-    existing_user = result.scalars().first()
-    
-    if existing_user:
-        raise HTTPException(
-            status_code=400,
-            detail="Account with this email or phone number already exists"
-        )
-    
-    # Create a new user
-    api_key = secrets.token_hex(32)
-    registeruser = User.User( 
-        username=request.username,
-        email=request.email,
-        password_hash=hashing.Hash.bcrypt(request.password),  # Decode the hash to store it as a string
-        # WABAID=request.WABAID,
-        # PAccessToken=request.PAccessToken,
-        # Phone_id=request.Phone_id,
-        api_key=api_key
-    )
-    
-    db.add(registeruser)
-    await db.commit()  # Commit the transaction asynchronously
-    await db.refresh(registeruser)  # Refresh the instance asynchronously
 
-    return {"success": True, "message": "Account created successfully"}
+    # verify_turnstile = await verify_turnstile_token(request.turnstile_token, request.remote_ip)
+    remote_ip = request.client.host
+    result = await verify_turnstile_token(request.cf_token, remoteip=remote_ip)
+
+    if result.get("success"):
+    
+        # Check for existing user
+        result = await db.execute(
+            select(User.User).filter(
+                (User.User.email == request.email) 
+            )
+        )
+        existing_user = result.scalars().first()
+        
+        if existing_user:
+            raise HTTPException(
+                status_code=400,
+                detail="Account with this email or phone number already exists"
+            )
+        
+        # Create a new user
+        api_key = secrets.token_hex(32)
+        registeruser = User.User( 
+            username=request.username,
+            email=request.email,
+            password_hash=hashing.Hash.bcrypt(request.password),  # Decode the hash to store it as a string
+            # WABAID=request.WABAID,
+            # PAccessToken=request.PAccessToken,
+            # Phone_id=request.Phone_id,
+            api_key=api_key
+        )
+        
+        db.add(registeruser)
+        await db.commit()  # Commit the transaction asynchronously
+        await db.refresh(registeruser)  # Refresh the instance asynchronously
+
+        return {"success": True, "message": "Account created successfully"}
 
 
 # @router.post("/update-profile", status_code=200)

@@ -22,6 +22,7 @@ class register_user(BaseModel):
     WABAID:Optional[int]=None
     PAccessToken:Optional[str]=None
     Phone_id:Optional[int]=None
+    cf_token:Optional[str]=None
 
 # login user model
 
