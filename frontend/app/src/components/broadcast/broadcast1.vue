@@ -3,6 +3,7 @@
     <div class="flex flex-col md:flex-row justify-between mb-4 border-b pb-5">
       <div>
         <h2 class="text-xl md:text-2xl font-bold">Manage Templates</h2>
+
         <p class="text-sm md:text-base">Your content for scheduled broadcasts goes here.</p>
       </div>
 
@@ -25,7 +26,7 @@
     </div>
 
     <h3 class="text-xl md:text-2xs mb-4 text-gray-600"><b>Template List</b></h3>
-
+    <span v-if="cursor" class="ml-5 w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin inline-block"></span>
 
     <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
 
@@ -380,6 +381,7 @@ export default {
   data() {
     return {
 
+      cursor:false,
       apiUrl: process.env.VUE_APP_API_URL,
       selectedFile: null,
       isUploading: false,
@@ -554,6 +556,7 @@ export default {
 
     async fetchtemplateList() {
       const token = localStorage.getItem('token');
+      this.cursor=true;
       try {
         const response = await fetch(`${this.apiUrl}/template`, {
           method: 'GET',
@@ -562,13 +565,14 @@ export default {
             'Content-Type': 'application/json',
           },
         });
-
+        
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-
+        
         const templatelist = await response.json();
         this.templates = templatelist.data;
+        this.cursor=false;
 
         // Generate previews for templates
         this.templates = this.templates.map(template => {

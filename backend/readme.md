@@ -6,6 +6,7 @@ This backend is powered by **FastAPI** and uses **Uvicorn** as the ASGI server. 
 
 ## 🔧 Setup Instructions
 
+## make sure you use python 3.12.3
 ### 1. Create and Activate a Virtual Environment
 
 Open your terminal and navigate to the `backend/` folder:
@@ -43,6 +44,7 @@ uvicorn wati.main:app --reload --port 8000
 
 ## 🧵 Running the Dramatiq Worker
 
+## pip install dramatiq
 Open a **new terminal window**, and make sure to activate the same virtual environment:
 
 ```bash
