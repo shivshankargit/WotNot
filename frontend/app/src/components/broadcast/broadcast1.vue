@@ -6,18 +6,20 @@
         <p class="text-sm md:text-base">Your content for scheduled broadcasts goes here.</p>
       </div>
 
-      <div >
+      <div>
         <!-- <button @click="showPopup = true"
           class="text-[#f5f6fa] px-4 py-2 md:px-4 md:py-4 text-sm md:text-base w-full md:w-auto">
           Create New Template
         </button> -->
-        <button class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
-        @click="showPopup = true">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+        <button
+          class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
+          @click="showPopup = true">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
           </svg>
           New Template
-      </button>
+        </button>
 
       </div>
     </div>
@@ -240,10 +242,22 @@
                 </div>
               </div>
 
-              <div class="">
+              <!-- <div class="">
                 <label class="block text-sm font-medium">Body<span class="text-red-800">*</span></label>
                 <textarea v-model="bodyComponent.text" class="mt-1 p-2 w-full border border-gray-300 rounded-md h-30"
                   placeholder="Template Message..." rows="4" required></textarea>
+              </div> -->
+
+              <div>
+                <label class="block text-sm font-medium">Body<span class="text-red-800">*</span></label>
+
+                <textarea v-model="bodyComponent.text" class="mt-1 p-2 w-full border border-gray-300 rounded-md h-30"
+                  placeholder="Template Message..." rows="4" required></textarea>
+
+                <div v-if="warningData"
+                  class="mt-2 p-3 bg-yellow-100 text-yellow-800 text-sm rounded-md border border-yellow-300">
+                  <p class="font-semibold">Warning:{{warningData}}</p>
+                </div>
               </div>
 
               <div>
@@ -266,10 +280,19 @@
               
             </div> -->
 
-              <div v-if="variableCounter">
+              <!-- <div v-if="variableCounter">
                 <h4>Variable Examples</h4>
                 <div v-for="index in variableCounter" :key="index">
                   <input type="text" :placeholder="'Variable ' + index" v-model="variables[index - 1]"
+                    class="border border-[#ddd] p-2 rounded-md w-50px mb-2" />
+                </div>
+              </div> -->
+
+              <div v-if="variables.length">
+
+                <h4>Variable Examples</h4>
+                <div v-for="(variable, index) in variables" :key="index">
+                  <input type="text" :placeholder="'Variable ' + (index + 1)" v-model="variables[index]"
                     class="border border-[#ddd] p-2 rounded-md w-50px mb-2" />
                 </div>
               </div>
@@ -294,14 +317,14 @@
 
 
               <!-- Sub-Category Selection -->
-              <label v-if="selectedCategory === 'Marketing'" for="">Sub-Category</label>
+              <!-- <label v-if="selectedCategory === 'Marketing'" for="">Sub-Category</label>
               <select v-model="selectedSubCategory" v-if="selectedCategory === 'Marketing'"
                 class="border border-[#ddd] p-2 rounded-md w-full mb-2">
                 <option value="" disabled>Select Sub-Category</option>
-                <option value="ORDER_DETAILS">Order Details</option>
+                <option value="ORDER_DETAILS">Order Details</option> -->
                 <!-- <option value="CUSTOM">Custom</option> -->
-                <!-- <option value="ORDER_STATUS">Order Status</option> -->
-              </select>
+                <!-- <option value="ORDER_STATUS">Order Status</option>
+              </select>-->
               <!-- Actions -->
               <div class="flex space-x-4">
                 <button @click.prevent="submitTemplate"
@@ -356,7 +379,7 @@ export default {
   },
   data() {
     return {
-      
+
       apiUrl: process.env.VUE_APP_API_URL,
       selectedFile: null,
       isUploading: false,
@@ -423,6 +446,7 @@ export default {
 
       variableCounter: null,
       variables: [],
+      warningData: null, // To store error data from the API
     };
   },
 
@@ -453,45 +477,35 @@ export default {
     // },
 
     addVariable() {
-      // Function to count words in the text
       const countWords = (text) => {
-        if (!text) return 0; // Handle undefined or empty text
+        if (!text) return 0;
         return text.split(/\s+/).filter(word => word.trim().length > 0).length;
       };
 
-      // Retrieve the text from the bodyComponent
-      const text = this.bodyComponent.text || ''; // Use a fallback for safety
-
-      // Log the text to debug issues
-      console.log("Current text:", text);
-
-      // Calculate the word count
+      const text = this.bodyComponent.text || '';
       const wordCount = countWords(text);
-      console.log("Word count:", wordCount);
 
-      // Extract existing variables in the text
       const currentVariables = text.match(/{{\d+}}/g) || [];
-      console.log("Current variables:", currentVariables);
+      const requiredWords = 3 * (currentVariables.length + 1);
 
-      // Calculate the required number of words (3 words per variable)
-      const requiredWords = 3 * (currentVariables.length + 1); // +1 accounts for the new variable being added
+      // if (wordCount < requiredWords) {
+      //   alert(`The text must have at least ${requiredWords} words to add ${currentVariables.length + 1} variables.`);
+      //   return;
+      // }
 
-      // Check if the word count meets the requirement
-      if (wordCount < requiredWords) {
-        alert(`The text must have at least ${requiredWords} words to add ${currentVariables.length + 1} variables.`);
-        return;
+      const nextVariableNumber = currentVariables.length + 1;
+      this.bodyComponent.text += ` {{${nextVariableNumber}}}`;
+
+      // 🔧 Update both
+      this.variableCounter = nextVariableNumber;
+
+      // 🔧 Extend `variables` array safely
+      while (this.variables.length < nextVariableNumber) {
+        this.variables.push("");
       }
 
-      // Determine the next variable number
-      const nextVariableNumber = currentVariables.length + 1;
-
-      // Append the new variable to the text
-      this.bodyComponent.text += ` {{${nextVariableNumber}}}`;
-      console.log(`Added variable {{${nextVariableNumber}}}`);
-
-      // Update the variable counter
-      this.variableCounter = nextVariableNumber;
       console.log("Updated variable counter:", this.variableCounter);
+      console.log("Updated variables:", this.variables);
     },
 
 
@@ -666,12 +680,14 @@ export default {
 
     updateTemplateComponents() {
 
-      console.log('hello')
-      let components = [this.bodyComponent];
+
+      const clonedBodyComponent = { ...this.bodyComponent };
 
       if (this.variables.length > 0) {
-        components[0].example = { body_text: this.variables };
+        clonedBodyComponent.example = { body_text: this.variables };
       }
+
+      let components = [clonedBodyComponent];
 
       if (this.headerComponent.text) {
         components.push(this.headerComponent);
@@ -697,10 +713,8 @@ export default {
       }
 
       this.template.components = components;
-      console.log(this.template) // Update template components dynamically
+      console.log(this.template); // Update template components dynamically
     },
-
-    // Helper function to generate the preview by replacing placeholders
 
     async submitTemplate() {
       const toast = useToast();
@@ -736,9 +750,9 @@ export default {
         if (response.status >= 200 && response.status < 300) {
           console.log('Template created successfully:', response.data);
           toast.success('Template created successfully');
-          this.isSubmitted=true;
+          this.isSubmitted = true;
           await this.fetchtemplateList();
-          
+
         } else {
           const errorMessage = response.data.detail || "Unknown error occurred";
           alert(`Error creating template: ${errorMessage}`);
@@ -755,6 +769,7 @@ export default {
         this.loading = false; // Hide loading indicator
       }
     },
+
 
     // 
     validateTemplateName() {
@@ -773,14 +788,14 @@ export default {
 
     async deleteTemplate(template_name) {
 
-      
+
       const toast = useToast();
       const token = localStorage.getItem('token');
       const confirmDelete = confirm("Are you sure you want to delete this template?");
       if (!confirmDelete) return;
 
       try {
-      this.tableLoading=true;
+        this.tableLoading = true;
         const response = await fetch(`${this.apiUrl}/delete-template/${template_name}`, {
           method: "DELETE",
           headers: {
@@ -803,22 +818,22 @@ export default {
       } catch (error) {
         console.error('Error deleting template:', error.response ? error.response.data : error.message);
       }
-      finally{
-        this.tableLoading=false;
+      finally {
+        this.tableLoading = false;
       }
 
     },
 
-    closePopup(){
-      this.showPopup=false;
+    closePopup() {
+      this.showPopup = false;
       this.clearForm();
     },
 
 
     clearForm() {
-      this.Loading=false;
+      this.Loading = false;
       this.template.name = '';
-      this.isSubmitted=false;
+      this.isSubmitted = false;
       this.variableCounter = null;
       this.template.components = [];
       this.bodyComponent.text = '';
@@ -885,6 +900,42 @@ export default {
     templateName() {
       this.validateTemplateName();
     },
+
+
+'bodyComponent.text': function (newText) {
+  // === Watcher A logic ===
+  const placeholders = newText.match(/{{\d+}}/g) || [];
+  const uniquePlaceholders = [...new Set(placeholders.map(p => parseInt(p.match(/\d+/)[0])))];
+  const requiredLength = uniquePlaceholders.length;
+
+  if (this.variables.length < requiredLength) {
+    while (this.variables.length < requiredLength) {
+      this.variables.push('');
+    }
+  } else if (this.variables.length > requiredLength) {
+    this.variables.splice(requiredLength);
+  }
+  console.log("Updated variables:", this.variables);
+
+  // === Watcher B logic ===
+  const countWords = (text) => {
+    if (!text) return 0;
+    return text.split(/\s+/).filter(word => word.trim().length > 0).length;
+  };
+
+  const wordCount = countWords(newText);
+  const variableCount = placeholders.length;
+
+  if (variableCount > 0) {
+    if ((wordCount - 1) / variableCount < 3) {
+      this.warningData = `The text must have exactly 3 words per variable (after subtracting 1 word). Current: ${(wordCount - 1) / variableCount}`;
+  }
+  } else {
+      this.warningData = null;
+    }
+},
+
+
 
     selectType(type) {
       this.selectedType = type;

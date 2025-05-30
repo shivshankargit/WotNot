@@ -38,6 +38,9 @@
 
       </div>
 
+              <!-- Turnstile widget -->
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAABeiGZqY3Hf9K04o"></div>
+
 
       <div class="flex flex-col items-center">
         <button class=" w-full bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
@@ -67,14 +70,31 @@ export default {
     };
   },
   name: 'BasicSignUpForm',
+  
+
+  mounted() {
+    const script = document.createElement("script");
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+  },
   methods: {
 
     handleSubmit() {
       // Get the form data
+
+      const token = document.querySelector('input[name="cf-turnstile-response"]')?.value;
+      if (!token) {
+        alert("Please complete the CAPTCHA.");
+        return;
+      }
+
       const formData = {
         username: document.getElementById('username').value,
         email: document.getElementById('email').value,
         password: document.getElementById('password').value,
+        cf_token: token, // Include the Turnstile token
       };
 
       // Check for required fields

@@ -91,6 +91,8 @@
     </div>
 
     <div class="flex flex-1">
+
+      
       <!-- Hamburger button for mobile view -->
       <button @click="isMenuOpen = !isMenuOpen" class="p-2 md:hidden">
         <i class="bi bi-list text-2xl z-[1000] absolute top-[60px]"></i>
@@ -165,7 +167,7 @@
       </div>
 
       <!-- AI agent Sidebar -->
-      <div
+      <!-- <div
       class="fixed top-12 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4  overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out"
       :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }"
       v-if="currentSection === 'AIagent'">
@@ -175,19 +177,11 @@
         AI Agent
       </a>
 
-      <!-- <a href="#" @click.prevent="navigate('/analytics/conversations')"
-        :class="{ 'text-green-900 font-semibold': isActive('/analytics/conversations'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/analytics/conversations') }"
-        class="block p-3 text-gray-600 rounded-lg  "><i class="bi bi-link-45deg"></i>
-        Conversations
-      </a> -->
-    </div>
+
+    </div> -->
 
 
-      <!--    <div v-if="currentSection === 'Chatbot'" class="flex-1 mt-16 p-8 bg-white overflow-y-auto h-[calc(100vh-65px)]">
-  <router-view></router-view>
-</div>-->
-      <!--<ActiveChatsSidebar v-if="currentSection === 'Chatbot'" class="fixed top-12 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4 overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out" :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }" />-->
-
+  
 
 
       <!-- Main Content-->
@@ -229,7 +223,7 @@ export default {
         { name: 'Integration', label: 'Integration', icon: 'bi bi-plugin', path: '/integration/integration1' },
         { name: 'chatbot', label: 'Chatbot', path: '/chatbot/chatbotview', icon: 'bi bi-robot' },
         { name: 'Analytics', label: 'Analytics', path: '/analytics/cost', icon: 'bi bi-graph-up' },
-        { name: 'AI Agent', label: 'AIagent', path: '/agent', icon: 'bi bi-robot' }
+        // { name: 'AI Agent', label: 'AIagent', path: '/agent', icon: 'bi bi-robot' }
       ],
       user: null,
       dropdownOpen: false,
