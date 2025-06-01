@@ -33,7 +33,7 @@
 
         <div class="popup-content custom-scrollbar p-4">
           <form @submit.prevent="handleBroadcast" id="messageForm"
-            :class="{ 'opacity-50 pointer-events-none': isSubmitted , 'cursor-not-allowed':isUploding }"
+            :class="{ 'opacity-50 pointer-events-none': isSubmitted }"
       
             >
             
