@@ -104,7 +104,8 @@
 </template>
 
 <script>
-import zxcvbn from 'zxcvbn';
+import zxcvbn from "zxcvbn";
+
 export default {
   
   data() {

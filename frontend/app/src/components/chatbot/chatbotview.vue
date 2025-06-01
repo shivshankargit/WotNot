@@ -141,7 +141,7 @@
 
           <input type="file" id="file-upload" @change="FileUpload" class="file-input" />
 
-          <button id="send-button" class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
+          <button id="send-button" class="bg-green-700 text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:bg-green-800"
           @click="sendChatMessage()" v-if="!replyMessage">Send</button>
           <button id="send-button" @click="sendChatMessageReply()" v-if="replyMessage">Reply</button>
 
@@ -550,7 +550,7 @@ export default {
       this.fetchActiveChatlist(status);
     },
 
-    ConversationSSE(wa_id) {
+    async ConversationSSE(wa_id) {
 
       this.selectedRemainingTime = null;
       // Check if there's an existing EventSource instance
@@ -570,8 +570,10 @@ export default {
         }
       });
 
-      this.ActiveContactDetails(wa_id);
-
+      await this.ActiveContactDetails(wa_id);
+      this.contactInfo.name=this.contactInfo.name?this.contactInfo.name:this.ActiveWaidName
+      this.contactInfo.phone=this.contactInfo.phone?this.contactInfo.phone:this.ActiveWaid
+      
       // Handle incoming messages
       this.eventSourceA.onmessage = (event) => {
         try {
@@ -936,16 +938,13 @@ export default {
 #send-button {
   padding: 10px 15px;
   margin-left: 10px;
-  background-color: #25D366;
+  
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
 }
 
-#send-button:hover {
-  background-color: #1da857;
-}
 
 /* Upload button */
 .upload-label {

@@ -12,12 +12,10 @@
           class="text-[#f5f6fa] px-4 py-2 md:px-4 md:py-4 text-sm md:text-base w-full md:w-auto">
           Create New Template
         </button> -->
-        <button
-          class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
-          @click="showPopup = true">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+        <button class="bg-green-700 text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
+        @click="showPopup = true">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
           </svg>
           New Template
         </button>
@@ -25,63 +23,60 @@
       </div>
     </div>
 
-    <h3 class="text-xl md:text-2xs mb-4 text-gray-600"><b>Template List</b></h3>
-    <span v-if="cursor"
-      class="ml-5 w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin inline-block"></span>
+    <h3 class="text-xl md:text-2xs mb-4 text-gray-600"><b>Template List</b><span v-if="cursor" class="ml-5 w-5 h-5 border-2 border-green-500 border-t-transparent rounded-full animate-spin inline-block"></span></h3>
+    
 
-    <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
+    <div class="overflow-x-auto max-h-[55vh] custom-scrollbar mb-2">
+        <table class="w-full border border-gray-300 rounded-lg text-sm md:text-base bg-white"
+              :class="{ 'opacity-50 pointer-events-none': tableLoading }">
+          <thead>
+            <tr class="bg-gray-100 text-center text-gray-700 font-semibold">
+              <th class="p-3 md:p-4 text-left border border-gray-300 sticky top-0 z-10 bg-gray-100">Name</th>
+              <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Language</th>
+              <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Status</th>
+              <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Category</th>
+              <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Sub Category</th>
+              <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">ID</th>
+              <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Preview</th>
+              <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="">
+            <tr v-for="template in templates" :key="template.id" class="hover:bg-gray-50">
+              <td class="p-3 md:p-4 text-left border border-gray-200">{{ template.name }}</td>
+              <td class="p-3 md:p-4 text-center border border-gray-200">{{ template.language }}</td>
+              <td class="p-3 md:p-4 text-center border border-gray-200">
+                <div :class="{
+                  ' text-green-600 font-semibold px-2 py-1 rounded': template.status === 'APPROVED',
+                  ' text-blue-600 font-semibold px-2 py-1 rounded': template.status === 'PENDING',
+                  ' text-red-500 font-semibold px-2 py-1 rounded': template.status === 'REJECTED'
+                }">
+                  {{ template.status }}
+                </div>
+              </td>
+              <td class="p-3 md:p-4 text-center border border-gray-200">{{ template.category }}</td>
+              <td class="p-3 md:p-4 text-center border border-gray-200">{{ template.sub_category }}</td>
+              <td class="p-3 md:p-4 text-center border border-gray-200">{{ template.id }}</td>
+              <td class="p-3 md:p-4 text-center border border-gray-200">
+                <button class="text-gray-600 underline hover:text-gray-800 hover:bg-inherit font-medium"
+                        @click="showpreview(template.preview)">
+                  Preview
+                </button>
+              </td>
+              <td class="p-3 md:p-4 text-center border border-gray-200">
+                <button @click="deleteTemplate(template.name)" class="hover:bg-white rounded-full p-2 transition">
+                  <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="hover"
+                    colors="primary:#ff5757,secondary:#000000" style="width:32px;height:32px">
+                  </lord-icon>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <table class="w-full rounded-md border-collapse" :class="{ 'opacity-50 pointer-events-none': tableLoading }">
-        <thead>
-          <tr class="border-b-2 bg-[#ffffff] text-center">
-            <th class="p-2 text-left md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Name</th>
-            <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Language</th>
-            <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Status</th>
-            <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Category</th>
-            <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Sub Category</th>
-            <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">ID</th>
-            <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 z-10">Preview</th>
-            <th class="p-2 text-center md:p-4 border-b-2 bg-[#ffffff] sticky top-0 z-10">Actions</th>
 
 
-
-
-          </tr>
-        </thead>
-        <tbody class="bg-white">
-          <tr v-for="template in templates" :key="template.id">
-            <td class=" border-[#ddd] p-2 md:p-4 text-left">{{ template.name }}</td>
-            <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.language }}</td>
-            <!-- <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.status }}</td> -->
-            <td class="p-2 md:p-4 text-center">
-              <div :class="{
-                'bg-[#e9f6ee] text-green-500 ': template.status === 'APPROVED',
-                'bg-blue-100 text-blue-500 ': template.status === 'PENDING',
-                'bg-red-100 text-red-500 ': template.status === 'REJECTED',
-                'border-[#ddd]': true
-              }" class="text-[80%] lg:text-[100%] rounded-lg">
-                {{ template.status }}
-              </div>
-            </td>
-            <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.category }}</td>
-            <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.sub_category }}</td>
-            <td class=" border-[#ddd] p-2 md:p-4 text-center">{{ template.id }}</td>
-            <td class=" border-[#ddd] p-2 md:p-4 text-center">
-              <button class="text-blue-500 underline hover:text-blue-700 hover:bg-transparent"
-                @click="showpreview(template.preview)">Preview</button>
-            </td>
-            <td class=" border-[#ddd] p-2 md:p-4 text-center">
-              <button @click="deleteTemplate(template.name)" class="hover:bg-white rounded-full p-2 transition">
-                <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="hover"
-                  colors="primary:#ff5757,secondary:#000000" style="width:32px;height:32px">
-                </lord-icon>
-              </button>
-            </td>
-
-          </tr>
-        </tbody>
-      </table>
-    </div>
 
 
     <PopUp_preview v-if="showPreview" @close="closePreview">
@@ -98,15 +93,17 @@
     <PopUp v-if="showPopup" @close="closePopup">
 
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold">Create Message Template</h2>
-        <hr class="mb-4" />
+        <h2 class="text-lg font-semibold text-green-800">Create Message Template</h2>
+  
       </div>
       <div>
+        <h4 class="text-green-800"><b>Enter a name for your template.</b></h4>
+        <p class="text-sm mb-2 ">Categorize your templates accoringly</p>
 
         <div class="flex ">
           <div class="mr-4 max-h-[600px] overflow-y-auto custom-scrollbar">
             <form class="p-4" :class="{ 'opacity-50 pointer-events-none': isSubmitted }">
-              <div class="grid grid-cols-3 gap-4">
+              <div class="grid grid-cols-3 gap-4 bg-[#f5f6fa] p-4 mb-2">
                 <div>
                   <label class="block below-402:text-custom-small text-sm font-medium">Template Name
                     <span class="text-red-800">*</span>
@@ -213,93 +210,59 @@
               </div>
 
 
-              <label for="">Header</label>
-              <select v-model="headerMediaComponent.format" class="border border-[#ddd] p-2 rounded-md w-full mb-2">
-                <option value="TEXT">Text</option>
-                <option value="IMAGE">Image</option>
-                <option value="VIDEO">Video</option>
+              <h4 class="text-green-800"><b>Header</b></h4>
+              <p class="text-sm mb-2 ">Add a header to your message</p>
+              
+              <div class="bg-[#f5f6fa] p-4 mb-2">
+                  <select v-model="headerMediaComponent.format" class="border border-[#ddd] p-2 rounded-md w-full mb-2">
+                  <option value="TEXT">Text</option>
+                  <option value="IMAGE">Image</option>
+                  <option value="VIDEO">Video</option>
 
               </select>
 
-              <div v-if="headerMediaComponent.format === 'TEXT'">
-                <input v-model="headerComponent.text" class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
-              </div>
+                <div v-if="headerMediaComponent.format === 'TEXT'">
+                  <input v-model="headerComponent.text" class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
+                </div>
 
-              <div v-if="headerMediaComponent.format === 'IMAGE' || headerMediaComponent.format === 'VIDEO'">
-                <div class="flex flex ml-4 items-center max-w-[50px]">
-                  <input type="file" @change="handleFileChange" class="mb-4">
+                <div v-if="headerMediaComponent.format === 'IMAGE' || headerMediaComponent.format === 'VIDEO'">
+                  <div class="flex flex ml-4 items-center max-w-[50px]">
+                    <input type="file" @change="handleFileChange" class="mb-4">
 
-                  <div>
-                    <button @click="uploadFile" :disabled="!selectedFile || isUploading"
-                      class="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:bg-gray-400">
-                      {{ isUploading ? 'Uploading...' : 'Upload' }}
-                    </button>
-                  </div>
+                    <div>
+                      <button @click="uploadFile" :disabled="!selectedFile || isUploading"
+                        class="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:bg-gray-400">
+                        {{ isUploading ? 'Uploading...' : 'Upload' }}
+                      </button>
+                    </div>
 
-                  <div v-if="uploadResponse" class="mt-4 p-2 bg-green-100 border border-green-300 rounded">
-                    <p class="text-sm text-green-700">Upload Successful!</p>
-                  </div>
+                    <div v-if="uploadResponse" class="mt-4 p-2 bg-green-100 border border-green-300 rounded">
+                      <p class="text-sm text-green-700">Upload Successful!</p>
+                    </div>
 
-                  <div v-if="uploadError" class="mt-4 p-2 bg-red-100 border border-red-300 rounded">
-                    <p class="text-sm text-red-700">Error: {{ uploadError }}</p>
+                    <div v-if="uploadError" class="mt-4 p-2 bg-red-100 border border-red-300 rounded">
+                      <p class="text-sm text-red-700">Error: {{ uploadError }}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              <!-- <div class="">
-                <label class="block text-sm font-medium">Body<span class="text-red-800">*</span></label>
-                <textarea v-model="bodyComponent.text" class="mt-1 p-2 w-full border border-gray-300 rounded-md h-30"
-                  placeholder="Template Message..." rows="4" required></textarea>
-              </div> -->
-
-              <div>
-                <label class="block text-sm font-medium">
-                  Body<span class="text-red-800">*</span>
-                </label>
-
-                <textarea v-model="bodyComponent.text" class="mt-1 p-2 w-full border border-gray-300 rounded-md h-30"
-                  placeholder="Template Message..." rows="4" required></textarea>
-
-                <div v-if="warningData"
-                  class="mt-2 p-3 bg-yellow-100 text-yellow-800 text-sm rounded-md border border-yellow-300">
-                  <!-- Icon + Text -->
-                  <div class="flex items-start space-x-2">
-                    <!-- Warning Icon -->
-                    <svg class="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg"
-                      fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd"
-                        d="M8.257 3.099c.765-1.36 2.721-1.36 3.486 0l6.518 11.595c.75 1.335-.213 2.993-1.743 2.993H3.482c-1.53 0-2.493-1.658-1.743-2.993L8.257 3.1zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-2a1 1 0 01-1-1V7a1 1 0 112 0v3a1 1 0 01-1 1z"
-                        clip-rule="evenodd" />
-                    </svg>
-
-                    <!-- Warning Message -->
-                    <p class="font-semibold">
-                      {{ warningData }}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-
-              <div>
-                <button type="button" @click="addVariable"
-                  class="relative my-2 h-8 w-24 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200">
-                  Add Variable</button>
-              </div>
-
-              <!-- <div>
-              <h4>Example Values for Variables:</h4>
-              <div v-for="(variable, index) in variables" :key="index" class="variable-input">
-                <input
-                  type="text"
-                  v-model="variables[index]"
-                  :placeholder="'Enter value for {{' + (index + 1) + '}}'"
-                  required
-                />
-                <button type="button" @click="removeVariable(index)">Remove</button>
               </div>
               
-            </div> -->
+              <h4 class="text-green-800"><b>Body</b></h4>
+              <p class="text-sm mb-2 ">This section is the main content of your message</p>
+              <div class="bg-[#f5f6fa] p-4" >
+                <textarea v-model="bodyComponent.text" class="mt-1 p-2 w-full border border-gray-300 rounded-md h-30"
+                  placeholder="Template Message..." rows="4" required></textarea>
+                
+                <div>
+                  <button
+                    type="button"
+                    @click="addVariable"
+                    class="my-2 px-4 py-2 rounded-md bg-green-700 text-white font-medium shadow-md ">
+                    Add Variable
+                  </button>
+                </div>
+
+              
 
               <!-- <div v-if="variableCounter">
                 <h4>Variable Examples</h4>
@@ -322,25 +285,27 @@
               <input v-model="footerComponent.text" placeholder="Footer Text (optional)"
                 class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
 
-              <span>
-                <button
-                  class="relative my-2 h-8 w-24 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200"
-                  @click.prevent="addbutton">
-                  Add Button
-                </button>
-              </span>
-
-              <!-- Button Text and URL Inputs -->
-              <input v-if="addButton && selectedSubCategory !== 'ORDER_STATUS'" v-model="button.text"
-                placeholder="Button Text (optional)" class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
-              <input v-if="addButton && selectedSubCategory !== 'ORDER_STATUS'" v-model="button.url"
-                placeholder="Button URL (optional)" class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
-
+                  <span>
+                    <button
+                      class="my-2 px-4 py-2 rounded-md bg-green-700 text-white font-medium shadow-md"
+                      @click.prevent="addbutton">
+                      Add Button
+                    </button>
+                  </span>
+                  <!-- Button Text and URL Inputs -->
+                  <input v-if="addButton && selectedSubCategory !== 'ORDER_STATUS'" v-model="button.text"
+                    placeholder="Button Text (optional)" class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
+                  <input v-if="addButton && selectedSubCategory !== 'ORDER_STATUS'" v-model="button.url"
+                    placeholder="Button URL (optional)" class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
+              </div>
+              
 
               <!-- Sub-Category Selection -->
-              <!-- <label v-if="selectedCategory === 'Marketing'" for="">Sub-Category</label>
+              <h4 class="text-green-800"><b>Sub-Category</b></h4>
+              <!-- <p class="text-sm mb-2 "></p> -->
+               
               <select v-model="selectedSubCategory" v-if="selectedCategory === 'Marketing'"
-                class="border border-[#ddd] p-2 rounded-md w-full mb-2">
+                class="border border-[#ddd] rounded-md w-full mb-2 p-2 "  >
                 <option value="" disabled>Select Sub-Category</option>
                 <option value="ORDER_DETAILS">Order Details</option> -->
               <!-- <option value="CUSTOM">Custom</option> -->
@@ -349,15 +314,12 @@
               <!-- Actions -->
               <div class="flex space-x-4">
                 <button @click.prevent="submitTemplate"
-                  class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
+                  class="bg-green-700 hover:bg-green-800 text-white px-3 py-2 rounded-lg shadow-lg font-medium flex items-center justify-center "
                   :disabled="loading || isSubmitted">
                   <span v-if="loading"
                     class="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4 mr-2"></span>
                   {{ isSubmitted ? "Submitted" : loading ? "Submitting..." : "Submit" }}
                 </button>
-
-
-                <button @click="closePopup" class="px-4 py-2 bg-gray-400 text-white rounded-md">Cancel</button>
               </div>
             </form>
           </div>

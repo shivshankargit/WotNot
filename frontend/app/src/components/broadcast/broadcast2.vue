@@ -2,17 +2,15 @@
   <div class="content-section m-8 md:ml-72">
     <div class="flex flex-col md:flex-row justify-between mb-4 border-b pb-5">
       <div>
-        <h2 class="text-xl md:text-2xl font-bold">Broadcast Messages</h2>
+        <h2 class="text-xl md:text-2xl font-bold text-green-800">Broadcast Messages</h2>
         <p class="text-sm md:text-base">Send out Broadcast Messages using templates</p>
       </div>
 
       <div>
-        <button
-          class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
-          @click="showPopup = true, fetchContacts()">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+        <button class="bg-green-700  hover:bg-green-600  text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center "
+        @click="showPopup = true, fetchContacts()">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
           </svg>
           New Broadcast
         </button>
@@ -27,8 +25,8 @@
       class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 custom-scrollbar">
 
 
-      <h2 class="text-xl font-semibold mb-4">New Broadcast</h2>
-      <hr class="mb-4" />
+      <h2 class="text-xl font-semibold mb-4 text-green-800">New Broadcast</h2>
+      
 
       <div class="flex">
 
@@ -38,7 +36,7 @@
             :class="{ 'opacity-50 pointer-events-none': isSubmitted }">
 
 
-            <h4><b>What message do you want to send?</b></h4>
+            <h4 class="text-green-700"><b>What message do you want to send?</b></h4>
             <p class="text-sm mb-2 ">Add broadcast name and template below</p>
 
 
@@ -87,7 +85,7 @@
               </div>
 
             </div>
-            <h4><b>Who do you want to send it to?</b></h4>
+            <h4 class="text-green-700"><b>Who do you want to send it to?</b></h4>
             <p class="text-sm mb-2 ">Select contacts below or <a
                 href="https://drive.google.com/file/d/1hVQErwmNN6eGN1zLBoniW_34-GzAtMwm/view?usp=sharing"
                 target="_blank" class="text-blue-500"><u>Download sample format for contact upload</u></a></p>
@@ -115,7 +113,7 @@
             </div>
 
             <div v-else>
-              <h4><b>Contacts</b></h4>
+              <h4 class="text-green-700"><b>Contacts</b></h4>
               <p class="text-sm mb-2 ">Select from your saved contacts</p>
             </div>
 
@@ -129,7 +127,7 @@
                 class="border border-gray-300 rounded px-3 py-2 w-30px">
 
               <button @click.prevent="fiterBytTags"
-                class="relative my-2 h-auto w-auto p-1 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200">Apply
+                class=" bg-gray-300 hover:bg-gray-400 relative my-2 h-auto w-auto p-1 text-white ">Apply
                 filter</button>
             </div>
 
@@ -168,7 +166,7 @@
             </div>
 
 
-            <h4><b>When do you want to send the message ?</b></h4>
+            <h4 class="text-green-700"><b>When do you want to send the message ?</b></h4>
             <p class="text-sm mb-2 ">Select from the options below </p>
 
 
@@ -176,10 +174,10 @@
 
 
               <p class=" text-sm font-semibold mb-1"><input type="radio" v-model="isScheduled" :value="false"
-                  class="scale-150 text-green-500 m-2">Send Now</p>
+                  class="scale-150 text-green-500 m-2 accent-green-700">Send Now</p>
 
               <p class="text-sm font-semibold mb-1"><input type="radio" v-model="isScheduled" :value="true"
-                  class="scale-150 text-green-500 m-2" @click="currentDateTime">Schedule </p>
+                  class="scale-150 text-green-500 m-2 accent-green-700" @click="currentDateTime">Schedule </p>
 
               <div v-if="isScheduled" class="flex justify-between">
                 <div class="w-[50%]">
@@ -200,8 +198,9 @@
             <!-- <button type="submit" class="bg-[#23a455] text-[#f5f6fa] px-4 py-2 rounded">{{ isScheduled ?
               'Schedule Message' : 'Send Message' }}</button> -->
 
-            <button type="submit"
-              class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
+              <button
+              type="submit"
+              class="bg-green-700 text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center "
               :disabled="popupLoading || isSubmitted">
               <span v-if="popupLoading"
                 class="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4 mr-2"></span>
@@ -243,18 +242,15 @@
     </PopUp>
 
 
-    <div class="bg-[#f5f6fa] p-4  filter-container space-x-2">
+    <div class="p-4  filter-container space-x-2">
 
       <div class="flex items-center">
-        <h3 class="text-xl md:text-2xs mb-2 text-gray-600"><b>Broadcast List </b></h3>
+        <h3 class="text-xl md:text-2xs mb-2 text-green-700"><b>Broadcast List </b></h3>
         <div class="pb-2 pl-2">
-          <button class="text-blue-500 underline hover:text-blue-700 hover:bg-transparent"
+          <button class=" text-green-600 underline hover:text-green-700 hover:bg-transparent"
             @click="fetchBroadcastList(this.filterStatus, 1)">
-            <i class="bi bi-arrow-clockwise"></i> Refresh
+             <i class="bi bi-arrow-clockwise inline-block text-xl" :class="{ 'animate-spin': loading }"></i> 
           </button>
-          <p v-if="loading"
-            class="ml-2 w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin inline-block">
-          </p>
         </div>
 
       </div>
@@ -276,41 +272,36 @@
     </div>
 
     <div class="overflow-x-auto max-h-[51vh] custom-scrollbar">
-      <table class="w-full rounded-lg border-collapse">
+      <table class="w-full border border-gray-300 rounded-lg text-sm md:text-base bg-white">
         <thead>
-          <tr class="bg-[#ffffff] text-center">
-
-            <th class="p-2 md:p-4 text-left border-b-2 bg-[#ffffff] sticky top-0 ">Broadcast Name</th>
-            <th class="p-2 md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Type</th>
-            <th class="p-2 md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Template</th>
-            <th class="p-2 md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Contacts</th>
-            <th class="p-2 md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Status</th>
-            <th class="p-2 md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Action</th>
-
-
+          <tr class="bg-gray-100 text-center text-gray-700 font-semibold">
+            <th class="p-3 md:p-4 text-left border border-gray-300 sticky top-0 z-10 bg-gray-100">Broadcast Name</th>
+            <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Type</th>
+            <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Template</th>
+            <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Contacts</th>
+            <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Status</th>
+            <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Action</th>
           </tr>
         </thead>
-        <tbody class="bg-white">
-          <tr v-for="broadcast in broadcasts" :key="broadcast.id">
-
-            <td class="border-[#ddd] p-2 md:p-4 text-left">{{ broadcast.name }}</td>
-            <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.type }}</td>
-            <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.template }}</td>
-            <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.contacts.length }}</td>
-            <td class="p-2 md:p-4 text-center">
+        <tbody>
+          <tr v-for="broadcast in broadcasts" :key="broadcast.id" class="hover:bg-gray-50">
+            <td class="p-3 md:p-4 text-left border border-gray-200">{{ broadcast.name }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">{{ broadcast.type }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">{{ broadcast.template }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">{{ broadcast.contacts.length }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">
               <div :class="{
-                'text-green-500 ': broadcast.status === 'Successful',
-                'text-blue-500 ': broadcast.status === 'Scheduled',
-                'text-red-500 ': broadcast.status === 'Cancelled',
-                'text-yellow-500 ': broadcast.status === 'Partially Successful',
-                'text-yellow-600 ': broadcast.status === 'processing...',
-                'border-[#ddd]': true
-              }" class="text-[80%] lg:text-[100%] rounded-lg">
+                'text-green-600 font-semibold': broadcast.status === 'Successful',
+                'text-blue-600 font-semibold': broadcast.status === 'Scheduled',
+                'text-red-500 font-semibold': broadcast.status === 'Cancelled',
+                'text-yellow-500 font-semibold': broadcast.status === 'Partially Successful',
+                'text-yellow-600 font-semibold': broadcast.status === 'processing...',
+              }">
                 {{ broadcast.status }}
               </div>
             </td>
-            <td class="border-[#ddd] p-2 md:p-4 text-center">
-              <button class="text-blue-500 underline hover:text-blue-700 hover:bg-transparent"
+            <td class="p-3 md:p-4 text-center border border-gray-200">
+              <button class="underline text-gray-800 hover:bg-inherit font-medium"
                 @click="showReportPopup = true, fetchBroadcastReport(broadcast.id)">
                 View Report
               </button>
@@ -319,15 +310,31 @@
         </tbody>
       </table>
     </div>
-    <div class="flex justify-end">
-      <div class="flex justify-between items-center">
-        <button class="p-2 text-blue-500 underline hover:text-blue-700 hover:bg-transparent" @click="loadPreviousPage"
-          :disabled="currentPage === 1">Previous</button>
-        <div class="border-2">{{ currentPage }}</div>
-        <button class="p-2 text-blue-500 underline hover:text-blue-700 hover:bg-transparent"
-          @click="loadNextPage">Next</button>
+
+
+
+    
+    <div class="flex justify-center mt-4">
+      <div class="flex items-center space-x-4 bg-white shadow-md rounded-lg px-4 py-2">
+        <button
+          class="px-3 py-1 bg-green-500 text-white font-medium rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          @click="loadPreviousPage"
+          :disabled="currentPage === 1"
+        >
+          Previous
+        </button>
+        <div class="px-4 py-1 border border-gray-300 rounded text-gray-700 font-semibold">
+          {{ currentPage }}
+        </div>
+        <button
+          class="px-3 py-1 bg-green-500 text-white font-medium rounded hover:bg-green-600"
+          @click="loadNextPage"
+        >
+          Next
+        </button>
       </div>
     </div>
+
 
 
 
@@ -678,8 +685,13 @@ export default {
 
 
     async loadNextPage() {
-      this.currentPage += 1;
+      const prevFirst = this.broadcasts[0]?.id;
       await this.fetchBroadcastList(this.filterStatus, this.currentPage);
+      const newFirst = this.broadcasts[0]?.id;
+
+      if (prevFirst !== newFirst && this.broadcasts.length > 0) {
+        this.currentPage += 1;
+      }
     },
     async loadPreviousPage() {
       if (this.currentPage > 1) {
@@ -870,7 +882,7 @@ export default {
     async fetchBroadcastList(statusFilter = null, page = 1) {
       const token = localStorage.getItem('token'); // Retrieve token from localStorage
       const itemsPerPage = 10;
-      this.currentPage = page;
+
       this.filterStatus = statusFilter;// Number of items to display per page
       const url = `${this.apiUrl}/broadcast?limit=${itemsPerPage}&offset=${(page - 1) * itemsPerPage}&statusfilter=${this.filterStatus}`;
 
