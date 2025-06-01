@@ -23,10 +23,10 @@
       </div>
     </div>
 
-    <h3 class="text-xl md:text-2xs mb-4 text-gray-600"><b>Template List</b></h3>
-    <span v-if="cursor" class="ml-5 w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin inline-block"></span>
+    <h3 class="text-xl md:text-2xs mb-4 text-gray-600"><b>Template List</b><span v-if="cursor" class="ml-5 w-5 h-5 border-2 border-green-500 border-t-transparent rounded-full animate-spin inline-block"></span></h3>
+    
 
-    <div class="overflow-x-auto max-h-[60vh] custom-scrollbar mb-2">
+    <div class="overflow-x-auto max-h-[55vh] custom-scrollbar mb-2">
         <table class="w-full border border-gray-300 rounded-lg text-sm md:text-base bg-white"
               :class="{ 'opacity-50 pointer-events-none': tableLoading }">
           <thead>
@@ -41,7 +41,7 @@
               <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody class="">
             <tr v-for="template in templates" :key="template.id" class="hover:bg-gray-50">
               <td class="p-3 md:p-4 text-left border border-gray-200">{{ template.name }}</td>
               <td class="p-3 md:p-4 text-center border border-gray-200">{{ template.language }}</td>
