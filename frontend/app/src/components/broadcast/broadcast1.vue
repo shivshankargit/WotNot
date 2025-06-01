@@ -97,12 +97,12 @@
   
       </div>
       <div>
-        <h4 class="text-green-800"><b>Enter a name for your template.</b></h4>
-        <p class="text-sm mb-2 ">Categorize your templates accoringly</p>
-
+        
         <div class="flex ">
           <div class="mr-4 max-h-[600px] overflow-y-auto custom-scrollbar">
             <form class="p-4" :class="{ 'opacity-50 pointer-events-none': isSubmitted }">
+              <h4 class="text-green-800"><b>Enter a name for your template.</b></h4>
+              <p class="text-sm mb-2 ">Categorize your templates accoringly</p>
               <div class="grid grid-cols-3 gap-4 bg-[#f5f6fa] p-4 mb-2">
                 <div>
                   <label class="block below-402:text-custom-small text-sm font-medium">Template Name
@@ -226,27 +226,19 @@
                 </div>
 
                 <div v-if="headerMediaComponent.format === 'IMAGE' || headerMediaComponent.format === 'VIDEO'">
-                  <div class="flex flex ml-4 items-center max-w-[50px]">
+                  <div class="flex ml-4 place-items-stretch justify-between w-full">
                     <input type="file" @change="handleFileChange" class="mb-4">
 
                     <div>
                       <button @click="uploadFile" :disabled="!selectedFile || isUploading"
-                        class="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:bg-gray-400">
-                        {{ isUploading ? 'Uploading...' : 'Upload' }}
+                        class="mr-5 px-4 py-2 bg-green-700 hover:bg-green-800 text-white rounded-lg disabled:cursor-not-allowed">
+                        {{ isUploading ? 'Uploading...' : 'Upload' }}{{uploadResponse ? 'ed' : ''}}
                       </button>
-                    </div>
-
-                    <div v-if="uploadResponse" class="mt-4 p-2 bg-green-100 border border-green-300 rounded">
-                      <p class="text-sm text-green-700">Upload Successful!</p>
-                    </div>
-
-                    <div v-if="uploadError" class="mt-4 p-2 bg-red-100 border border-red-300 rounded">
-                      <p class="text-sm text-red-700">Error: {{ uploadError }}</p>
                     </div>
                   </div>
                 </div>
               </div>
-              
+
               <h4 class="text-green-800"><b>Body</b></h4>
               <p class="text-sm mb-2 ">This section is the main content of your message</p>
               <div class="bg-[#f5f6fa] p-4" >
@@ -301,13 +293,13 @@
               
 
               <!-- Sub-Category Selection -->
-              <h4 class="text-green-800"><b>Sub-Category</b></h4>
+              <!-- <h4 class="text-green-800"><b>Sub-Category</b></h4> -->
               <!-- <p class="text-sm mb-2 "></p> -->
                
-              <select v-model="selectedSubCategory" v-if="selectedCategory === 'Marketing'"
+              <!-- <select v-model="selectedSubCategory" v-if="selectedCategory === 'Marketing'"
                 class="border border-[#ddd] rounded-md w-full mb-2 p-2 "  />
                 <option value="" disabled>Select Sub-Category</option>
-                <option value="ORDER_DETAILS">Order Details</option>
+                <option value="ORDER_DETAILS">Order Details</option> -->
               <!-- <option value="CUSTOM">Custom</option> -->
               <!-- <option value="ORDER_STATUS">Order Status</option>
               </select>-->

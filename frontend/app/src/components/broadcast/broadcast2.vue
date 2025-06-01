@@ -33,8 +33,10 @@
 
         <div class="popup-content custom-scrollbar p-4">
           <form @submit.prevent="handleBroadcast" id="messageForm"
-            :class="{ 'opacity-50 pointer-events-none': isSubmitted }">
-
+            :class="{ 'opacity-50 pointer-events-none': isSubmitted , 'cursor-not-allowed':isUploding }"
+      
+            >
+            
 
             <h4 class="text-green-700"><b>What message do you want to send?</b></h4>
             <p class="text-sm mb-2 ">Add broadcast name and template below</p>
@@ -73,8 +75,12 @@
                 <div v-if="selectedTemplateHasMedia">
                   <label for="" class="block text-sm font-semibold">Upload Media</label>
                   <input type="file" @change="onFileChange" class="mb-2 w-[60%] mr-1">
+                  <div v-if="uploadedMedia"><p  class="text-green-800 font-bold">Uploaded</p></div>
+                  <div v-else><span class="ml-5 w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin inline-block"></span></div>
+                  
+
                 </div>
-                <div v-if="uploadedMedia">{{ this.mediaId }}</div>
+                
 
                 <div v-if="selectedTemplateHasParameters">
                   <label for="">Select Parameter</label>
@@ -992,7 +998,7 @@ export default {
         }
         else {
           this.uploadedMedia = true
-          alert("Media Uploaded Successfully")
+          // alert("Media Uploaded Successfully")
         }
       } catch (error) {
         console.error('Error uploading media:', error);
