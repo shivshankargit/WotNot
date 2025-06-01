@@ -305,9 +305,9 @@
               <!-- <p class="text-sm mb-2 "></p> -->
                
               <select v-model="selectedSubCategory" v-if="selectedCategory === 'Marketing'"
-                class="border border-[#ddd] rounded-md w-full mb-2 p-2 "  >
+                class="border border-[#ddd] rounded-md w-full mb-2 p-2 "  />
                 <option value="" disabled>Select Sub-Category</option>
-                <option value="ORDER_DETAILS">Order Details</option> -->
+                <option value="ORDER_DETAILS">Order Details</option>
               <!-- <option value="CUSTOM">Custom</option> -->
               <!-- <option value="ORDER_STATUS">Order Status</option>
               </select>-->
