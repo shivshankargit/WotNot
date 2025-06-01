@@ -104,7 +104,9 @@
 </template>
 
 <script>
+import zxcvbn from 'zxcvbn';
 export default {
+  
   data() {
     return {
       apiUrl: process.env.VUE_APP_API_URL,

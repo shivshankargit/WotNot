@@ -1285,4 +1285,56 @@ async def load_media(
 
 
 
+from fastapi import FastAPI, Request, HTTPException, Query
+from fastapi.responses import StreamingResponse
+import httpx
+import io
+from fastapi import APIRouter, Query, Depends, HTTPException
+from fastapi.responses import StreamingResponse
+
+
+import mimetypes
+from urllib.parse import urlparse, unquote
+
+
+
+
+@router.get("/download-media")
+async def download_media(
+    media_url: str = Query(..., description="URL of the media to download"),
+    get_current_user: user.newuser = Depends(get_current_user)
+):
+    headers = {
+        "Authorization": f"Bearer {get_current_user.PAccessToken}"
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            response = await client.get(media_url, headers=headers)
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail="Failed to fetch media")
+
+        content_type = response.headers.get("content-type", "application/octet-stream")
+
+        # Extract a safe filename
+        parsed_url = urlparse(media_url)
+        filename = unquote(parsed_url.path.split("/")[-1].split("?")[0]) or "downloaded_media"
+        
+        # Add extension if it's missing
+        if "." not in filename:
+            ext = mimetypes.guess_extension(content_type) or ""
+            filename += ext
+
+        return StreamingResponse(
+            io.BytesIO(response.content),
+            media_type=content_type,
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"'
+            }
+        )
+
+    except httpx.RequestError as exc:
+        raise HTTPException(status_code=500, detail=f"Error fetching media: {str(exc)}")
+
 

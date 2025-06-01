@@ -7,13 +7,15 @@
       </div>
 
       <div>
-        <button class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
-        @click="showPopup = true, fetchContacts()">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+        <button
+          class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
+          @click="showPopup = true, fetchContacts()">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
           </svg>
           New Broadcast
-      </button>
+        </button>
         <!-- <button @click="showPopup = true, fetchContacts()"
           class="bg-[#075e54] text-[#f5f6fa] px-4 py-2 md:px-4 md:py-4 text-sm md:text-base rounded-md shadow-lg ">
           
@@ -32,7 +34,8 @@
 
 
         <div class="popup-content custom-scrollbar p-4">
-          <form @submit.prevent="handleBroadcast" id="messageForm" :class="{ 'opacity-50 pointer-events-none': isSubmitted }">
+          <form @submit.prevent="handleBroadcast" id="messageForm"
+            :class="{ 'opacity-50 pointer-events-none': isSubmitted }">
 
 
             <h4><b>What message do you want to send?</b></h4>
@@ -69,9 +72,9 @@
                 </select>
 
                 <!-- Conditional Image URL input field -->
-                <div v-if="selectedTemplateHasImage">
+                <div v-if="selectedTemplateHasMedia">
                   <label for="" class="block text-sm font-semibold">Upload Media</label>
-                  <input type="file" @change="onFileChange" class="mb-2 w-[60%] mr-1" required>
+                  <input type="file" @change="onFileChange" class="mb-2 w-[60%] mr-1">
                 </div>
                 <div v-if="uploadedMedia">{{ this.mediaId }}</div>
 
@@ -197,14 +200,13 @@
             <!-- <button type="submit" class="bg-[#23a455] text-[#f5f6fa] px-4 py-2 rounded">{{ isScheduled ?
               'Schedule Message' : 'Send Message' }}</button> -->
 
-              <button
-              type="submit"
+            <button type="submit"
               class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
               :disabled="popupLoading || isSubmitted">
               <span v-if="popupLoading"
                 class="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4 mr-2"></span>
               {{ isSubmitted ? "Submitted" : popupLoading ? "Submitting..." : isScheduled ?
-              'Schedule Message' : 'Send Message' }}
+                'Schedule Message' : 'Send Message' }}
             </button>
           </form>
         </div>
@@ -250,7 +252,9 @@
             @click="fetchBroadcastList(this.filterStatus, 1)">
             <i class="bi bi-arrow-clockwise"></i> Refresh
           </button>
-          <p v-if="loading" class="ml-2 w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin inline-block"></p>
+          <p v-if="loading"
+            class="ml-2 w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin inline-block">
+          </p>
         </div>
 
       </div>
@@ -270,7 +274,7 @@
 
       </div>
     </div>
-    
+
     <div class="overflow-x-auto max-h-[51vh] custom-scrollbar">
       <table class="w-full rounded-lg border-collapse">
         <thead>
@@ -515,7 +519,7 @@ export default {
       // Tmeplate preview
       previewData: null,
 
-      loading:false,
+      loading: false,
       currentPage: 1,
       tooltipVisible: null, // Index of the row with a visible tooltip
       tooltipStyles: {},
@@ -549,7 +553,7 @@ export default {
 
 
       selectedTemplateId: null, // Holds the selected template's ID
-      selectedTemplateHasImage: false, // Boolean to control if image URL input should appear
+      selectedTemplateHasMedia: false, // Boolean to control if image URL input should appear
       imageUrl: '',// To store the input value for the image URL
       selectedTemplateHasParameters: false,
       bodyParameters: [],
@@ -561,7 +565,7 @@ export default {
       // loading
       popupLoading: false,
       isSubmitted: false,
-      tableLoading:false
+      tableLoading: false
 
     };
   },
@@ -594,6 +598,15 @@ export default {
        style="width: 100%; height: 100%; object-fit: cover; object-position: start; display: block ; border-radius: 4px">
 </div>`;
 
+            }
+            else if (component.format === 'VIDEO' && component.example?.header_handle) {
+              previewMessage += `<div style="width: auto; height: 200px; overflow: hidden; position: relative; border-radius: 5px">
+                <video controls 
+                    src="${component.example.header_handle[0]}" 
+                    style="width: 100%; height: 100%; object-fit: cover; object-position: start; display: block; border-radius: 4px">
+                    Your browser does not support the video tag.
+                </video>
+            </div>`;
             }
             break;
           }
@@ -707,7 +720,7 @@ export default {
 
     async fetchtemplateList() {
       const token = localStorage.getItem('token');
-      
+
       try {
         const response = await fetch(`${this.apiUrl}/template`, {
           method: 'GET',
@@ -728,27 +741,74 @@ export default {
       }
     },
 
-    onTemplateSelect() {
+    async onTemplateSelect() {
       // Find the selected template
+  
       const selectedTemplate = this.templates.find(template => template.id === this.selectedTemplateId);
       this.previewData = this.generateTemplatePreview(selectedTemplate.components);
       console.log(this.previewData);
 
       // Check if the selected template has a HEADER with IMAGE format
       const headerComponent = selectedTemplate.components.find(
-        component => component.type === 'HEADER' && component.format === 'IMAGE'
+        component => component.type === 'HEADER' && (component.format === 'IMAGE' || component.format === 'VIDEO')
 
       );
 
+      // if (headerComponent) {
+      //   // Show the image input field and pre-fill with the example image URL if available
+      //   this.selectedTemplateHasMedia = true;
+      //   this.imageUrl = headerComponent.example?.header_handle?.[0] || ''; // Use the first example image if available
+      // } else {
+      //   // Hide the image input field if no image is found in the template
+      //   this.selectedTemplateHasMedia = false;
+      //   this.imageUrl = '';
+      // }
+
       if (headerComponent) {
-        // Show the image input field and pre-fill with the example image URL if available
-        this.selectedTemplateHasImage = true;
-        this.imageUrl = headerComponent.example?.header_handle?.[0] || ''; // Use the first example image if available
+        this.selectedTemplateHasMedia = true;
+        this.imageUrl = headerComponent.example?.header_handle?.[0] || '';
+
+        if (this.imageUrl) {
+          try {
+            const token = localStorage.getItem('token'); // or however you're storing it
+            const downloadUrl = new URL("http://localhost:8000/download-media");
+            downloadUrl.searchParams.append("media_url", this.imageUrl);
+
+            const response = await fetch(downloadUrl.toString(), {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            });
+
+            if (!response.ok) {
+              throw new Error(`Download failed with status ${response.status}`);
+            }
+
+            const blob = await response.blob();
+            console.log("Blob received:", blob);
+            const contentType = response.headers.get("content-type") || "application/octet-stream";
+            const ext = contentType.split("/")[1] || "bin";
+            const file = new File([blob], `template-media.${ext}`, { type: contentType });
+
+            const fakeEvent = {
+              target: {
+                files: [file]
+              }
+            };
+
+            await this.onFileChange(fakeEvent);
+            this.popupLoading = false;
+            console.log(`Template media downloaded and uploaded successfully.: ${this.mediaId}`);
+          } catch (error) {
+            console.error("Failed to download/upload template media:", error);
+          }
+        }
       } else {
-        // Hide the image input field if no image is found in the template
-        this.selectedTemplateHasImage = false;
+        this.selectedTemplateHasMedia = false;
         this.imageUrl = '';
       }
+
+
 
 
       // Check if the selected template has BODY parameters
@@ -787,11 +847,11 @@ export default {
             'Content-Type': 'application/json',
           },
         });
-      
+
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        
+
         const contactList = await response.json();
         this.contacts = contactList.map(contact => ({
           id: contact.id,
@@ -816,7 +876,7 @@ export default {
 
       try {
         // Fetch data from the backend
-        this.loading=true;
+        this.loading = true;
         // await new Promise(resolve => setTimeout(resolve, 2000));
         const response = await fetch(url, {
           method: 'GET',
@@ -825,7 +885,7 @@ export default {
             'Content-Type': 'application/json',
           },
         });
-        
+
         // Check if the response is OK
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -833,7 +893,7 @@ export default {
 
         // Parse JSON response
         const broadcastList = await response.json();
-        this.loading=false;
+        this.loading = false;
         // Process and optionally filter broadcasts
         this.broadcasts = broadcastList
           .map((broadcast) => ({
@@ -882,15 +942,19 @@ export default {
     },
 
 
-    onFileChange(event) {
-      this.file = event.target.files[0];
+    async onFileChange(event) {
+      this.mediafile = event.target.files[0];
       this.uploadMedia();
     },
 
 
     async uploadMedia() {
+      if (!this.mediafile) {
+        console.error("No file available for upload");
+        return;
+      }
       const token = localStorage.getItem('token');
-      this.mediafile = event.target.files[0];
+
       const formData = new FormData();
       formData.append('file', this.mediafile);
 
@@ -927,7 +991,7 @@ export default {
 
     async sendBroadcast() {
       const toast = useToast();
-      
+
 
       // Assuming recipients have both name and number in format 'Name:1234567890'
       const contacts = this.recipients.split(',').map(entry => {
@@ -939,7 +1003,7 @@ export default {
       const selectedTemplate = Template.name;
       const formattedDate = this.formatDateTime(new Date());
       const broadcastNameWithDate = `${this.broadcastName} - ${formattedDate}`;
-      
+
       const mediaID = this.mediaId;
       const token = localStorage.getItem('token');
       const bodyparamter = this.bodyParameter
@@ -987,7 +1051,7 @@ export default {
 
       } catch (error) {
         console.error('Error sending broadcast:', error);
-        
+
       }
     },
 
@@ -1067,10 +1131,10 @@ export default {
       const scheduledDatetime = new Date(`${this.scheduleDate}T${this.scheduleTime}`).toISOString();
 
       try {
-        this.popupLoading=true;
+        this.popupLoading = true;
         this.fetchBroadcastList();
 
-        
+
 
 
         const requestBody = {
@@ -1108,8 +1172,8 @@ export default {
           throw new Error('Network response was not ok');
         } else {
           toast.success('Broadcast scheduled successfully!');
-          this.popupLoading=false;
-          this.isSubmitted=true;
+          this.popupLoading = false;
+          this.isSubmitted = true;
           this.fetchBroadcastList();
         }
 
@@ -1121,13 +1185,13 @@ export default {
 
 
     clearForm() {
-        this.popupLoading=false;
-        this.isSubmitted=false,
+      this.popupLoading = false;
+      this.isSubmitted = false,
         this.contact = "",
-        this.previewData='';
-        this.broadcastName = '',
+        this.previewData = '';
+      this.broadcastName = '',
         this.selectedTemplateHasParameters = '',
-        this.selectedTemplateHasImage = false,
+        this.selectedTemplateHasMedia = false,
         this.selectedTemplateId = '',
         this.bodyParameter = '',
         this.recipients = '',

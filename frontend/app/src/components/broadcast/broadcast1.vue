@@ -26,7 +26,8 @@
     </div>
 
     <h3 class="text-xl md:text-2xs mb-4 text-gray-600"><b>Template List</b></h3>
-    <span v-if="cursor" class="ml-5 w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin inline-block"></span>
+    <span v-if="cursor"
+      class="ml-5 w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin inline-block"></span>
 
     <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
 
@@ -213,16 +214,18 @@
 
 
               <label for="">Header</label>
-              <select v-model="selectedHeaderFormat" class="border border-[#ddd] p-2 rounded-md w-full mb-2">
+              <select v-model="headerMediaComponent.format" class="border border-[#ddd] p-2 rounded-md w-full mb-2">
                 <option value="TEXT">Text</option>
                 <option value="IMAGE">Image</option>
+                <option value="VIDEO">Video</option>
+
               </select>
 
-              <div v-if="selectedHeaderFormat === 'TEXT'">
+              <div v-if="headerMediaComponent.format === 'TEXT'">
                 <input v-model="headerComponent.text" class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
               </div>
 
-              <div v-else-if="selectedHeaderFormat === 'IMAGE'">
+              <div v-if="headerMediaComponent.format === 'IMAGE' || headerMediaComponent.format === 'VIDEO'">
                 <div class="flex flex ml-4 items-center max-w-[50px]">
                   <input type="file" @change="handleFileChange" class="mb-4">
 
@@ -250,16 +253,33 @@
               </div> -->
 
               <div>
-                <label class="block text-sm font-medium">Body<span class="text-red-800">*</span></label>
+                <label class="block text-sm font-medium">
+                  Body<span class="text-red-800">*</span>
+                </label>
 
                 <textarea v-model="bodyComponent.text" class="mt-1 p-2 w-full border border-gray-300 rounded-md h-30"
                   placeholder="Template Message..." rows="4" required></textarea>
 
                 <div v-if="warningData"
                   class="mt-2 p-3 bg-yellow-100 text-yellow-800 text-sm rounded-md border border-yellow-300">
-                  <p class="font-semibold">Warning:{{warningData}}</p>
+                  <!-- Icon + Text -->
+                  <div class="flex items-start space-x-2">
+                    <!-- Warning Icon -->
+                    <svg class="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd"
+                        d="M8.257 3.099c.765-1.36 2.721-1.36 3.486 0l6.518 11.595c.75 1.335-.213 2.993-1.743 2.993H3.482c-1.53 0-2.493-1.658-1.743-2.993L8.257 3.1zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-2a1 1 0 01-1-1V7a1 1 0 112 0v3a1 1 0 01-1 1z"
+                        clip-rule="evenodd" />
+                    </svg>
+
+                    <!-- Warning Message -->
+                    <p class="font-semibold">
+                      {{ warningData }}
+                    </p>
+                  </div>
                 </div>
               </div>
+
 
               <div>
                 <button type="button" @click="addVariable"
@@ -294,7 +314,7 @@
                 <h4>Variable Examples</h4>
                 <div v-for="(variable, index) in variables" :key="index">
                   <input type="text" :placeholder="'Variable ' + (index + 1)" v-model="variables[index]"
-                    class="border border-[#ddd] p-2 rounded-md w-50px mb-2" />
+                    class="border border-[#ddd] p-2 rounded-md w-50px mb-2" required />
                 </div>
               </div>
 
@@ -323,8 +343,8 @@
                 class="border border-[#ddd] p-2 rounded-md w-full mb-2">
                 <option value="" disabled>Select Sub-Category</option>
                 <option value="ORDER_DETAILS">Order Details</option> -->
-                <!-- <option value="CUSTOM">Custom</option> -->
-                <!-- <option value="ORDER_STATUS">Order Status</option>
+              <!-- <option value="CUSTOM">Custom</option> -->
+              <!-- <option value="ORDER_STATUS">Order Status</option>
               </select>-->
               <!-- Actions -->
               <div class="flex space-x-4">
@@ -381,7 +401,7 @@ export default {
   data() {
     return {
 
-      cursor:false,
+      cursor: false,
       apiUrl: process.env.VUE_APP_API_URL,
       selectedFile: null,
       isUploading: false,
@@ -426,9 +446,9 @@ export default {
         format: 'TEXT',
         text: ''
       },
-      headerImageComponent: {
+      headerMediaComponent: {
         type: 'HEADER',
-        format: 'IMAGE',
+        format: '',
         example: {
           header_handle: [
             ''
@@ -479,16 +499,16 @@ export default {
     // },
 
     addVariable() {
-      const countWords = (text) => {
-        if (!text) return 0;
-        return text.split(/\s+/).filter(word => word.trim().length > 0).length;
-      };
+      // const countWords = (text) => {
+      //   if (!text) return 0;
+      //   return text.split(/\s+/).filter(word => word.trim().length > 0).length;
+      // };
 
       const text = this.bodyComponent.text || '';
-      const wordCount = countWords(text);
+      // const wordCount = countWords(text);
 
       const currentVariables = text.match(/{{\d+}}/g) || [];
-      const requiredWords = 3 * (currentVariables.length + 1);
+      // const requiredWords = 3 * (currentVariables.length + 1);
 
       // if (wordCount < requiredWords) {
       //   alert(`The text must have at least ${requiredWords} words to add ${currentVariables.length + 1} variables.`);
@@ -511,33 +531,8 @@ export default {
     },
 
 
-    //     addVariable() {
-    //   // Function to count words in the text
-    //   const countWords = (text) => {
-    //     return text.split(/\s+/).filter(word => word.trim().length > 0).length;
-    //   };
-
-    //   // Check the word count before adding the variable
-    //   const wordCount = countWords(this.bodyComponent.text);
-    //   console.log(wordCount)
-    //   const currentVariables = this.bodyComponent.text.match(/{{\d+}}/g) || [];
-
-    //   if(wordCount<3*currentVariables.length+1){
-    //     alert("The text must have at least 3 words before adding a variable.");
-    //     return;
-    //   }
 
 
-    //   // Count existing variables in the text
-
-
-    //   // Determine the next variable number
-    //   const nextVariableNumber = currentVariables.length + 1;
-
-    //   // Append the new variable to the text
-    //   this.bodyComponent.text += ` {{${nextVariableNumber}}}`;
-    //   this.variableCounter = nextVariableNumber;
-    // },
 
     showpreview(preview) {
       this.showPreview = true;
@@ -556,7 +551,7 @@ export default {
 
     async fetchtemplateList() {
       const token = localStorage.getItem('token');
-      this.cursor=true;
+      this.cursor = true;
       try {
         const response = await fetch(`${this.apiUrl}/template`, {
           method: 'GET',
@@ -565,14 +560,14 @@ export default {
             'Content-Type': 'application/json',
           },
         });
-        
+
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        
+
         const templatelist = await response.json();
         this.templates = templatelist.data;
-        this.cursor=false;
+        this.cursor = false;
 
         // Generate previews for templates
         this.templates = this.templates.map(template => {
@@ -613,6 +608,16 @@ export default {
        style="width: 100%; height: 100%; object-fit: cover; object-position: start; display: block ; border-radius: 4px">
 </div>`;
 
+            }
+
+            else if (component.format === 'VIDEO' && component.example?.header_handle) {
+              previewMessage += `<div style="width: auto; height: 200px; overflow: hidden; position: relative; border-radius: 5px">
+                <video controls 
+                    src="${component.example.header_handle[0]}" 
+                    style="width: 100%; height: 100%; object-fit: cover; object-position: start; display: block; border-radius: 4px">
+                    Your browser does not support the video tag.
+                </video>
+            </div>`;
             }
             break;
           }
@@ -669,18 +674,28 @@ export default {
       return previewMessage;
     },
 
-    // Replace placeholders with example data (or default values if not available)
+
+
+
+
     replacePlaceholders(bodyText, example) {
-      if (example && example.length > 0) {
-        // Assuming example contains placeholder names like "Name"
-        example.forEach((param, index) => {
+      if (!bodyText || !Array.isArray(example) || example.length === 0) return bodyText;
+
+      example.forEach((param, index) => {
+        if (param && param.toString().trim() !== '') {
           const placeholder = `${index + 1}`;
-          bodyText = bodyText.replace(placeholder, param[0]); // Replace with the actual placeholder value
-        });
-      }
-      // console.log(bodyText);
+          const regex = new RegExp(placeholder, 'g');
+          bodyText = bodyText.replace(regex, param.toString().trim());
+        }
+      });
+
       return bodyText;
     },
+
+
+
+
+
 
     updateTemplateComponents() {
 
@@ -698,11 +713,11 @@ export default {
       }
 
       if (
-        this.headerImageComponent.example.header_handle &&
-        this.headerImageComponent.example.header_handle.length > 0 &&
-        this.headerImageComponent.example.header_handle[0] !== ''
+        this.headerMediaComponent.example.header_handle &&
+        this.headerMediaComponent.example.header_handle.length > 0 &&
+        this.headerMediaComponent.example.header_handle[0] !== ''
       ) {
-        components.push(this.headerImageComponent);
+        components.push(this.headerMediaComponent);
       }
 
       if (this.footerComponent.text) {
@@ -887,12 +902,51 @@ export default {
         });
 
         this.uploadResponse = response.data;
-        this.headerImageComponent.example.header_handle[0] = response.data.upload_response?.h || "N/A";
+        this.headerMediaComponent.example.header_handle[0] = response.data.upload_response?.h || "N/A";
         console.log(this.uploadHandleID);
       } catch (error) {
         this.uploadError = error.response ? error.response.data.detail : "Upload failed";
       } finally {
         this.isUploading = false;
+      }
+    },
+
+    updateVariablesFromText(newText) {
+      const placeholders = newText.match(/{{\d+}}/g) || [];
+      const uniquePlaceholders = [...new Set(placeholders.map(p => parseInt(p.match(/\d+/)[0])))];
+      const requiredLength = uniquePlaceholders.length;
+
+      if (this.variables.length < requiredLength) {
+        while (this.variables.length < requiredLength) {
+          this.variables.push('');
+        }
+      } else if (this.variables.length > requiredLength) {
+        this.variables.splice(requiredLength);
+      }
+
+      console.log("Updated variables:", this.variables);
+    },
+
+    validateTemplateText(newText) {
+      const countWords = (text) => {
+        if (!text) return 0;
+        return text.split(/\s+/).filter(word => word.trim().length > 0).length;
+      };
+
+      const text = newText || '';
+      const wordCount = countWords(text);
+      const currentVariables = text.match(/{{\d+}}/g) || [];
+      const variableCount = currentVariables.length;
+
+      if (variableCount > 0) {
+        const ratio = (wordCount - 1) / variableCount;
+        if (ratio < 3) {
+          this.warningData = "This template contains too many variable parameters relative to the message length. You need to decrease the number of variable parameters or increase the message length.";
+        } else {
+          this.warningData = null;
+        }
+      } else {
+        this.warningData = null;
       }
     }
 
@@ -906,39 +960,85 @@ export default {
     },
 
 
-'bodyComponent.text': function (newText) {
-  // === Watcher A logic ===
-  const placeholders = newText.match(/{{\d+}}/g) || [];
-  const uniquePlaceholders = [...new Set(placeholders.map(p => parseInt(p.match(/\d+/)[0])))];
-  const requiredLength = uniquePlaceholders.length;
+    // 'bodyComponent.text': function (newText) {
+    //   // === Watcher A logic ===
+    //   const placeholders = newText.match(/{{\d+}}/g) || [];
+    //   const uniquePlaceholders = [...new Set(placeholders.map(p => parseInt(p.match(/\d+/)[0])))];
+    //   const requiredLength = uniquePlaceholders.length;
 
-  if (this.variables.length < requiredLength) {
-    while (this.variables.length < requiredLength) {
-      this.variables.push('');
-    }
-  } else if (this.variables.length > requiredLength) {
-    this.variables.splice(requiredLength);
-  }
-  console.log("Updated variables:", this.variables);
+    //   if (this.variables.length < requiredLength) {
+    //     while (this.variables.length < requiredLength) {
+    //       this.variables.push('');
+    //     }
+    //   } else if (this.variables.length > requiredLength) {
+    //     this.variables.splice(requiredLength);
+    //   }
+    //   console.log("Updated variables:", this.variables);
 
-  // === Watcher B logic ===
-  const countWords = (text) => {
-    if (!text) return 0;
-    return text.split(/\s+/).filter(word => word.trim().length > 0).length;
-  };
+    //   // === Watcher B logic ===
+    //   const countWords = (text) => {
+    //     if (!text) return 0;
+    //     return text.split(/\s+/).filter(word => word.trim().length > 0).length;
+    //   };
 
-  const wordCount = countWords(newText);
-  const variableCount = placeholders.length;
+    //   const wordCount = countWords(newText);
+    //   const variableCount = placeholders.length;
 
-  if (variableCount > 0) {
-    if ((wordCount - 1) / variableCount < 3) {
-      this.warningData = `The text must have exactly 3 words per variable (after subtracting 1 word). Current: ${(wordCount - 1) / variableCount}`;
-  }
-  } else {
-      this.warningData = null;
-    }
-},
+    //   if (variableCount > 0) {
+    //     if ((wordCount - 1) / variableCount < 3) {
+    //       this.warningData = "This template contains too many variable parameters relative to the message length. You need to decrease the number of variable parameters or increase the message length.";
+    //     }
+    //   } else {
+    //     this.warningData = null;
+    //   }
+    // },
 
+    // 'bodyComponent.text': function (newText) {
+    //   const placeholders = newText.match(/{{\d+}}/g) || [];
+
+    //   const uniquePlaceholders = [...new Set(placeholders.map(p => parseInt(p.match(/\d+/)[0])))];
+    //   const requiredLength = uniquePlaceholders.length;
+
+    //   // Resize the variables array reactively
+    //   if (this.variables.length < requiredLength) {
+    //     while (this.variables.length < requiredLength) {
+    //       this.variables.push('');
+    //     }
+    //   } else if (this.variables.length > requiredLength) {
+    //     this.variables.splice(requiredLength);
+    //   }
+    //   console.log("Updated variables:", this.variables);
+    // },
+
+    // 'bodyComponent.text'(newText) {
+    //   const countWords = (text) => {
+    //     if (!text) return 0;
+    //     return text.split(/\s+/).filter(word => word.trim().length > 0).length;
+    //   };
+
+    //   const text = newText || '';
+    //   const wordCount = countWords(text);
+
+    //   const currentVariables = text.match(/{{\d+}}/g) || [];
+    //   const variableCount = currentVariables.length;
+
+    //   // Only validate if at least 1 variable is present
+    //   if (variableCount > 0) {
+    //     // Check if (wordCount - 1) / variableCount === 3
+    //     if ((wordCount - 1) / variableCount < 3) {
+    //       this.warningData="This template contains too many variable parameters relative to the message length. You need to decrease the number of variable parameters or increase the message length.";
+    //     }
+    //     else {
+    //       this.warningData = null; // Clear warning if condition is met
+    //     }
+    //   }
+    // },
+
+
+    'bodyComponent.text'(newText) {
+      this.updateVariablesFromText(newText);
+      this.validateTemplateText(newText);
+    },
 
 
     selectType(type) {
@@ -979,7 +1079,7 @@ export default {
         this.updateTemplateComponents();
       }
     },
-    headerImageComponent: {
+    headerMediaComponent: {
       deep: true,
       handler() {
         this.updateTemplateComponents();
