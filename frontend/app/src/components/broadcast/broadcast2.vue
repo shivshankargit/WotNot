@@ -26,6 +26,8 @@
 
 
       <h2 class="text-xl font-semibold mb-4 text-green-800">New Broadcast</h2>
+
+      <hr class="pb-4">
       
 
       <div class="flex">
@@ -297,11 +299,11 @@
             <td class="p-3 md:p-4 text-center border border-gray-200">{{ broadcast.contacts.length }}</td>
             <td class="p-3 md:p-4 text-center border border-gray-200">
               <div :class="{
-                'text-green-600 font-semibold': broadcast.status === 'Successful',
-                'text-blue-600 font-semibold': broadcast.status === 'Scheduled',
-                'text-red-500 font-semibold': broadcast.status === 'Cancelled',
-                'text-yellow-500 font-semibold': broadcast.status === 'Partially Successful',
-                'text-yellow-600 font-semibold': broadcast.status === 'processing...',
+                  'text-emerald-600 font-semibold': broadcast.status === 'Successful',           // Green: Success
+                  'text-sky-600 font-semibold': broadcast.status === 'Scheduled',                // Blue: Info/Scheduled
+                  'text-rose-600 font-semibold': broadcast.status === 'Cancelled',              // Red: Danger/Cancelled
+                  'text-amber-600 font-semibold': broadcast.status === 'Partially Successful',  // Amber: Warning/Partial
+                  'text-indigo-600 font-semibold': broadcast.status === 'processing...', 
               }">
                 {{ broadcast.status }}
               </div>
@@ -456,17 +458,17 @@
       </div>
 
 
-      <div class="overflow-x-auto max-h-[45vh] overflow-y-auto custom-scrollbar">
-        <table class="w-full rounded-lg border-collapse">
-          <thead>
-            <tr class="text-center">
+    <div class="p-4 overflow-x-auto max-h-[51vh] custom-scrollbar">
+      <table class="w-full border border-gray-300 rounded-lg text-sm md:text-base bg-white">
+        <thead>
+          <tr class="bg-gray-100 text-center text-gray-700 font-semibold">
               <th class="p-2 md:p-4 border-b-2 sticky top-0">Name</th>
               <th class="p-2 md:p-4 border-b-2 sticky top-0">Phone No</th>
               <th class="p-2 md:p-4 border-b-2 sticky top-0">Status</th>
-              <th class="p-2 md:p-4 border-b-2 sticky top-0">Sent</th>
+              <!-- <th class="p-2 md:p-4 border-b-2 sticky top-0">Sent</th>
               <th class="p-2 md:p-4 border-b-2 sticky top-0">Delivered</th>
               <th class="p-2 md:p-4 border-b-2 sticky top-0">Read</th>
-              <th class="p-2 md:p-4 border-b-2 sticky top-0">Replied</th>
+              <th class="p-2 md:p-4 border-b-2 sticky top-0">Replied</th> -->
               <th class="p-2 md:p-4 border-b-2 sticky top-0">Failure Reason</th>
 
             </tr>
@@ -476,10 +478,10 @@
               <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.contact_name }}</td>
               <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.phone_no }}</td>
               <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.status }}</td>
-              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.sent }}</td>
+              <!-- <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.sent }}</td>
               <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.delivered }}</td>
               <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.read }}</td>
-              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.replied }}</td>
+              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.replied }}</td> -->
               <td class="border-[#ddd] p-2 md:p-4 text-center">
                 <div class="relative flex justify-center items-center">
                   <button v-if="contactReport.error_reason" @mouseenter="showTooltip(index, $event)"
@@ -692,7 +694,7 @@ export default {
 
     async loadNextPage() {
       const prevFirst = this.broadcasts[0]?.id;
-      await this.fetchBroadcastList(this.filterStatus, this.currentPage);
+      await this.fetchBroadcastList(this.filterStatus, this.currentPage+1);
       const newFirst = this.broadcasts[0]?.id;
 
       if (prevFirst !== newFirst && this.broadcasts.length > 0) {
@@ -1413,6 +1415,8 @@ export default {
 </script>
 
 <style scoped>
+
+
 .tooltip-container {
   display: flex;
   position: fixed;
@@ -1454,10 +1458,16 @@ export default {
 
 
 .info-button {
-  display: flex;
+  display: inline-flex;       /* Use inline-flex so it wraps to content */
   align-items: center;
   cursor: pointer;
   color: blue;
+  padding: 4px 8px;           /* Small padding around the text */
+  border: 1px solid blue;     /* Optional: add a border */
+  border-radius: 4px;         /* Slightly rounded corners */
+  font-size: 14px;            /* Optional: control font size */
+  background-color: #f0f8ff;  /* Optional: light background */
+  width: fit-content;         /* Ensure it fits content size */
 }
 
 .custom-scrollbar::-webkit-scrollbar {

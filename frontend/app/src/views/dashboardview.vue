@@ -733,7 +733,7 @@ h2 {
 button {
   background-color: #075e54;
   color: white;
-  border: none;
+  
   border-radius: 5px;
   padding: 10px;
   font-size: 16px;

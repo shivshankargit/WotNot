@@ -4,7 +4,7 @@
 
       <div class="flex justify-between items-center">
         <div>
-          <h2 class="title">Cost Breakdown <span class="info">Info</span></h2>
+          <h2 class="title">Conversations <span class="info">Info</span></h2>
         </div>
 
         <!-- <label>Start Date: <input type="date" v-model="startDate" /></label>

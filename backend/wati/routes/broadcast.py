@@ -381,43 +381,87 @@ def convert_to_dict(instance):
 
 
 
+# @router.get("/active-conversations")
+# async def get_active_conversations(
+#     token: str = Query(...),
+#     db: AsyncSession = Depends(database.get_db),  # Use AsyncSession for async DB operations
+# ) -> StreamingResponse:
+#     '''
+#     Stream active conversations for the current user.
+#     '''
+#     # Authenticate the user using the token
+#     current_user = await get_current_user(token, db)
+#     if current_user is None:
+#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
+
+#     async def get_active_chats() -> AsyncGenerator[str, None]:
+#         last_active_chats = None  # Variable to hold the last known state of active chats
+        
+#         while True:
+#             # Asynchronously query the database for active chats
+#             result = await db.execute(
+#                 select(ChatBox.Last_Conversation)
+#                 .filter(cast(ChatBox.Last_Conversation.receiver_wa_id, String) == str(current_user.Phone_id)).order_by(desc(ChatBox.Last_Conversation.last_chat_time))
+#             )
+            
+#             # Fetch results and convert to a list of dictionaries
+#             active_chat_data = [convert_to_dict(chat) for chat in result.scalars().all()]
+
+#             # Check if the current active chats are different from the last known state
+#             if active_chat_data != last_active_chats:
+#                 # Update the last known state
+#                 last_active_chats = active_chat_data
+#                 # Yield the updated active chats as a JSON string
+#                 yield f"data: {json.dumps(active_chat_data)}\n\n"
+
+#             # Sleep for a while before the next check
+#             await asyncio.sleep(1)  # Use await with asyncio.sleep for non-blocking sleep
+
+#     return StreamingResponse(get_active_chats(), media_type="text/event-stream")
+
+
+
+
+
+
 @router.get("/active-conversations")
 async def get_active_conversations(
+    request: Request,  # <-- Add request param here
     token: str = Query(...),
-    db: AsyncSession = Depends(database.get_db),  # Use AsyncSession for async DB operations
+    db: AsyncSession = Depends(database.get_db),
 ) -> StreamingResponse:
     '''
     Stream active conversations for the current user.
     '''
-    # Authenticate the user using the token
     current_user = await get_current_user(token, db)
     if current_user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
 
     async def get_active_chats() -> AsyncGenerator[str, None]:
-        last_active_chats = None  # Variable to hold the last known state of active chats
+        last_active_chats = None
         
         while True:
-            # Asynchronously query the database for active chats
+            # Check if client disconnected
+            if await request.is_disconnected():
+                print("Client disconnected, stopping SSE stream")
+                break  # Exit the loop to close the connection
+            
             result = await db.execute(
                 select(ChatBox.Last_Conversation)
-                .filter(cast(ChatBox.Last_Conversation.receiver_wa_id, String) == str(current_user.Phone_id)).order_by(desc(ChatBox.Last_Conversation.last_chat_time))
+                .filter(cast(ChatBox.Last_Conversation.receiver_wa_id, String) == str(current_user.Phone_id))
+                .order_by(desc(ChatBox.Last_Conversation.last_chat_time))
             )
             
-            # Fetch results and convert to a list of dictionaries
             active_chat_data = [convert_to_dict(chat) for chat in result.scalars().all()]
 
-            # Check if the current active chats are different from the last known state
             if active_chat_data != last_active_chats:
-                # Update the last known state
                 last_active_chats = active_chat_data
-                # Yield the updated active chats as a JSON string
                 yield f"data: {json.dumps(active_chat_data)}\n\n"
 
-            # Sleep for a while before the next check
-            await asyncio.sleep(1)  # Use await with asyncio.sleep for non-blocking sleep
+            await asyncio.sleep(1)
 
     return StreamingResponse(get_active_chats(), media_type="text/event-stream")
+
 
 
 
@@ -1077,7 +1121,9 @@ async def create_template(
         payload = template_data
         print(payload)
 
-        async with httpx.AsyncClient() as client:
+        timeout = httpx.Timeout(30.0, connect=30.0)
+
+        async with httpx.AsyncClient(timeout=timeout) as client:
             response = await client.post(url, headers=headers, json=payload)
             response_data = response.json()  # Ensure JSON parsing
 

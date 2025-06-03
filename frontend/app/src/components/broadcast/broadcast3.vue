@@ -158,6 +158,8 @@ export default {
 
 
 <style scoped>
+
+
 /* Custom Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;

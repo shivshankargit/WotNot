@@ -194,12 +194,10 @@
               <td style=" color: gray; font-weight: 300;">Created at</td>
               <td>{{ contactInfo.created_at }}</td>
             </tr>
-            <tr>
-              <div v-for="(tag, index) in contactInfo.tags" :key="index">
-                <td style=" color: gray; font-weight: 300;">{{ tag.split(':')[0] }}</td>
-                <td>{{ tag.split(':')[1] }}</td>
-              </div>
-            </tr>
+<tr v-for="(tag, index) in contactInfo.tags" :key="index">
+  <td style="color: gray; font-weight: 300;">{{ tag.split(':')[0] }}</td>
+  <td>{{ tag.split(':')[1] }}</td>
+</tr>
 
           </tbody>
         </table>
@@ -258,6 +256,20 @@ export default {
       this.contextMenuVisible = false;
     });
 
+  },
+
+    beforeUnmount() {
+    document.removeEventListener('click', this.handleClickOutside);
+    // Clean up the EventSource instance
+    if (this.eventSourceB) {
+      console.log("Closing eventSourceB:", this.eventSourceB);
+      this.eventSourceB.close();
+      this.eventSourceB = null;
+    }
+    if (this.eventSourceA) {
+      this.eventSourceA.close();
+      console.log("SSE connection closed on component unmount.");
+    }
   },
 
   methods: {
@@ -502,9 +514,7 @@ export default {
 
         // Create a new EventSource for receiving SSE
         this.eventSourceB = new EventSource(`${this.apiUrl}/active-conversations?token=${token}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`  // Unfortunately, EventSource does not support custom headers directly
-          }
+
         });
 
         // Listen for events
@@ -634,6 +644,7 @@ export default {
     },
 
     async ActiveContactDetails(wa_id) {
+      this.contactInfo= {};
       const token = localStorage.getItem('token');
 
       try {
@@ -737,20 +748,7 @@ export default {
 
 
 
-  beforeUnmount() {
 
-    document.removeEventListener('click', this.handleClickOutside);
-    // Clean up the EventSource instance
-    if (this.eventSourceB) {
-
-      this.eventSourceB.close();
-      console.log("SSE connection closed on component unmount.");
-    }
-    if (this.eventSourceA) {
-      this.eventSourceA.close();
-      console.log("SSE connection closed on component unmount.");
-    }
-  },
 
 
 };

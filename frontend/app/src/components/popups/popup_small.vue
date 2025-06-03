@@ -1,6 +1,6 @@
 <template>
-  <div class="popup">
-    <div class="popup-inner">
+  <div class="fixed inset-0 bg-black bg-opacity-20 flex justify-center items-center p-5 z-[10000] text-left shadow-lg">
+    <div class="bg-[#ffffff]  p-6 rounded-md">
       <div class="flex">
         <span class="close" @click="$emit('close')">&times;</span>  
       </div>
@@ -8,6 +8,8 @@
       <slot/>
     </div>
   </div>
+
+
 </template>
 
 <script>
@@ -17,27 +19,7 @@ export default {
 </script>
 
 <style scoped>
-.popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.4); /* Darkened overlay */
-  display: flex;
-  justify-content: center;
-  align-items: center; /* Center the popup */
-  z-index: 10000;
-}
 
-.popup-inner {
-  background-color: #f5f6fa;
-  padding: 15px;
-  border-radius: 8px;
-  width:fit-content; /* Adjust width for a smaller popup */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  position: relative;
-}
 
 .close{
 

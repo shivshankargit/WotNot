@@ -12,10 +12,12 @@
           class="text-[#f5f6fa] px-4 py-2 md:px-4 md:py-4 text-sm md:text-base w-full md:w-auto">
           Create New Template
         </button> -->
-        <button class="bg-green-700 text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
-        @click="showPopup = true">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+        <button
+          class="bg-green-700 text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
+          @click="showPopup = true">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
           </svg>
           New Template
         </button>
@@ -23,61 +25,67 @@
       </div>
     </div>
 
-    <h3 class="text-xl md:text-2xs mb-4 text-gray-600"><b>Template List</b><span v-if="cursor" class="ml-5 w-5 h-5 border-2 border-green-500 border-t-transparent rounded-full animate-spin inline-block"></span></h3>
-    
+    <h3 class="text-xl md:text-2xs mb-4 text-gray-600"><b>Template List</b><span v-if="cursor"
+        class="ml-5 w-5 h-5 border-2 border-green-500 border-t-transparent rounded-full animate-spin inline-block"></span>
+    </h3>
+
 
     <div class="overflow-x-auto max-h-[55vh] custom-scrollbar mb-2">
-        <table class="w-full border border-gray-300 rounded-lg text-sm md:text-base bg-white"
-              :class="{ 'opacity-50 pointer-events-none': tableLoading }">
-          <thead>
-            <tr class="bg-gray-100 text-center text-gray-700 font-semibold">
-              <th class="p-3 md:p-4 text-left border border-gray-300 sticky top-0 z-10 bg-gray-100">Name</th>
-              <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Language</th>
-              <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Status</th>
-              <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Category</th>
-              <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Sub Category</th>
-              <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">ID</th>
-              <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Preview</th>
-              <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="">
-            <tr v-for="template in templates" :key="template.id" class="hover:bg-gray-50">
-              <td class="p-3 md:p-4 text-left border border-gray-200">{{ template.name }}</td>
-              <td class="p-3 md:p-4 text-center border border-gray-200">{{ template.language }}</td>
-              <td class="p-3 md:p-4 text-center border border-gray-200">
-                <div :class="{
-                  ' text-green-600 font-semibold px-2 py-1 rounded': template.status === 'APPROVED',
-                  ' text-blue-600 font-semibold px-2 py-1 rounded': template.status === 'PENDING',
-                  ' text-red-500 font-semibold px-2 py-1 rounded': template.status === 'REJECTED'
-                }">
-                  {{ template.status }}
-                </div>
-              </td>
-              <td class="p-3 md:p-4 text-center border border-gray-200">{{ template.category }}</td>
-              <td class="p-3 md:p-4 text-center border border-gray-200">{{ template.sub_category }}</td>
-              <td class="p-3 md:p-4 text-center border border-gray-200">{{ template.id }}</td>
-              <td class="p-3 md:p-4 text-center border border-gray-200">
-                <button class="text-gray-600 underline hover:text-gray-800 hover:bg-inherit font-medium"
-                        @click="showpreview(template.preview)">
-                  Preview
-                </button>
-              </td>
-              <td class="p-3 md:p-4 text-center border border-gray-200">
-                <button @click="deleteTemplate(template.name)" class="hover:bg-white rounded-full p-2 transition">
-                  <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="hover"
-                    colors="primary:#ff5757,secondary:#000000" style="width:32px;height:32px">
-                  </lord-icon>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <table class="w-full border border-gray-300 rounded-lg text-sm md:text-base bg-white"
+        :class="{ 'opacity-50 pointer-events-none': tableLoading }">
+        <thead>
+          <tr class="bg-gray-100 text-center text-gray-700 font-semibold">
+            <th class="p-3 md:p-4 text-left border border-gray-300 sticky top-0 z-10 bg-gray-100">Name</th>
+            <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Language</th>
+            <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Status</th>
+            <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Category</th>
+            <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Sub Category</th>
+            <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">ID</th>
+            <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Preview</th>
+            <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="">
+          <tr v-for="template in templates" :key="template.id" class="hover:bg-gray-50">
+            <td class="p-3 md:p-4 text-left border border-gray-200">{{ template.name }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">{{ template.language }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">
+              <div :class="{
+                ' text-green-600 font-semibold px-2 py-1 rounded': template.status === 'APPROVED',
+                ' text-blue-600 font-semibold px-2 py-1 rounded': template.status === 'PENDING',
+                ' text-red-500 font-semibold px-2 py-1 rounded': template.status === 'REJECTED'
+              }">
+                {{ template.status }}
+              </div>
+            </td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">{{ template.category }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">{{ template.sub_category }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">{{ template.id }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">
+              <button class="text-gray-600 underline hover:text-gray-800 hover:bg-inherit font-medium"
+                @click="showpreview(template.preview)">
+                Preview
+              </button>
+            </td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">
+              <button @click="showConfirmationPopup(template.name)" class="hover:bg-white rounded-full p-2 transition">
+                <lord-icon src="https://cdn.lordicon.com/skkahier.json" trigger="hover"
+                  colors="primary:#ff5757,secondary:#000000" style="width:32px;height:32px">
+                </lord-icon>
+              </button>
+            </td>
+            
+              
+            
+           
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
 
 
-
+    <confirmationPopup  v-if="showConfirmPopup" @yes="deleteTemplate(deleteTemplateName)" @no="showConfirmPopup = false" @close="showConfirmPopup = false" />
 
     <PopUp_preview v-if="showPreview" @close="closePreview">
 
@@ -90,31 +98,32 @@
 
     </PopUp_preview>
 
-    <PopUp v-if="showPopup" @close="closePopup">
+    <PopUp v-if="showPopup" @close="closePopup"
+      class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 custom-scrollbar">
 
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-green-800">Create Message Template</h2>
-  
-      </div>
+
+      <h2 class="text-xl font-semibold mb-4 text-green-800">Create Message Template</h2>
+
+      <hr class="pb-4">
+
+
       <div>
-        
+
         <div class="flex ">
           <div class="mr-4 max-h-[600px] overflow-y-auto custom-scrollbar">
             <form class="p-4" :class="{ 'opacity-50 pointer-events-none': isSubmitted }">
-              <h4 class="text-green-800"><b>Enter a name for your template.</b></h4>
-              <p class="text-sm mb-2 ">Categorize your templates accoringly</p>
+              <h4 class="text-green-800"><b>Template name and language</b></h4>
+              <p class="text-sm mb-2 ">Categorize your template</p>
               <div class="grid grid-cols-3 gap-4 bg-[#f5f6fa] p-4 mb-2">
                 <div>
                   <label class="block below-402:text-custom-small text-sm font-medium">Template Name
                     <span class="text-red-800">*</span>
                   </label>
                   <div class="relative mb-2">
-                    <input v-model="template.name" :placeholder="nameError || 'Template Name'"
-                      @blur="validateTemplateName" :class="[
-                        'border border-[#ddd] p-2 rounded-md w-full',
-                        { 'border-red-500': nameError, 'placeholder-red-500': nameError }
-                      ]" required />
-
+                    <input v-model="template.name" :placeholder="'Template Name'"
+                      @blur="validateTemplateName" class="mt-1 p-2 w-full border border-gray-300 rounded-md h-10" required />
+                                    <span v-if="nameError" class="text-red-500 text-xs absolute top-full left-0 mt-1">
+                      {{ nameError }}</span>
                   </div>
                 </div>
 
@@ -129,7 +138,7 @@
 
                 <!-- Language -->
                 <div class="mb-4">
-                  <label class="block text-sm font-medium">Language</label>
+                  <label class="block text-sm font-medium">Language<span class="text-red-800">*</span></label>
                   <select v-model="selectedLanguage" class="mt-1 p-2 w-full border border-gray-300 rounded-md h-10"
                     required>
                     <option value="af">Afrikaans</option>
@@ -209,54 +218,73 @@
 
               </div>
 
-
-              <h4 class="text-green-800"><b>Header</b></h4>
-              <p class="text-sm mb-2 ">Add a header to your message</p>
               
-              <div class="bg-[#f5f6fa] p-4 mb-2">
+
+
+              <h4 class="text-green-800"><b>Content</b></h4>
+              <p class="text-sm mb-2 ">Fill in the header, body and footer sections of your template.</p>
+
+              <div class="bg-[#f5f6fa] p-4">
+
+                <div>
+                  <label class="block text-sm font-medium">Header</label>
                   <select v-model="headerMediaComponent.format" class="border border-[#ddd] p-2 rounded-md w-full mb-2">
-                  <option value="TEXT">Text</option>
-                  <option value="IMAGE">Image</option>
-                  <option value="VIDEO">Video</option>
+                    <option value="TEXT">Text</option>
+                    <option value="IMAGE">Image</option>
+                    <option value="VIDEO">Video</option>
 
-              </select>
+                  </select>
 
-                <div v-if="headerMediaComponent.format === 'TEXT'">
-                  <input v-model="headerComponent.text" class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
-                </div>
+                  <div v-if="headerMediaComponent.format === 'TEXT'">
+                    <input v-model="headerComponent.text" class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
+                  </div>
 
-                <div v-if="headerMediaComponent.format === 'IMAGE' || headerMediaComponent.format === 'VIDEO'">
-                  <div class="flex ml-4 place-items-stretch justify-between w-full">
-                    <input type="file" @change="handleFileChange" class="mb-4">
+                  <div v-if="headerMediaComponent.format === 'IMAGE' || headerMediaComponent.format === 'VIDEO'">
+                    <div class="flex ml-4 place-items-stretch justify-between w-full">
+                      <input type="file" @change="handleFileChange" class="mb-4">
 
-                    <div>
-                      <button @click="uploadFile" :disabled="!selectedFile || isUploading"
-                        class="mr-5 px-4 py-2 bg-green-700 hover:bg-green-800 text-white rounded-lg disabled:cursor-not-allowed">
-                        {{ isUploading ? 'Uploading...' : 'Upload' }}{{uploadResponse ? 'ed' : ''}}
-                      </button>
+                      <div>
+                        <button @click="uploadFile" :disabled="!selectedFile || isUploading"
+                          class="mr-5 px-4 py-2 bg-green-700 hover:bg-green-800 text-white rounded-lg disabled:cursor-not-allowed">
+                          {{ isUploading ? 'Uploading...' : 'Upload' }}{{ uploadResponse ? 'ed' : '' }}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <h4 class="text-green-800"><b>Body</b></h4>
-              <p class="text-sm mb-2 ">This section is the main content of your message</p>
-              <div class="bg-[#f5f6fa] p-4" >
-                <textarea v-model="bodyComponent.text" class="mt-1 p-2 w-full border border-gray-300 rounded-md h-30"
-                  placeholder="Template Message..." rows="4" required></textarea>
-                
                 <div>
-                  <button
-                    type="button"
-                    @click="addVariable"
-                    class="my-2 px-4 py-2 rounded-md bg-green-700 text-white font-medium shadow-md ">
-                    Add Variable
+                  <label class="block text-sm font-medium">Body<span class="text-red-800">*</span></label>
+
+                  <textarea v-model="bodyComponent.text" class="mt-1 p-2 w-full border border-gray-300 rounded-md h-30"
+                    placeholder="Enter text" rows="4" required></textarea>
+
+                  <div v-if="warningData"
+                    class="mt-2 p-3 bg-yellow-100 text-yellow-800 text-sm rounded-md border border-yellow-300">
+                    <p class="font-semibold">Warning:{{ warningData }}</p>
+                  </div>
+                </div>
+
+                <!-- <div class="quill-editor-wrapper">
+                                  <QuillEditor class="quill-custom mt-1 p-2 w-full rounded-md h-60 bg-white"
+                                   ref="myQuillEditor"
+                  v-model:content="bodyComponent.text" contentType="html" theme="snow" :toolbar="[
+                    ['bold', 'italic', 'underline']
+                  ]" placeholder="Start typing your content here..." />
+
+                </div> -->
+
+
+
+                <div class="flex items=flex-end justify-end">
+                  <button type="button" @click="addVariable" class="text-black p-2 text-xs font-bold hover:bg-gray-200">
+                    + Add variable
                   </button>
                 </div>
 
-              
 
-              <!-- <div v-if="variableCounter">
+
+                <!-- <div v-if="variableCounter">
                 <h4>Variable Examples</h4>
                 <div v-for="index in variableCounter" :key="index">
                   <input type="text" :placeholder="'Variable ' + index" v-model="variables[index - 1]"
@@ -264,55 +292,56 @@
                 </div>
               </div> -->
 
-              <div v-if="variables.length">
+                <div v-if="variables.length">
 
-                <h4>Variable Examples</h4>
-                <div v-for="(variable, index) in variables" :key="index">
-                  <input type="text" :placeholder="'Variable ' + (index + 1)" v-model="variables[index]"
-                    class="border border-[#ddd] p-2 rounded-md w-50px mb-2" required />
+                  <h4></h4>
+                  <label class="block text-sm font-medium">Samples for body content<span class="text-red-800">*</span></label>
+                  <span class="text-sm text-gray-500">To help us review your message template, please add an example for each variable in your body text. Do not use real customer information. Cloud API hosted by Meta reviews templates and variable parameters to protect the security and integrity of our services.</span>
+                  
+                  <div v-for="(variable, index) in variables" :key="index">
+                    <input type="text" :placeholder="'Variable ' + (index + 1)" v-model="variables[index]"
+                      class="border border-[#ddd] p-2 rounded-md w-50px mb-2" required />
+                  </div>
                 </div>
+
+
+                <label class="block text-sm font-medium">Footer</label>
+                <input v-model="footerComponent.text" placeholder="Enter text"
+                  class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
+
+
               </div>
 
-              <label for="">Footer</label>
-              <input v-model="footerComponent.text" placeholder="Footer Text (optional)"
-                class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
-
+              <h4 class="text-green-800 mt-2"><b>Buttons</b></h4>
+              <p class="text-sm mb-2 ">Create buttons that let customers respond to your message or take action.</p>
+              <div class="bg-[#f5f6fa] p-4 ">
                   <span>
-                    <button
-                      class="my-2 px-4 py-2 rounded-md bg-green-700 text-white font-medium shadow-md"
-                      @click.prevent="addbutton">
-                      Add Button
-                    </button>
-                  </span>
-                  <!-- Button Text and URL Inputs -->
-                  <input v-if="addButton && selectedSubCategory !== 'ORDER_STATUS'" v-model="button.text"
-                    placeholder="Button Text (optional)" class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
-                  <input v-if="addButton && selectedSubCategory !== 'ORDER_STATUS'" v-model="button.url"
-                    placeholder="Button URL (optional)" class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
-              </div>
-              
+                  <button class="text-black p-2 text-small border border-black hover:bg-gray-200"
+                    @click.prevent="addbutton">
+                     + Add Button
+                  </button>
+                </span>
+                <!-- Button Text and URL Inputs -->
+                 <div class="mt-2">
+                                  <input v-if="addButton && selectedSubCategory !== 'ORDER_STATUS'" v-model="button.text"
+                  placeholder="Text" class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
+                <input v-if="addButton && selectedSubCategory !== 'ORDER_STATUS'" v-model="button.url"
+                  placeholder="URL" class="border border-[#ddd] p-2 rounded-md w-full mb-2" />
+                 </div>
 
-              <!-- Sub-Category Selection -->
-              <!-- <h4 class="text-green-800"><b>Sub-Category</b></h4> -->
-              <!-- <p class="text-sm mb-2 "></p> -->
-               
-              <!-- <select v-model="selectedSubCategory" v-if="selectedCategory === 'Marketing'"
-                class="border border-[#ddd] rounded-md w-full mb-2 p-2 "  />
-                <option value="" disabled>Select Sub-Category</option>
-                <option value="ORDER_DETAILS">Order Details</option> -->
-              <!-- <option value="CUSTOM">Custom</option> -->
-              <!-- <option value="ORDER_STATUS">Order Status</option>
-              </select>-->
-              <!-- Actions -->
-              <div class="flex space-x-4">
-                <button @click.prevent="submitTemplate"
-                  class="bg-green-700 hover:bg-green-800 text-white px-3 py-2 rounded-lg shadow-lg font-medium flex items-center justify-center "
-                  :disabled="loading || isSubmitted">
-                  <span v-if="loading"
-                    class="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4 mr-2"></span>
-                  {{ isSubmitted ? "Submitted" : loading ? "Submitting..." : "Submit" }}
-                </button>
               </div>
+
+
+              <!-- Actions -->
+
+              <button @click.prevent="submitTemplate"
+                class="bg-green-700 mt-4 text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center "
+                :disabled="loading || isSubmitted">
+                <span v-if="loading"
+                  class="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4 mr-2"></span>
+                {{ isSubmitted ? "Submitted" : loading ? "Submitting..." : "Submit" }}
+              </button>
+
             </form>
           </div>
 
@@ -334,16 +363,22 @@
 </template>
 
 <script>
+
+// import { QuillEditor } from '@vueup/vue-quill';
+// import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import axios from 'axios';
 import PopUp from "../popups/popup";
 import { useToast } from 'vue-toastification';
 import PopUp_preview from "../popups/template_preview";
+import confirmationPopup from '../popups/confirmation';
 
 export default {
   components: {
-
-    PopUp,
-    PopUp_preview
+    // QuillEditor,
+    
+    PopUp_preview,
+    confirmationPopup,
+    PopUp
   },
   name: 'BroadCast1',
   props: {
@@ -362,6 +397,8 @@ export default {
       uploadResponse: null,
       uploadError: null,
       uploadHandleID: null,
+      deleteTemplateName: '', // To store the name of the template to be deleted
+      showConfirmPopup: false, // State to control the confirmation popup visibility
 
       // loading
       loading: false, // Add loading state
@@ -440,17 +477,11 @@ export default {
 
   methods: {
 
-    // addVariable() {
-    //   // Count existing variables in the text
-    //   const currentVariables = this.bodyComponent.text.match(/{{\d+}}/g) || [];
-
-    //   // Determine the next variable number
-    //   const nextVariableNumber = currentVariables.length + 1;
-
-    //   // Append the new variable to the text
-    //   this.bodyComponent.text += `{{${nextVariableNumber}}}`;
-    //   this.variableCounter = nextVariableNumber;
-    // },
+      async showConfirmationPopup(templateName) {
+    this.showConfirmPopup = true;
+    this.deleteTemplateName = templateName; // Store the template name to be deleted
+     // Store the template name to be deleted
+  },
 
     addVariable() {
       // const countWords = (text) => {
@@ -484,6 +515,55 @@ export default {
       console.log("Updated variables:", this.variables);
     },
 
+
+    //  addVariable() {
+    //   const nextVariableNumber = (this.bodyComponent.text.match(/{{\d+}}/g) || []).length + 1;
+    //   const variableToInsert = ` {{${nextVariableNumber}}}`;
+
+    //   // 1. Get the Quill editor instance using the ref
+    //   const quill = this.$refs.myQuillEditor.quill;
+
+    //   if (quill) {
+    //     // 2. Get the current cursor selection
+    //     const selection = quill.getSelection();
+
+    //     if (selection) {
+    //       // If there's a selection, insert the text at the current cursor position
+    //       quill.insertText(selection.index, variableToInsert, 'user');
+    //       // Move the cursor after the inserted text
+    //       quill.setSelection(selection.index + variableToInsert.length, 0);
+    //     } else {
+    //       // If no selection (e.g., editor not focused), append to the end
+    //       quill.insertText(quill.getLength(), variableToInsert, 'user');
+    //       // Move the cursor to the very end
+    //       quill.setSelection(quill.getLength(), 0);
+    //     }
+
+    //     // 3. Update your internal data properties
+    //     this.variableCounter = nextVariableNumber;
+
+    //     // Extend `variables` array safely
+    //     while (this.variables.length < nextVariableNumber) {
+    //       this.variables.push("");
+    //     }
+
+    //     console.log("Updated variable counter:", this.variableCounter);
+    //     console.log("Updated variables:", this.variables);
+
+    //     // Optional: If this.bodyComponent.text is bound with 'contentType="text"',
+    //     // update it from Quill's content after insertion to keep them in sync.
+    //     // If using 'html' or 'delta', v-model should handle most sync automatically,
+    //     // but for immediate plain text reflection, you might still need this.
+    //     // This will only update the text representation, not the rich text.
+    //     this.bodyComponent.text = quill.getText();
+
+    //   } else {
+    //     console.error("Quill editor instance not found. Make sure the ref is set correctly and the editor is mounted.");
+    //     // Fallback or error handling if Quill instance isn't available
+    //     // (though this is less likely if ref is correctly used)
+    //     this.bodyComponent.text += variableToInsert;
+    //   }
+    // },
 
 
 
@@ -728,13 +808,16 @@ export default {
 
         } else {
           const errorMessage = response.data.detail || "Unknown error occurred";
-          alert(`Error creating template: ${errorMessage}`);
+          
+          // alert(`Error creating template: ${errorMessage}`);
+          toast.error(`Error creating template: ${errorMessage}`);
           console.error('Error creating template:', response.data.detail);
         }
       } catch (error) {
         // Handle network errors
         const errorMessage = error.response?.data?.detail?.error?.error_user_msg || error.response?.data?.detail?.error?.message || error.message;
-        alert(`Request failed: ${errorMessage}`);
+        toast.error(`Request failed: ${errorMessage}`);
+        // alert(`Request failed: ${errorMessage}`);
         console.error('Request failed:', error);
       }
       finally {
@@ -745,27 +828,29 @@ export default {
 
 
     // 
-    validateTemplateName() {
-      // Updated regex to allow lowercase letters and underscores
-      const regex = /^[a-z_0-9]+$/;
+validateTemplateName() {
+  // Convert to lowercase, replace spaces with underscores, and trim whitespace
+  this.template.name = this.template.name
+    .toLowerCase()
+    .replace(/\s+/g, '_')       // replace spaces with underscores
+    .trim();                    // remove leading/trailing whitespace
 
-      if (this.template.name.trim() === '') {
-        this.nameError = 'Template name is required';
-      } else if (!regex.test(this.template.name)) {
-        this.template.name = '';
-        this.nameError = 'Template name must contain only lowercase letters and underscores.';
-      } else {
-        this.nameError = '';
-      }
-    },
+  const regex = /^[a-z_0-9]+$/;
+
+  if (this.template.name === '') {
+    this.nameError = 'Template name is required';
+  } else if (!regex.test(this.template.name)) {
+    this.nameError = 'Template name must contain only lowercase letters, numbers, and underscores.';
+  } else {
+    this.nameError = '';
+  }
+},
 
     async deleteTemplate(template_name) {
-
+      this.showConfirmPopup = false; // Close the confirmation popup if it's open
 
       const toast = useToast();
       const token = localStorage.getItem('token');
-      const confirmDelete = confirm("Are you sure you want to delete this template?");
-      if (!confirmDelete) return;
 
       try {
         this.tableLoading = true;
@@ -793,6 +878,7 @@ export default {
       }
       finally {
         this.tableLoading = false;
+        this.deleteTemplateName = ''; // Clear the template name after deletion
       }
 
     },
@@ -914,79 +1000,7 @@ export default {
     },
 
 
-    // 'bodyComponent.text': function (newText) {
-    //   // === Watcher A logic ===
-    //   const placeholders = newText.match(/{{\d+}}/g) || [];
-    //   const uniquePlaceholders = [...new Set(placeholders.map(p => parseInt(p.match(/\d+/)[0])))];
-    //   const requiredLength = uniquePlaceholders.length;
 
-    //   if (this.variables.length < requiredLength) {
-    //     while (this.variables.length < requiredLength) {
-    //       this.variables.push('');
-    //     }
-    //   } else if (this.variables.length > requiredLength) {
-    //     this.variables.splice(requiredLength);
-    //   }
-    //   console.log("Updated variables:", this.variables);
-
-    //   // === Watcher B logic ===
-    //   const countWords = (text) => {
-    //     if (!text) return 0;
-    //     return text.split(/\s+/).filter(word => word.trim().length > 0).length;
-    //   };
-
-    //   const wordCount = countWords(newText);
-    //   const variableCount = placeholders.length;
-
-    //   if (variableCount > 0) {
-    //     if ((wordCount - 1) / variableCount < 3) {
-    //       this.warningData = "This template contains too many variable parameters relative to the message length. You need to decrease the number of variable parameters or increase the message length.";
-    //     }
-    //   } else {
-    //     this.warningData = null;
-    //   }
-    // },
-
-    // 'bodyComponent.text': function (newText) {
-    //   const placeholders = newText.match(/{{\d+}}/g) || [];
-
-    //   const uniquePlaceholders = [...new Set(placeholders.map(p => parseInt(p.match(/\d+/)[0])))];
-    //   const requiredLength = uniquePlaceholders.length;
-
-    //   // Resize the variables array reactively
-    //   if (this.variables.length < requiredLength) {
-    //     while (this.variables.length < requiredLength) {
-    //       this.variables.push('');
-    //     }
-    //   } else if (this.variables.length > requiredLength) {
-    //     this.variables.splice(requiredLength);
-    //   }
-    //   console.log("Updated variables:", this.variables);
-    // },
-
-    // 'bodyComponent.text'(newText) {
-    //   const countWords = (text) => {
-    //     if (!text) return 0;
-    //     return text.split(/\s+/).filter(word => word.trim().length > 0).length;
-    //   };
-
-    //   const text = newText || '';
-    //   const wordCount = countWords(text);
-
-    //   const currentVariables = text.match(/{{\d+}}/g) || [];
-    //   const variableCount = currentVariables.length;
-
-    //   // Only validate if at least 1 variable is present
-    //   if (variableCount > 0) {
-    //     // Check if (wordCount - 1) / variableCount === 3
-    //     if ((wordCount - 1) / variableCount < 3) {
-    //       this.warningData="This template contains too many variable parameters relative to the message length. You need to decrease the number of variable parameters or increase the message length.";
-    //     }
-    //     else {
-    //       this.warningData = null; // Clear warning if condition is met
-    //     }
-    //   }
-    // },
 
 
     'bodyComponent.text'(newText) {
@@ -1100,6 +1114,32 @@ export default {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+.quill-editor-wrapper .ql-container {
+  display: flex;
+  flex-direction: column-reverse;
+  /* This is the key property! */
+  /* You might need to adjust height or other styles based on your layout */
+  min-height: 200px;
+  /* Example: ensure the editor has some height */
+  border: 1px solid #ccc;
+  /* Restore border if it gets lost with flexbox */
+}
+
+/* Optional: Adjust spacing or appearance */
+.quill-editor-wrapper .ql-toolbar {
+  border-top: 1px solid #ccc;
+  /* Add a top border to the toolbar */
+  border-bottom: none;
+  /* Remove default bottom border if it exists */
+}
+
+.quill-editor-wrapper .ql-editor {
+  /* Ensure the editor area expands to fill available space */
+  flex-grow: 1;
+}
+
+
 </style>
 
 <!-- <style scoped>

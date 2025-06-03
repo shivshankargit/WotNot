@@ -361,10 +361,14 @@ async def delete_contact(
 
     if contact is None:
         raise HTTPException(status_code=404, detail="Contact not found")
-    
-    await db.delete(contact)
-    await db.commit()
-    return {"ok": True}
+
+    try:
+        await db.delete(contact)
+        await db.commit()
+        return {"ok": True}
+    except Exception as e:
+        await db.rollback() # Ensure rollback in case of an error during commit
+        raise HTTPException(status_code=500, detail=f"Internal server error: {e}")
 
 @router.put("/contacts/{contact_id}", response_model=contacts.ContactRead)
 async def update_contact(
