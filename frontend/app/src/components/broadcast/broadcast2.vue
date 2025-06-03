@@ -1188,7 +1188,8 @@ export default {
         if (!response.ok) {
           const errorData = await response.json(); // Parse the response JSON
           const errorMessage = errorData.detail || 'Unknown error'; // Extract error message
-          alert(`Error scheduling broadcast: ${errorMessage}`);
+          toast.error(`Error scheduling broadcast: ${errorMessage}`);
+          // alert(`Error scheduling broadcast: ${errorMessage}`);
           throw new Error('Network response was not ok');
         } else {
           toast.success('Broadcast scheduled successfully!');

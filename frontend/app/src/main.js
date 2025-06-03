@@ -11,8 +11,9 @@ import "element-plus/dist/index.css";
 const app = createApp(App);
 app.use(ElementPlus);
 app.use(Toast, {
-    position: POSITION.TOP_RIGHT,
+    position: POSITION.TOP_LEFT,
     timeout: 5000,
+    zIndex: 2147483647
   });
 
 // Enable devtools in production

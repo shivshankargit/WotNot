@@ -921,7 +921,8 @@ validateTemplateName() {
     },
     async uploadFile() {
       if (!this.selectedFile) {
-        alert("Please select a file first.");
+        this.uploadError = "No file selected for upload.";
+        
         return;
       }
 

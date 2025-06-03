@@ -548,6 +548,11 @@ function getSectionFromRoute(path) {
 
 
 <style>
+
+.Toastify__toast-container {
+  z-index: 11000 !important; /* higher than your popup */
+}
+
 body {
   font-family: Arial, sans-serif;
   margin: 0;

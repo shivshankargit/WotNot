@@ -428,7 +428,8 @@ export default {
         }
       } catch (error) {
         console.error("Error saving contact:", error);
-        alert("Error saving contact");
+        toast.error("Error saving contact");
+        
       }
     },
     clearForm() {
@@ -452,46 +453,47 @@ export default {
     },
 
 
-    async fetchContactList(page = 1) {
-      const token = localStorage.getItem("token");
-      const itemsPerPage = 10; // Number of contacts per page
-      const url = `${this.apiUrl}/contacts/?sort_by=${this.sortBy}&order=${this.order}&limit=${itemsPerPage}&offset=${(page - 1) * itemsPerPage}`;
+async fetchContactList(page = 1) {
+  const token = localStorage.getItem("token");
+  const itemsPerPage = 10; // Number of contacts per page
+  // Modified URL to explicitly sort by 'created_at' in 'desc' (descending) order
+  const url = `${this.apiUrl}/contacts/?sort_by=updated_at&order=desc&limit=${itemsPerPage}&offset=${(page - 1) * itemsPerPage}`;
 
-      try {
-        const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
 
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
 
-        const contactsList = await response.json();
-        console.log(contactsList);
+    const contactsList = await response.json();
+    console.log(contactsList);
 
-        if (contactsList.length === 0) {
-          return;
-        }
-        this.contacts = contactsList.map((contact) => ({
-          id: contact.id,
-          name: contact.name,
-          phone: contact.phone,
-          email: contact.email,
-          tags: contact.tags.map(tag => {
-            const [key, value] = tag.split(":");
-            return { key, value };
-          }),
-          created_at: contact.created_at, // Store raw dates for sorting
-          updated_at: contact.updated_at // Store updated_at too
-        }));
-      } catch (error) {
-        console.error("Error fetching contacts:", error);
-      }
-    },
+    if (contactsList.length === 0) {
+      return;
+    }
+    this.contacts = contactsList.map((contact) => ({
+      id: contact.id,
+      name: contact.name,
+      phone: contact.phone,
+      email: contact.email,
+      tags: contact.tags.map(tag => {
+        const [key, value] = tag.split(":");
+        return { key, value };
+      }),
+      created_at: contact.created_at, // Store raw dates for sorting
+      updated_at: contact.updated_at // Store updated_at too
+    }));
+  } catch (error) {
+    console.error("Error fetching contacts:", error);
+  }
+},
 
     // Contacts Tags Filter
     async fiterBytTags() {
@@ -567,7 +569,8 @@ export default {
         }
       } catch (error) {
         console.error("Error deleting contact:", error);
-        alert("Error deleting contact");
+        toast.error("Error deleting contact");
+        
       }
     },
 
