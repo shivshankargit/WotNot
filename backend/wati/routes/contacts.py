@@ -272,20 +272,50 @@ async def create_contact(
 
 
 
+from typing import Optional
+from sqlalchemy import desc, asc
+
 @router.get("/contacts/", response_model=list[contacts.ContactRead])
 async def read_contacts(
     limit: int = Query(10),
     offset: int = Query(0),
     tag: str = None,
+    sort_by: Optional[str] = Query("created_at", description="Field to sort by (e.g., 'created_at', 'updated_at', 'name', 'email', 'phone')"),
+    order: Optional[str] = Query("desc", description="Sort order: 'asc' or 'desc'"),
     db: AsyncSession = Depends(database.get_db),
     get_current_user: user.newuser = Depends(get_current_user)
 ):
     # Start building the query
     query = select(Contacts.Contact).filter(Contacts.Contact.user_id == get_current_user.id)
-    
+
     # Apply tag filter if provided
     if tag:
         query = query.filter(Contacts.Contact.tags.contains([tag]))
+
+    # --- Apply Sorting ---
+    # Define allowed sortable fields to prevent SQL injection
+    sortable_fields = {
+        "created_at": Contacts.Contact.created_at,
+        "updated_at": Contacts.Contact.updated_at,
+        "name": Contacts.Contact.name,
+        "email": Contacts.Contact.email,
+        "phone": Contacts.Contact.phone,
+    }
+
+    # Get the column to sort by
+    sort_column = sortable_fields.get(sort_by)
+
+    if sort_column:
+        if order == "desc":
+            query = query.order_by(desc(sort_column))
+        elif order == "asc":
+            query = query.order_by(asc(sort_column))
+        # If order is neither 'asc' nor 'desc', it will default to descending without logging a warning
+        else:
+            query = query.order_by(desc(sort_column))
+    else:
+        # Default sorting if sort_by is invalid or not provided, without logging a warning
+        query = query.order_by(desc(Contacts.Contact.created_at))
 
     # Apply pagination
     query = query.offset(offset).limit(limit)
@@ -296,9 +326,8 @@ async def read_contacts(
     # Fetch all contacts
     contacts = result.scalars().all()
 
-    logging.info(contacts)  # Log the contacts
+    # Removed logging.info(contacts)
     return contacts
-
 
 @router.get("/contacts-filter/", response_model=List[ContactRead])
 async def read_contacts(
@@ -361,10 +390,14 @@ async def delete_contact(
 
     if contact is None:
         raise HTTPException(status_code=404, detail="Contact not found")
-    
-    await db.delete(contact)
-    await db.commit()
-    return {"ok": True}
+
+    try:
+        await db.delete(contact)
+        await db.commit()
+        return {"ok": True}
+    except Exception as e:
+        await db.rollback() # Ensure rollback in case of an error during commit
+        raise HTTPException(status_code=500, detail=f"Internal server error: {e}")
 
 @router.put("/contacts/{contact_id}", response_model=contacts.ContactRead)
 async def update_contact(

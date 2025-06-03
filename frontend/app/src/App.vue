@@ -10,3 +10,8 @@ export default {
 };
 </script>
 
+<style>
+.Toastify__toast-container {
+  z-index: 99999 !important;
+}
+</style>

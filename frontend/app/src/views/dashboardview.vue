@@ -5,7 +5,7 @@
       <div class="nav-left">
         <div class="logo-div">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-            <path fill="#075e54"
+              <path fill="#166534"
               d="M160 368c26.5 0 48 21.5 48 48l0 16 72.5-54.4c8.3-6.2 18.4-9.6 28.8-9.6L448 368c8.8 0 16-7.2 16-16l0-288c0-8.8-7.2-16-16-16L64 48c-8.8 0-16 7.2-16 16l0 288c0 8.8 7.2 16 16 16l96 0zm48 124l-.2 .2-5.1 3.8-17.1 12.8c-4.8 3.6-11.3 4.2-16.8 1.5s-8.8-8.2-8.8-14.3l0-21.3 0-6.4 0-.3 0-4 0-48-48 0-48 0c-35.3 0-64-28.7-64-64L0 64C0 28.7 28.7 0 64 0L448 0c35.3 0 64 28.7 64 64l0 288c0 35.3-28.7 64-64 64l-138.7 0L208 492z" />
           </svg>
         </div>
@@ -91,6 +91,8 @@
     </div>
 
     <div class="flex flex-1">
+
+      
       <!-- Hamburger button for mobile view -->
       <button @click="isMenuOpen = !isMenuOpen" class="p-2 md:hidden">
         <i class="bi bi-list text-2xl z-[1000] absolute top-[60px]"></i>
@@ -102,17 +104,17 @@
         :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }"
         v-if="currentSection === 'broadcast'">
         <a href="#" @click.prevent="navigate('/broadcast/broadcast2')"
-          :class="{ 'text-green-900 font-semibold': isActive('/broadcast/broadcast2'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/broadcast/broadcast2') }"
+          :class="{ 'text-green-800 font-semibold': isActive('/broadcast/broadcast2'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/broadcast/broadcast2') }"
           class="block p-3 text-gray-600 rounded-lg ">
           <i class="bi bi-broadcast mr-2"></i>Broadcast Messages
         </a>
         <a href="#" @click.prevent="navigate('/broadcast/broadcast1')"
-          :class="{ 'text-green-900 font-semibold': isActive('/broadcast/broadcast1'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/broadcast/broadcast1') }"
+          :class="{ 'text-green-800 font-semibold': isActive('/broadcast/broadcast1'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/broadcast/broadcast1') }"
           class="block p-3 text-gray-600 rounded-lg ">
           <i class="bi bi-chat-right-text-fill mr-2"></i>Manage Templates
         </a>
         <a href="#" @click.prevent="navigate('/broadcast/broadcast3')"
-          :class="{ 'text-green-900 font-semibold': isActive('/broadcast/broadcast3'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/broadcast/broadcast3') }"
+          :class="{ 'text-green-800 font-semibold': isActive('/broadcast/broadcast3'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/broadcast/broadcast3') }"
           class="block p-3 text-gray-600 rounded-lg ">
           <i class="bi bi-calendar2-range-fill mr-2"></i>Scheduled Broadcasts
         </a>
@@ -123,12 +125,12 @@
         class="fixed top-12 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4  overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out"
         :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }" v-if="currentSection === 'Contacts'">
         <a href="#" @click.prevent="navigate('/contacts/contacts1')"
-          :class="{ 'text-green-900 font-semibold': isActive('/contacts/contacts1'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/contacts/contacts1') }"
+          :class="{ 'text-green-800 font-semibold': isActive('/contacts/contacts1'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/contacts/contacts1') }"
           class="block p-3 text-gray-600 rounded-lg ">
           <i class="bi bi-journal-bookmark-fill mr-2 "></i>Manage Contacts
         </a>
         <a href="#" @click.prevent="navigate('/contacts/contacts2')"
-          :class="{ 'text-green-900 font-semibold': isActive('/contacts/contacts2'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/contacts/contacts2') }"
+          :class="{ 'text-green-800 font-semibold': isActive('/contacts/contacts2'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/contacts/contacts2') }"
           class="block p-3 text-gray-600 rounded-lg ">
           <i class="bi bi-tags-fill mr-2"></i>Manage Tags
         </a>
@@ -140,7 +142,7 @@
         :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }"
         v-if="currentSection === 'Integration'">
         <a href="#" @click.prevent="navigate('/integration/integration1')"
-          :class="{ 'text-green-900 font-semibold': isActive('/integration/integration1'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/integration/integration1') }"
+          :class="{ 'text-green-800 font-semibold': isActive('/integration/integration1'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/integration/integration1') }"
           class="block p-3 text-gray-600 rounded-lg  "><i class="bi bi-link-45deg"></i>
           Woocommerce
         </a>
@@ -152,35 +154,35 @@
         :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }"
         v-if="currentSection === 'Analytics'">
         <a href="#" @click.prevent="navigate('/analytics/cost')"
-          :class="{ 'text-green-900 font-semibold': isActive('/analytics/cost'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/analytics/cost') }"
+          :class="{ 'text-green-800 font-semibold': isActive('/analytics/cost'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/analytics/cost') }"
           class="block p-3 text-gray-600 rounded-lg  "><i class="bi bi-currency-dollar"></i>
           Cost
         </a>
 
         <a href="#" @click.prevent="navigate('/analytics/conversations')"
-          :class="{ 'text-green-900 font-semibold': isActive('/analytics/conversations'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/analytics/conversations') }"
+          :class="{ 'text-green-800 font-semibold': isActive('/analytics/conversations'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/analytics/conversations') }"
           class="block p-3 text-gray-600 rounded-lg  "><i class="bi bi-link-45deg"></i>
           Conversations
         </a>
       </div>
 
       <!-- AI agent Sidebar -->
-      <div
+      <!-- <div
       class="fixed top-12 left-0 w-64 h-[calc(100vh-65px)] bg-gray-100 p-4  overflow-y-auto mt-4 z-50 transform md:transform-none transition-transform duration-300 ease-in-out"
       :class="{ '-translate-x-full': !isMenuOpen, 'translate-x-0': isMenuOpen }"
       v-if="currentSection === 'AIagent'">
       <a href="#" @click.prevent="navigate('/agent')"
-        :class="{ 'text-green-900 font-semibold': isActive('/agent'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/agent') }"
+        :class="{ 'text-green-800 font-semibold': isActive('/agent'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/agent') }"
         class="block p-3 text-gray-600 rounded-lg  "><i class="bi bi-currency-dollar"></i>
         AI Agent
       </a>
 
-      <!-- <a href="#" @click.prevent="navigate('/analytics/conversations')"
-        :class="{ 'text-green-900 font-semibold': isActive('/analytics/conversations'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/analytics/conversations') }"
+       <a href="#" @click.prevent="navigate('/analytics/conversations')"
+        :class="{ 'text-green-800 font-semibold': isActive('/analytics/conversations'), 'hover:bg-gray-200 hover:font-semibold': !isActive('/analytics/conversations') }"
         class="block p-3 text-gray-600 rounded-lg  "><i class="bi bi-link-45deg"></i>
         Conversations
       </a> -->
-    </div>
+    <!-- </div> -->
 
 
       <!--    <div v-if="currentSection === 'Chatbot'" class="flex-1 mt-16 p-8 bg-white overflow-y-auto h-[calc(100vh-65px)]">
@@ -229,7 +231,7 @@ export default {
         { name: 'Integration', label: 'Integration', icon: 'bi bi-plugin', path: '/integration/integration1' },
         { name: 'chatbot', label: 'Chatbot', path: '/chatbot/chatbotview', icon: 'bi bi-robot' },
         { name: 'Analytics', label: 'Analytics', path: '/analytics/cost', icon: 'bi bi-graph-up' },
-        { name: 'AI Agent', label: 'AIagent', path: '/agent', icon: 'bi bi-robot' }
+        // { name: 'AI Agent', label: 'AIagent', path: '/agent', icon: 'bi bi-robot' }
       ],
       user: null,
       dropdownOpen: false,
@@ -546,6 +548,11 @@ function getSectionFromRoute(path) {
 
 
 <style>
+
+.Toastify__toast-container {
+  z-index: 11000 !important; /* higher than your popup */
+}
+
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -582,7 +589,7 @@ body {
   margin: 8px 0;
   padding-right: 30px;
   font-size: xx-large;
-  color: #075e54;
+  color: #166534;
 }
 
 .logo-div svg {
@@ -731,7 +738,7 @@ h2 {
 button {
   background-color: #075e54;
   color: white;
-  border: none;
+  
   border-radius: 5px;
   padding: 10px;
   font-size: 16px;

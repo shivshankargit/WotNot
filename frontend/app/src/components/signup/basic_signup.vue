@@ -58,24 +58,24 @@
         </div>
 
         <div class="mt-4 text-sm text-center">
-        <p class="mb-2 text-sm">
-          By signing up you agree to the
-          <!-- Updated: Use router-link for Terms -->
-          <router-link
-            to="/terms-and-privacy#terms-and-conditions"
-            class="text-[#075e54] font-semibold"
-            >Terms</router-link
-          >
-          and
-          <!-- Updated: Use router-link for Privacy Policy -->
-          <router-link
-            to="/terms-and-privacy#privacy-policy"
-            class="text-[#075e54] font-semibold"
-            >Privacy Policy</router-link
-          >
-        </p>
+          <p class="mb-2 text-sm">
+            By signing up you agree to the
+            <router-link
+              to="/terms-and-privacy#terms-and-conditions"
+              class="text-[#075e54] font-semibold"
+              >Terms</router-link
+            >
+            and
+            <router-link
+              to="/terms-and-privacy#privacy-policy"
+              class="text-[#075e54] font-semibold"
+              >Privacy Policy</router-link
+            >
+          </p>
+        </div>
       </div>
-      </div>
+
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAABeiGZqY3Hf9K04o"></div>
 
       <div class="flex flex-col items-center">
         <button
@@ -100,10 +100,13 @@
 </template>
 
 <script>
+import zxcvbn from "zxcvbn";
+
 export default {
   data() {
     return {
       apiUrl: process.env.VUE_APP_API_URL,
+      password: "", // ✅ Added this line
     };
   },
   name: "BasicSignUpForm",
@@ -125,22 +128,35 @@ export default {
       return `${(this.strengthScore / 4) * 100}%`;
     },
   },
+  mounted() {
+    const script = document.createElement("script");
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+  },
   methods: {
     handleSubmit() {
-      // Get the form data
+      const token = document.querySelector(
+        'input[name="cf-turnstile-response"]'
+      )?.value;
+      if (!token) {
+        alert("Please complete the CAPTCHA.");
+        return;
+      }
+
       const formData = {
         username: document.getElementById("username").value,
         email: document.getElementById("email").value,
         password: document.getElementById("password").value,
+        cf_token: token,
       };
 
-      // Check for required fields
       if (!formData.username || !formData.email || !formData.password) {
         alert("Please fill in all required fields.");
         return;
       }
 
-      // Send a request to your FastAPI endpoint
       fetch(`${this.apiUrl}/register`, {
         method: "POST",
         headers: {
@@ -151,14 +167,12 @@ export default {
         .then((response) => response.json())
         .then((data) => {
           if (data.success) {
-            // console.log(response)
             alert("Account created successfully!");
-            // Clear the form fields
             document
               .querySelectorAll("input")
               .forEach((input) => (input.value = ""));
           } else if (data.detail) {
-            alert(data.detail); // Show the error message from the API
+            alert(data.detail);
           } else {
             alert("Failed to create account. Please try again.");
           }
@@ -185,25 +199,18 @@ export default {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  /* equivalent to min-h-screen */
-
   background-image: url("@/assets/LoginPage.png");
   background-position: center;
-  /* equivalent to bg-gray-100 */
   padding: 0 16px;
-  /* equivalent to px-4 */
 }
 
-/* Responsive padding for different screen sizes */
 @media (min-width: 640px) {
-  /* equivalent to sm:px-6 */
   .container {
     padding: 0 24px;
   }
 }
 
 @media (min-width: 1024px) {
-  /* equivalent to lg:px-8 */
   .container {
     padding: 0 32px;
   }

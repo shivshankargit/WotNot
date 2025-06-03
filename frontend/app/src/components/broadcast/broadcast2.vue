@@ -2,18 +2,18 @@
   <div class="content-section m-8 md:ml-72">
     <div class="flex flex-col md:flex-row justify-between mb-4 border-b pb-5">
       <div>
-        <h2 class="text-xl md:text-2xl font-bold">Broadcast Messages</h2>
+        <h2 class="text-xl md:text-2xl font-bold text-green-800">Broadcast Messages</h2>
         <p class="text-sm md:text-base">Send out Broadcast Messages using templates</p>
       </div>
 
       <div>
-        <button class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
+        <button class="bg-green-700  hover:bg-green-600  text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center "
         @click="showPopup = true, fetchContacts()">
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
           </svg>
           New Broadcast
-      </button>
+        </button>
         <!-- <button @click="showPopup = true, fetchContacts()"
           class="bg-[#075e54] text-[#f5f6fa] px-4 py-2 md:px-4 md:py-4 text-sm md:text-base rounded-md shadow-lg ">
           
@@ -25,17 +25,22 @@
       class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 custom-scrollbar">
 
 
-      <h2 class="text-xl font-semibold mb-4">New Broadcast</h2>
-      <hr class="mb-4" />
+      <h2 class="text-xl font-semibold mb-4 text-green-800">New Broadcast</h2>
+
+      <hr class="pb-4">
+      
 
       <div class="flex">
 
 
         <div class="popup-content custom-scrollbar p-4">
-          <form @submit.prevent="handleBroadcast" id="messageForm" :class="{ 'opacity-50 pointer-events-none': isSubmitted }">
+          <form @submit.prevent="handleBroadcast" id="messageForm"
+            :class="{ 'opacity-50 pointer-events-none': isSubmitted }"
+      
+            >
+            
 
-
-            <h4><b>What message do you want to send?</b></h4>
+            <h4 class="text-green-700"><b>What message do you want to send?</b></h4>
             <p class="text-sm mb-2 ">Add broadcast name and template below</p>
 
 
@@ -69,11 +74,15 @@
                 </select>
 
                 <!-- Conditional Image URL input field -->
-                <div v-if="selectedTemplateHasImage">
+                <div v-if="selectedTemplateHasMedia">
                   <label for="" class="block text-sm font-semibold">Upload Media</label>
-                  <input type="file" @change="onFileChange" class="mb-2 w-[60%] mr-1" required>
+                  <input type="file" @change="onFileChange" class="mb-2 w-[60%] mr-1">
+                  <div v-if="uploadedMedia"><p  class="text-green-800 font-bold">Uploaded</p></div>
+                  <div v-else><span class="ml-5 w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin inline-block"></span></div>
+                  
+
                 </div>
-                <div v-if="uploadedMedia">{{ this.mediaId }}</div>
+                
 
                 <div v-if="selectedTemplateHasParameters">
                   <label for="">Select Parameter</label>
@@ -84,7 +93,7 @@
               </div>
 
             </div>
-            <h4><b>Who do you want to send it to?</b></h4>
+            <h4 class="text-green-700"><b>Who do you want to send it to?</b></h4>
             <p class="text-sm mb-2 ">Select contacts below or <a
                 href="https://drive.google.com/file/d/1hVQErwmNN6eGN1zLBoniW_34-GzAtMwm/view?usp=sharing"
                 target="_blank" class="text-blue-500"><u>Download sample format for contact upload</u></a></p>
@@ -112,7 +121,7 @@
             </div>
 
             <div v-else>
-              <h4><b>Contacts</b></h4>
+              <h4 class="text-green-700"><b>Contacts</b></h4>
               <p class="text-sm mb-2 ">Select from your saved contacts</p>
             </div>
 
@@ -126,7 +135,7 @@
                 class="border border-gray-300 rounded px-3 py-2 w-30px">
 
               <button @click.prevent="fiterBytTags"
-                class="relative my-2 h-auto w-auto p-1 border-2 border-solid border-green-500 text-green-500 hover:text-gray-200">Apply
+                class=" bg-gray-300 hover:bg-gray-400 relative my-2 h-auto w-auto p-1 text-white ">Apply
                 filter</button>
             </div>
 
@@ -165,7 +174,7 @@
             </div>
 
 
-            <h4><b>When do you want to send the message ?</b></h4>
+            <h4 class="text-green-700"><b>When do you want to send the message ?</b></h4>
             <p class="text-sm mb-2 ">Select from the options below </p>
 
 
@@ -173,10 +182,10 @@
 
 
               <p class=" text-sm font-semibold mb-1"><input type="radio" v-model="isScheduled" :value="false"
-                  class="scale-150 text-green-500 m-2">Send Now</p>
+                  class="scale-150 text-green-500 m-2 accent-green-700">Send Now</p>
 
               <p class="text-sm font-semibold mb-1"><input type="radio" v-model="isScheduled" :value="true"
-                  class="scale-150 text-green-500 m-2" @click="currentDateTime">Schedule </p>
+                  class="scale-150 text-green-500 m-2 accent-green-700" @click="currentDateTime">Schedule </p>
 
               <div v-if="isScheduled" class="flex justify-between">
                 <div class="w-[50%]">
@@ -199,12 +208,12 @@
 
               <button
               type="submit"
-              class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
+              class="bg-green-700 text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center "
               :disabled="popupLoading || isSubmitted">
               <span v-if="popupLoading"
                 class="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4 mr-2"></span>
               {{ isSubmitted ? "Submitted" : popupLoading ? "Submitting..." : isScheduled ?
-              'Schedule Message' : 'Send Message' }}
+                'Schedule Message' : 'Send Message' }}
             </button>
           </form>
         </div>
@@ -241,16 +250,15 @@
     </PopUp>
 
 
-    <div class="bg-[#f5f6fa] p-4  filter-container space-x-2">
+    <div class="p-4  filter-container space-x-2">
 
       <div class="flex items-center">
-        <h3 class="text-xl md:text-2xs mb-2 text-gray-600"><b>Broadcast List </b></h3>
+        <h3 class="text-xl md:text-2xs mb-2 text-green-700"><b>Broadcast List </b></h3>
         <div class="pb-2 pl-2">
-          <button class="text-blue-500 underline hover:text-blue-700 hover:bg-transparent"
+          <button class=" text-green-600 underline hover:text-green-700 hover:bg-transparent"
             @click="fetchBroadcastList(this.filterStatus, 1)">
-            <i class="bi bi-arrow-clockwise"></i> Refresh
+             <i class="bi bi-arrow-clockwise inline-block text-xl" :class="{ 'animate-spin': loading }"></i> 
           </button>
-          <p v-if="loading" class="ml-2 w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin inline-block"></p>
         </div>
 
       </div>
@@ -270,43 +278,38 @@
 
       </div>
     </div>
-    
+
     <div class="overflow-x-auto max-h-[51vh] custom-scrollbar">
-      <table class="w-full rounded-lg border-collapse">
+      <table class="w-full border border-gray-300 rounded-lg text-sm md:text-base bg-white">
         <thead>
-          <tr class="bg-[#ffffff] text-center">
-
-            <th class="p-2 md:p-4 text-left border-b-2 bg-[#ffffff] sticky top-0 ">Broadcast Name</th>
-            <th class="p-2 md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Type</th>
-            <th class="p-2 md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Template</th>
-            <th class="p-2 md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Contacts</th>
-            <th class="p-2 md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Status</th>
-            <th class="p-2 md:p-4 border-b-2 bg-[#ffffff] sticky top-0 ">Action</th>
-
-
+          <tr class="bg-gray-100 text-center text-gray-700 font-semibold">
+            <th class="p-3 md:p-4 text-left border border-gray-300 sticky top-0 z-10 bg-gray-100">Broadcast Name</th>
+            <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Type</th>
+            <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Template</th>
+            <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Contacts</th>
+            <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Status</th>
+            <th class="p-3 md:p-4 border border-gray-300 sticky top-0 z-10 bg-gray-100">Action</th>
           </tr>
         </thead>
-        <tbody class="bg-white">
-          <tr v-for="broadcast in broadcasts" :key="broadcast.id">
-
-            <td class="border-[#ddd] p-2 md:p-4 text-left">{{ broadcast.name }}</td>
-            <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.type }}</td>
-            <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.template }}</td>
-            <td class="border-[#ddd] p-2 md:p-4 text-center">{{ broadcast.contacts.length }}</td>
-            <td class="p-2 md:p-4 text-center">
+        <tbody>
+          <tr v-for="broadcast in broadcasts" :key="broadcast.id" class="hover:bg-gray-50">
+            <td class="p-3 md:p-4 text-left border border-gray-200">{{ broadcast.name }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">{{ broadcast.type }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">{{ broadcast.template }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">{{ broadcast.contacts.length }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">
               <div :class="{
-                'text-green-500 ': broadcast.status === 'Successful',
-                'text-blue-500 ': broadcast.status === 'Scheduled',
-                'text-red-500 ': broadcast.status === 'Cancelled',
-                'text-yellow-500 ': broadcast.status === 'Partially Successful',
-                'text-yellow-600 ': broadcast.status === 'processing...',
-                'border-[#ddd]': true
-              }" class="text-[80%] lg:text-[100%] rounded-lg">
+                  'text-emerald-600 font-semibold': broadcast.status === 'Successful',           // Green: Success
+                  'text-sky-600 font-semibold': broadcast.status === 'Scheduled',                // Blue: Info/Scheduled
+                  'text-rose-600 font-semibold': broadcast.status === 'Cancelled',              // Red: Danger/Cancelled
+                  'text-amber-600 font-semibold': broadcast.status === 'Partially Successful',  // Amber: Warning/Partial
+                  'text-indigo-600 font-semibold': broadcast.status === 'processing...', 
+              }">
                 {{ broadcast.status }}
               </div>
             </td>
-            <td class="border-[#ddd] p-2 md:p-4 text-center">
-              <button class="text-blue-500 underline hover:text-blue-700 hover:bg-transparent"
+            <td class="p-3 md:p-4 text-center border border-gray-200">
+              <button class="underline text-gray-800 hover:bg-inherit font-medium"
                 @click="showReportPopup = true, fetchBroadcastReport(broadcast.id)">
                 View Report
               </button>
@@ -315,15 +318,31 @@
         </tbody>
       </table>
     </div>
-    <div class="flex justify-end">
-      <div class="flex justify-between items-center">
-        <button class="p-2 text-blue-500 underline hover:text-blue-700 hover:bg-transparent" @click="loadPreviousPage"
-          :disabled="currentPage === 1">Previous</button>
-        <div class="border-2">{{ currentPage }}</div>
-        <button class="p-2 text-blue-500 underline hover:text-blue-700 hover:bg-transparent"
-          @click="loadNextPage">Next</button>
+
+
+
+    
+    <div class="flex justify-center mt-4">
+      <div class="flex items-center space-x-4 bg-white shadow-md rounded-lg px-4 py-2">
+        <button
+          class="px-3 py-1 bg-green-500 text-white font-medium rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          @click="loadPreviousPage"
+          :disabled="currentPage === 1"
+        >
+          Previous
+        </button>
+        <div class="px-4 py-1 border border-gray-300 rounded text-gray-700 font-semibold">
+          {{ currentPage }}
+        </div>
+        <button
+          class="px-3 py-1 bg-green-500 text-white font-medium rounded hover:bg-green-600"
+          @click="loadNextPage"
+        >
+          Next
+        </button>
       </div>
     </div>
+
 
 
 
@@ -439,17 +458,17 @@
       </div>
 
 
-      <div class="overflow-x-auto max-h-[45vh] overflow-y-auto custom-scrollbar">
-        <table class="w-full rounded-lg border-collapse">
-          <thead>
-            <tr class="text-center">
+    <div class="p-4 overflow-x-auto max-h-[51vh] custom-scrollbar">
+      <table class="w-full border border-gray-300 rounded-lg text-sm md:text-base bg-white">
+        <thead>
+          <tr class="bg-gray-100 text-center text-gray-700 font-semibold">
               <th class="p-2 md:p-4 border-b-2 sticky top-0">Name</th>
               <th class="p-2 md:p-4 border-b-2 sticky top-0">Phone No</th>
               <th class="p-2 md:p-4 border-b-2 sticky top-0">Status</th>
-              <th class="p-2 md:p-4 border-b-2 sticky top-0">Sent</th>
+              <!-- <th class="p-2 md:p-4 border-b-2 sticky top-0">Sent</th>
               <th class="p-2 md:p-4 border-b-2 sticky top-0">Delivered</th>
               <th class="p-2 md:p-4 border-b-2 sticky top-0">Read</th>
-              <th class="p-2 md:p-4 border-b-2 sticky top-0">Replied</th>
+              <th class="p-2 md:p-4 border-b-2 sticky top-0">Replied</th> -->
               <th class="p-2 md:p-4 border-b-2 sticky top-0">Failure Reason</th>
 
             </tr>
@@ -459,10 +478,10 @@
               <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.contact_name }}</td>
               <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.phone_no }}</td>
               <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.status }}</td>
-              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.sent }}</td>
+              <!-- <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.sent }}</td>
               <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.delivered }}</td>
               <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.read }}</td>
-              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.replied }}</td>
+              <td class="border-[#ddd] p-2 md:p-4 text-center">{{ contactReport.replied }}</td> -->
               <td class="border-[#ddd] p-2 md:p-4 text-center">
                 <div class="relative flex justify-center items-center">
                   <button v-if="contactReport.error_reason" @mouseenter="showTooltip(index, $event)"
@@ -515,7 +534,7 @@ export default {
       // Tmeplate preview
       previewData: null,
 
-      loading:false,
+      loading: false,
       currentPage: 1,
       tooltipVisible: null, // Index of the row with a visible tooltip
       tooltipStyles: {},
@@ -549,7 +568,7 @@ export default {
 
 
       selectedTemplateId: null, // Holds the selected template's ID
-      selectedTemplateHasImage: false, // Boolean to control if image URL input should appear
+      selectedTemplateHasMedia: false, // Boolean to control if image URL input should appear
       imageUrl: '',// To store the input value for the image URL
       selectedTemplateHasParameters: false,
       bodyParameters: [],
@@ -561,7 +580,7 @@ export default {
       // loading
       popupLoading: false,
       isSubmitted: false,
-      tableLoading:false
+      tableLoading: false
 
     };
   },
@@ -594,6 +613,15 @@ export default {
        style="width: 100%; height: 100%; object-fit: cover; object-position: start; display: block ; border-radius: 4px">
 </div>`;
 
+            }
+            else if (component.format === 'VIDEO' && component.example?.header_handle) {
+              previewMessage += `<div style="width: auto; height: 200px; overflow: hidden; position: relative; border-radius: 5px">
+                <video controls 
+                    src="${component.example.header_handle[0]}" 
+                    style="width: 100%; height: 100%; object-fit: cover; object-position: start; display: block; border-radius: 4px">
+                    Your browser does not support the video tag.
+                </video>
+            </div>`;
             }
             break;
           }
@@ -665,8 +693,13 @@ export default {
 
 
     async loadNextPage() {
-      this.currentPage += 1;
-      await this.fetchBroadcastList(this.filterStatus, this.currentPage);
+      const prevFirst = this.broadcasts[0]?.id;
+      await this.fetchBroadcastList(this.filterStatus, this.currentPage+1);
+      const newFirst = this.broadcasts[0]?.id;
+
+      if (prevFirst !== newFirst && this.broadcasts.length > 0) {
+        this.currentPage += 1;
+      }
     },
     async loadPreviousPage() {
       if (this.currentPage > 1) {
@@ -707,7 +740,7 @@ export default {
 
     async fetchtemplateList() {
       const token = localStorage.getItem('token');
-      
+
       try {
         const response = await fetch(`${this.apiUrl}/template`, {
           method: 'GET',
@@ -728,27 +761,74 @@ export default {
       }
     },
 
-    onTemplateSelect() {
+    async onTemplateSelect() {
       // Find the selected template
+  
       const selectedTemplate = this.templates.find(template => template.id === this.selectedTemplateId);
       this.previewData = this.generateTemplatePreview(selectedTemplate.components);
       console.log(this.previewData);
 
       // Check if the selected template has a HEADER with IMAGE format
       const headerComponent = selectedTemplate.components.find(
-        component => component.type === 'HEADER' && component.format === 'IMAGE'
+        component => component.type === 'HEADER' && (component.format === 'IMAGE' || component.format === 'VIDEO')
 
       );
 
+      // if (headerComponent) {
+      //   // Show the image input field and pre-fill with the example image URL if available
+      //   this.selectedTemplateHasMedia = true;
+      //   this.imageUrl = headerComponent.example?.header_handle?.[0] || ''; // Use the first example image if available
+      // } else {
+      //   // Hide the image input field if no image is found in the template
+      //   this.selectedTemplateHasMedia = false;
+      //   this.imageUrl = '';
+      // }
+
       if (headerComponent) {
-        // Show the image input field and pre-fill with the example image URL if available
-        this.selectedTemplateHasImage = true;
-        this.imageUrl = headerComponent.example?.header_handle?.[0] || ''; // Use the first example image if available
+        this.selectedTemplateHasMedia = true;
+        this.imageUrl = headerComponent.example?.header_handle?.[0] || '';
+
+        if (this.imageUrl) {
+          try {
+            const token = localStorage.getItem('token'); // or however you're storing it
+            const downloadUrl = new URL("http://localhost:8000/download-media");
+            downloadUrl.searchParams.append("media_url", this.imageUrl);
+
+            const response = await fetch(downloadUrl.toString(), {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            });
+
+            if (!response.ok) {
+              throw new Error(`Download failed with status ${response.status}`);
+            }
+
+            const blob = await response.blob();
+            console.log("Blob received:", blob);
+            const contentType = response.headers.get("content-type") || "application/octet-stream";
+            const ext = contentType.split("/")[1] || "bin";
+            const file = new File([blob], `template-media.${ext}`, { type: contentType });
+
+            const fakeEvent = {
+              target: {
+                files: [file]
+              }
+            };
+
+            await this.onFileChange(fakeEvent);
+            this.popupLoading = false;
+            console.log(`Template media downloaded and uploaded successfully.: ${this.mediaId}`);
+          } catch (error) {
+            console.error("Failed to download/upload template media:", error);
+          }
+        }
       } else {
-        // Hide the image input field if no image is found in the template
-        this.selectedTemplateHasImage = false;
+        this.selectedTemplateHasMedia = false;
         this.imageUrl = '';
       }
+
+
 
 
       // Check if the selected template has BODY parameters
@@ -787,11 +867,11 @@ export default {
             'Content-Type': 'application/json',
           },
         });
-      
+
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        
+
         const contactList = await response.json();
         this.contacts = contactList.map(contact => ({
           id: contact.id,
@@ -810,13 +890,13 @@ export default {
     async fetchBroadcastList(statusFilter = null, page = 1) {
       const token = localStorage.getItem('token'); // Retrieve token from localStorage
       const itemsPerPage = 10;
-      this.currentPage = page;
+
       this.filterStatus = statusFilter;// Number of items to display per page
       const url = `${this.apiUrl}/broadcast?limit=${itemsPerPage}&offset=${(page - 1) * itemsPerPage}&statusfilter=${this.filterStatus}`;
 
       try {
         // Fetch data from the backend
-        this.loading=true;
+        this.loading = true;
         // await new Promise(resolve => setTimeout(resolve, 2000));
         const response = await fetch(url, {
           method: 'GET',
@@ -825,7 +905,7 @@ export default {
             'Content-Type': 'application/json',
           },
         });
-        
+
         // Check if the response is OK
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -833,7 +913,7 @@ export default {
 
         // Parse JSON response
         const broadcastList = await response.json();
-        this.loading=false;
+        this.loading = false;
         // Process and optionally filter broadcasts
         this.broadcasts = broadcastList
           .map((broadcast) => ({
@@ -882,15 +962,19 @@ export default {
     },
 
 
-    onFileChange(event) {
-      this.file = event.target.files[0];
+    async onFileChange(event) {
+      this.mediafile = event.target.files[0];
       this.uploadMedia();
     },
 
 
     async uploadMedia() {
+      if (!this.mediafile) {
+        console.error("No file available for upload");
+        return;
+      }
       const token = localStorage.getItem('token');
-      this.mediafile = event.target.files[0];
+
       const formData = new FormData();
       formData.append('file', this.mediafile);
 
@@ -916,7 +1000,7 @@ export default {
         }
         else {
           this.uploadedMedia = true
-          alert("Media Uploaded Successfully")
+          // alert("Media Uploaded Successfully")
         }
       } catch (error) {
         console.error('Error uploading media:', error);
@@ -927,7 +1011,7 @@ export default {
 
     async sendBroadcast() {
       const toast = useToast();
-      
+
 
       // Assuming recipients have both name and number in format 'Name:1234567890'
       const contacts = this.recipients.split(',').map(entry => {
@@ -939,7 +1023,7 @@ export default {
       const selectedTemplate = Template.name;
       const formattedDate = this.formatDateTime(new Date());
       const broadcastNameWithDate = `${this.broadcastName} - ${formattedDate}`;
-      
+
       const mediaID = this.mediaId;
       const token = localStorage.getItem('token');
       const bodyparamter = this.bodyParameter
@@ -987,7 +1071,7 @@ export default {
 
       } catch (error) {
         console.error('Error sending broadcast:', error);
-        
+
       }
     },
 
@@ -1067,10 +1151,10 @@ export default {
       const scheduledDatetime = new Date(`${this.scheduleDate}T${this.scheduleTime}`).toISOString();
 
       try {
-        this.popupLoading=true;
+        this.popupLoading = true;
         this.fetchBroadcastList();
 
-        
+
 
 
         const requestBody = {
@@ -1104,12 +1188,13 @@ export default {
         if (!response.ok) {
           const errorData = await response.json(); // Parse the response JSON
           const errorMessage = errorData.detail || 'Unknown error'; // Extract error message
-          alert(`Error scheduling broadcast: ${errorMessage}`);
+          toast.error(`Error scheduling broadcast: ${errorMessage}`);
+          // alert(`Error scheduling broadcast: ${errorMessage}`);
           throw new Error('Network response was not ok');
         } else {
           toast.success('Broadcast scheduled successfully!');
-          this.popupLoading=false;
-          this.isSubmitted=true;
+          this.popupLoading = false;
+          this.isSubmitted = true;
           this.fetchBroadcastList();
         }
 
@@ -1121,13 +1206,13 @@ export default {
 
 
     clearForm() {
-        this.popupLoading=false;
-        this.isSubmitted=false,
+      this.popupLoading = false;
+      this.isSubmitted = false,
         this.contact = "",
-        this.previewData='';
-        this.broadcastName = '',
+        this.previewData = '';
+      this.broadcastName = '',
         this.selectedTemplateHasParameters = '',
-        this.selectedTemplateHasImage = false,
+        this.selectedTemplateHasMedia = false,
         this.selectedTemplateId = '',
         this.bodyParameter = '',
         this.recipients = '',
@@ -1331,6 +1416,8 @@ export default {
 </script>
 
 <style scoped>
+
+
 .tooltip-container {
   display: flex;
   position: fixed;
@@ -1372,10 +1459,16 @@ export default {
 
 
 .info-button {
-  display: flex;
+  display: inline-flex;       /* Use inline-flex so it wraps to content */
   align-items: center;
   cursor: pointer;
   color: blue;
+  padding: 4px 8px;           /* Small padding around the text */
+  border: 1px solid blue;     /* Optional: add a border */
+  border-radius: 4px;         /* Slightly rounded corners */
+  font-size: 14px;            /* Optional: control font size */
+  background-color: #f0f8ff;  /* Optional: light background */
+  width: fit-content;         /* Ensure it fits content size */
 }
 
 .custom-scrollbar::-webkit-scrollbar {

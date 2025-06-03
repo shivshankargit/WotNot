@@ -16,6 +16,9 @@ import CostAnalytics from "./components/PurchaseHistory/CostDashboard.vue";
 import Analytics from "./components/analytics/Analytics.vue";
 
 import TermsAndPrivacy from "./views/TermsAndPrivacy.vue";
+import { useToast } from "vue-toastification";
+
+const toast = useToast();
 
 const routes = [
   // Public routes
@@ -88,14 +91,39 @@ const router = createRouter({
 });
 
 // Navigation guard to check for authentication
+// Navigation guard to check for authentication and token expiration
 router.beforeEach((to, from, next) => {
-  const loggedIn = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
-  if (to.matched.some((record) => record.meta.requiresAuth) && !loggedIn) {
-    next("/"); // Redirect to login page if not authenticated
-  } else {
-    next();
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    if (!token) {
+      // No token = not logged in
+      
+      toast.error("Session expired. Please log in again.");
+      return next("/");
+    }
+
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      const now = Math.floor(Date.now() / 1000);
+
+      if (payload.exp < now) {
+        // Token expired
+        localStorage.removeItem("token");
+        toast.error("Session expired. Please log in again.");
+        return next("/");
+      }
+    } catch (error) {
+      // Invalid token format or parsing error
+      localStorage.removeItem("token");
+      ("Invalid session. Please log in again.");
+      return next("/");
+    }
   }
+
+  // If route doesn't require auth or token is valid
+  next();
 });
+
 
 export default router;

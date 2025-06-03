@@ -55,17 +55,19 @@ class BroadcastListUpdate(BaseModel):
 
     
 class ExampleModel(BaseModel):
-    header_handle: List[str]
+    header_handle: Optional[List[str]] = None
+    body_text: Optional[List[str]] = None
 
 class Button(BaseModel):
     type: str = Field(..., description="The type of the button, e.g., 'URL' or 'QUICK_REPLY'")
     text: str = Field(..., description="The text of the button")
     url: Optional[HttpUrl] = None
+
 class Component(BaseModel):
     type: str
     format: Optional[str] = None  # Allowed only for certain component types
     text: Optional[str] = None
-    example: ExampleModel = None
+    example: Optional[ExampleModel] = None
     buttons: Optional[List[Button]] = None  # Optional list of Button objects
     @classmethod
     def validate_component(cls, component: dict):
@@ -79,6 +81,7 @@ class Component(BaseModel):
         if component.get('buttons'):
             for button in component['buttons']:
                 Button(**button)  # Validate using the Button model
+
 class TemplateCreate(BaseModel):
     name: str
     category: str
@@ -89,6 +92,7 @@ class TemplateCreate(BaseModel):
     def validate_template(cls, template: dict):
         for component in template.get('components', []):
             Component.validate_component(component)
+
 class TemplateResponse(BaseModel):
     id: str
     status: str

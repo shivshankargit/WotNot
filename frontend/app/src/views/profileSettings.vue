@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col m-8 overflow-y-auto h-[80vh]">
+  <div class="flex flex-col m-8 overflow-y-auto h-[80vh] md:ml-72">
     <div class="flex flex-col md:flex-row justify-between mb-4 border-b pb-5">
       <div>
         <h2 class="text-xl md:text-2xl font-bold">Profile Settings</h2>

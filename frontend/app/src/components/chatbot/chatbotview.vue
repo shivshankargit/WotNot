@@ -141,7 +141,7 @@
 
           <input type="file" id="file-upload" @change="FileUpload" class="file-input" />
 
-          <button id="send-button" class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
+          <button id="send-button" class="bg-green-700 text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:bg-green-800"
           @click="sendChatMessage()" v-if="!replyMessage">Send</button>
           <button id="send-button" @click="sendChatMessageReply()" v-if="replyMessage">Reply</button>
 
@@ -194,12 +194,10 @@
               <td style=" color: gray; font-weight: 300;">Created at</td>
               <td>{{ contactInfo.created_at }}</td>
             </tr>
-            <tr>
-              <div v-for="(tag, index) in contactInfo.tags" :key="index">
-                <td style=" color: gray; font-weight: 300;">{{ tag.split(':')[0] }}</td>
-                <td>{{ tag.split(':')[1] }}</td>
-              </div>
-            </tr>
+<tr v-for="(tag, index) in contactInfo.tags" :key="index">
+  <td style="color: gray; font-weight: 300;">{{ tag.split(':')[0] }}</td>
+  <td>{{ tag.split(':')[1] }}</td>
+</tr>
 
           </tbody>
         </table>
@@ -258,6 +256,20 @@ export default {
       this.contextMenuVisible = false;
     });
 
+  },
+
+    beforeUnmount() {
+    document.removeEventListener('click', this.handleClickOutside);
+    // Clean up the EventSource instance
+    if (this.eventSourceB) {
+      console.log("Closing eventSourceB:", this.eventSourceB);
+      this.eventSourceB.close();
+      this.eventSourceB = null;
+    }
+    if (this.eventSourceA) {
+      this.eventSourceA.close();
+      console.log("SSE connection closed on component unmount.");
+    }
   },
 
   methods: {
@@ -502,9 +514,7 @@ export default {
 
         // Create a new EventSource for receiving SSE
         this.eventSourceB = new EventSource(`${this.apiUrl}/active-conversations?token=${token}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`  // Unfortunately, EventSource does not support custom headers directly
-          }
+
         });
 
         // Listen for events
@@ -550,7 +560,7 @@ export default {
       this.fetchActiveChatlist(status);
     },
 
-    ConversationSSE(wa_id) {
+    async ConversationSSE(wa_id) {
 
       this.selectedRemainingTime = null;
       // Check if there's an existing EventSource instance
@@ -570,8 +580,10 @@ export default {
         }
       });
 
-      this.ActiveContactDetails(wa_id);
-
+      await this.ActiveContactDetails(wa_id);
+      this.contactInfo.name=this.contactInfo.name?this.contactInfo.name:this.ActiveWaidName
+      this.contactInfo.phone=this.contactInfo.phone?this.contactInfo.phone:this.ActiveWaid
+      
       // Handle incoming messages
       this.eventSourceA.onmessage = (event) => {
         try {
@@ -632,6 +644,7 @@ export default {
     },
 
     async ActiveContactDetails(wa_id) {
+      this.contactInfo= {};
       const token = localStorage.getItem('token');
 
       try {
@@ -735,20 +748,7 @@ export default {
 
 
 
-  beforeUnmount() {
 
-    document.removeEventListener('click', this.handleClickOutside);
-    // Clean up the EventSource instance
-    if (this.eventSourceB) {
-
-      this.eventSourceB.close();
-      console.log("SSE connection closed on component unmount.");
-    }
-    if (this.eventSourceA) {
-      this.eventSourceA.close();
-      console.log("SSE connection closed on component unmount.");
-    }
-  },
 
 
 };
@@ -936,16 +936,13 @@ export default {
 #send-button {
   padding: 10px 15px;
   margin-left: 10px;
-  background-color: #25D366;
+  
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
 }
 
-#send-button:hover {
-  background-color: #1da857;
-}
 
 /* Upload button */
 .upload-label {

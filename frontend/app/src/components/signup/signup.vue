@@ -78,6 +78,7 @@
 
 <script>
 /* global FB */
+import { useToast } from 'vue-toastification';
 
 export default {
 
@@ -243,6 +244,7 @@ export default {
     },
 
     handleSubmit() {
+      const toast = useToast();
       // Get the form data
       const formData = {
         username: document.getElementById('username').value,
@@ -255,7 +257,9 @@ export default {
 
       // Check for required fields
       if (!formData.username || !formData.email || !formData.password || !formData.WABAID || !formData.PAccessToken || !formData.Phone_id) {
-        alert('Please fill in all required fields.');
+        
+        toast.error('Please fill in all required fields.');
+        
         return;
       }
 
@@ -271,14 +275,16 @@ export default {
         .then(data => {
           if (data.success) {
             // console.log(response)
-            alert('Account created successfully!');
+            toast.success('Account created successfully!');
+            
             // Clear the form fields
             document.querySelectorAll('input').forEach(input => input.value = '');
           } else if (data.detail) {
-            alert(data.detail); // Show the error message from the API
+             // Show the error message from the API
+            toast.error(data.detail);
           } else {
-
-            alert('Failed to create account. Please try again.');
+            toast.error('Failed to create account. Please try again.');
+            
           }
         })
         .catch(error => console.error(error));

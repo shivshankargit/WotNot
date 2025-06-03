@@ -12,7 +12,7 @@
           class="text-[#f5f6fa] px-4 py-2 md:px-4 md:py-4 text-sm md:text-base w-full md:w-auto">
           + Create Integration
         </button> -->
-        <button class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
+        <button class="bg-green-700 text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:bg-green-800"
         @click="showPopup = true">
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
@@ -341,7 +341,7 @@
           
           <button
           type="submit"
-          class="bg-gradient-to-r from-[#075e54] via-[#089678] to-[#075e54] text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:from-[#078478] hover:via-[#08b496] hover:to-[#078478] transition-all duration-300"
+          class="bg-green-700 text-white px-6 py-3 rounded-lg shadow-lg font-medium flex items-center justify-center hover:bg-green-800"
           :disabled="PopupLoading || isSubmitted">
           <span v-if="PopupLoading"
             class="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4 mr-2"></span>
@@ -354,34 +354,39 @@
 
     </PopUp1>
     <h3 class="text-xl md:text-2xs mb-4 text-gray-600"><b>Integration List</b></h3>
-    <div class="overflow-x-auto max-h-[32vh] custom-scrollbar">
-      <table class="w-full rounded-lg border-collapse" :class="{ 'opacity-50 pointer-events-none':deleteLoading }">
+   <div class="overflow-x-auto max-h-[32vh] custom-scrollbar">
+      <table class="w-full border border-gray-300 rounded-lg text-sm md:text-base bg-white">
         <thead>
-          <tr class=" text-center">
-            <th class="p-2 md:p-4 border-b-2 sticky top-0 bg-[#ffffff]">ID</th>
-            <th class="p-2 md:p-4 border-b-2 sticky top-0 bg-[#ffffff]">Decription</th>
-            <th class="p-2 md:p-4 border-b-2 sticky top-0 bg-[#ffffff]">Type</th>
-            <th class="p-2 md:p-4 border-b-2 sticky top-0 bg-[#ffffff]">Template</th>
-            <th class="p-2 md:p-4 border-b-2 sticky top-0 bg-[#ffffff] z-10">Action</th>
-
+          <tr class="bg-gray-100 text-center text-gray-700 font-semibold">
+            <th class="p-3 md:p-4 text-center border border-gray-300 sticky top-0 z-10 bg-gray-100">ID</th>
+            <th class="p-3 md:p-4 text-center border border-gray-300 sticky top-0 z-10 bg-gray-100">Description</th>
+            <th class="p-3 md:p-4 text-center border border-gray-300 sticky top-0 z-10 bg-gray-100">Type</th>
+            <th class="p-3 md:p-4 text-center border border-gray-300 sticky top-0 z-10 bg-gray-100">Template</th>
+            <th class="p-3 md:p-4 text-center border border-gray-300 sticky top-0 z-10 bg-gray-100">Action</th>
           </tr>
         </thead>
-        <tbody class="bg-white">
-          <tr v-for="integration in integrations" :key="integration.id">
-            <td class="border-[#ddd] p-2 md:p-4 text-center">{{ integration.id }}</td>
-            <td class="border-[#ddd] p-2 md:p-4 text-center">{{ integration.description }}</td>
-            <td class="border-[#ddd] p-2 md:p-4 text-center">{{ integration.type }}</td>
-            <td class="border-[#ddd] p-2 md:p-4 text-center">{{ integration.template }}</td>
-            <button @click="deleteIntegration(integration.integration_id)"
-              class="hover:bg-white rounded-full p-2 center">
-              <lord-icon src="https://cdn.lordicon.com/skkahier.json" colors="primary:#ff5757,secondary:#000000"
-                style="width:32px;height:32px">
-              </lord-icon>
-            </button>
+        <tbody>
+          <tr v-for="integration in integrations" :key="integration.id" class="hover:bg-gray-50">
+            <td class="p-3 md:p-4 text-center border border-gray-200">{{ integration.id }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">{{ integration.description }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">{{ integration.type }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">{{ integration.template }}</td>
+            <td class="p-3 md:p-4 text-center border border-gray-200">
+              <div class="flex justify-center">
+                <button @click="deleteIntegration(integration.integration_id)"
+                  class="hover:bg-white rounded-full p-2 transition">
+                  <lord-icon src="https://cdn.lordicon.com/skkahier.json"
+                    colors="primary:#ff5757,secondary:#000000" trigger="hover"
+                    style="width:32px;height:32px">
+                  </lord-icon>
+                </button>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
+
 
 
   </div>
