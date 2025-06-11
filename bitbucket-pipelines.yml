@@ -8,9 +8,11 @@ pipelines:
           caches:
             - node
           script:
-            - apt-get update && apt-get install -y python3-pip
-            - pip3 install awscli
+            - apt-get update && apt-get install -y awscli
             - cd frontend/app
             - npm install
             - npm run build
-            - aws s3 sync dist/ s3://$S3_BUCKET --region $S3_REGION --delete
+            - aws s3 sync dist/ s3://$S3_BUCKET --region $S3_REGION --delete    
+
+  
+
