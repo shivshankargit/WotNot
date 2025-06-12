@@ -20,7 +20,8 @@ pipelines:
           script:
             - apt-get update && apt-get install -y openssh-client
             - ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
-            - scp -o StrictHostKeyChecking=no -r backend/* ubuntu@$EC2_HOST:/home/ubuntu/backend/
-            - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_HOST 'cd /home/ubuntu/backend && docker-compose down && docker-compose up -d --build'
+            - scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@$EC2_HOST:/home/ubuntu/
+            - scp -o StrictHostKeyChecking=no -r backend/ ubuntu@$EC2_HOST:/home/ubuntu/
+            - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_HOST 'cd /home/ubuntu && docker-compose down && docker-compose up -d --build'
 
 
