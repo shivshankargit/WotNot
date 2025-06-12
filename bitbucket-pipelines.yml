@@ -16,8 +16,8 @@ pipelines:
 
       - step:
          name: Deploy Backend to EC2 via Docker Compose
-          deployment: production
-          script:
+         deployment: production
+         script:
             - apt-get update && apt-get install -y openssh-client
             - echo "$EC2_SSH_KEY" > key.pem
             - chmod 400 key.pem
