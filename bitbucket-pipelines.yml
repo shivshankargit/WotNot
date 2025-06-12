@@ -14,5 +14,15 @@ pipelines:
             - npm run build
             - aws s3 sync dist/ s3://$S3_BUCKET --region $S3_REGION --delete --acl public-read   
 
-  
+      - step:
+          name: Deploy Backend to EC2 via Docker Compose
+          deployment: production
+          script:
+            - apt-get update && apt-get install -y openssh-client
+            - mkdir -p ~/.ssh
+            - echo "$EC2_SSH_KEY" > ~/.ssh/id_rsa
+            - chmod 600 ~/.ssh/id_rsa
+            - ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
+            - scp -r backend/* ec2-user@$EC2_HOST:/home/ec2-user/backend/
+            - ssh ec2-user@$EC2_HOST 'cd /home/ec2-user/backend && docker-compose down && docker-compose up -d --build'
 
