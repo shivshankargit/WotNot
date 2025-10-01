@@ -196,6 +196,10 @@
       <div class="flex-1 mt-16 bg-white h-[calc(100vh-65px)] ">
         <router-view></router-view>
       </div>
+      <!-- <div class="flex-1 mt-16 bg-white h-[calc(100vh-65px)] p-6 overflow-y-auto">
+        <AIGreetingGenerator/>
+      </div> -->
+
 
       <!-- Profile Popup -->
       <ProfilePopup :visible="showProfilePopup" :user="user" @close="showProfilePopup = false" />
@@ -210,11 +214,13 @@
 import { useRouter, useRoute } from 'vue-router';
 import ProfilePopup from './profile.vue';
 import axios from "axios";
+// import AIGreetingGenerator from '@/components/AIagent/AIGreetingGenerator.vue';
 
 export default {
   name: 'DashboardView',
   components: {
-    ProfilePopup
+    ProfilePopup,
+    // AIGreetingGenerator
   },
   data() {
     return {

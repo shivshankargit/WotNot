@@ -24,3 +24,9 @@ class MessagePayload(BaseModel):
     body: str
     context_message_id: Optional[str] = Field(None)
     
+class GreetingRequest(BaseModel):
+    name: str
+    prompt: Optional[str] = "Happy Diwali"
+
+class GreetingResponse(BaseModel):
+    greeting: str

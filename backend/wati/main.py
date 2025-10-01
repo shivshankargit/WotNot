@@ -1,8 +1,9 @@
 from fastapi import FastAPI, Depends
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 from .database import database
-from .routes import user, broadcast, contacts, auth, woocommerce, integration, wallet,analytics
+from .routes import user, broadcast, contacts, auth, woocommerce, integration, wallet, analytics, ai_generator
 from .services import dramatiq_router
 from . import oauth2
 from wati.models.ChatBox import Last_Conversation
@@ -52,7 +53,9 @@ app.include_router(dramatiq_router.router)
 app.include_router(woocommerce.router)
 app.include_router(integration.router)
 app.include_router(analytics.router)
+app.include_router(ai_generator.router)
 
+app.mount("/", StaticFiles(directory="dist", html=True), name="dist")
 # Defining origins for CORS
 
 

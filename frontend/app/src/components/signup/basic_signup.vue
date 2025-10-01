@@ -75,7 +75,7 @@
         </div>
       </div>
 
-      <div class="cf-turnstile" data-sitekey="0x4AAAAAABeiGZqY3Hf9K04o"></div>
+      <div class="cf-turnstile" :data-sitekey="turnstileSiteKey"></div>
 
       <div class="flex flex-col items-center">
         <button
@@ -107,6 +107,7 @@ export default {
     return {
       apiUrl: process.env.VUE_APP_API_URL,
       password: "", // ✅ Added this line
+      turnstileSiteKey: process.env.VUE_APP_TURNSTILE_SITE_KEY
     };
   },
   name: "BasicSignUpForm",

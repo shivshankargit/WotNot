@@ -155,19 +155,20 @@ async def verify_turnstile_token(token: str, remoteip: str = None) -> dict:
 
 @router.post('/register')
 async def new_user(
-    request: user.register_user,
+    user_data: user.register_user,
+    request: Request,
     db: AsyncSession = Depends(database.get_db)):
 
     # verify_turnstile = await verify_turnstile_token(request.turnstile_token, request.remote_ip)
     remote_ip = request.client.host
-    result = await verify_turnstile_token(request.cf_token, remoteip=remote_ip)
+    result = await verify_turnstile_token(user_data.cf_token, remoteip=remote_ip)
 
     if result.get("success"):
     
         # Check for existing user
         result = await db.execute(
             select(User.User).filter(
-                (User.User.email == request.email) 
+                (User.User.email == user_data.email) 
             )
         )
         existing_user = result.scalars().first()
@@ -181,9 +182,9 @@ async def new_user(
         # Create a new user
         api_key = secrets.token_hex(32)
         registeruser = User.User( 
-            username=request.username,
-            email=request.email,
-            password_hash=hashing.Hash.bcrypt(request.password),  # Decode the hash to store it as a string
+            username=user_data.username,
+            email=user_data.email,
+            password_hash=hashing.Hash.bcrypt(user_data.password),  # Decode the hash to store it as a string
             # WABAID=request.WABAID,
             # PAccessToken=request.PAccessToken,
             # Phone_id=request.Phone_id,

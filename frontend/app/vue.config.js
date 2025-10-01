@@ -21,6 +21,7 @@ module.exports = {
     // Ensure WebSocket uses 'wss://'
     client: {
       webSocketURL: 'wss://5543-2405-201-3004-d09d-e838-3470-27b1-6b78.ngrok-free.app.ngrok.io/ws', // Keep unchanged
+      overlay: false,
     },
   },
 };
